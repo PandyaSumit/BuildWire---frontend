@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Geist Sans';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/GeistVF.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/GeistMonoVF.woff') format('woff');
+}
+
+:root {
+  --font-geist-sans: 'Geist Sans', system-ui, sans-serif;
+  --font-geist-mono: 'Geist Mono', ui-monospace, monospace;
+  --bg: 0 0% 98%;
+  --surface: 0 0% 100%;
+  --elevated: 0 0% 100%;
+  --border: 0 0% 90%;
+  --text-primary: 0 0% 4%;
+  --text-secondary: 0 0% 32%;
+  --text-muted: 0 0% 64%;
+  --brand: 0 0% 9%;
+  --brand-light: 0 0% 9% / 0.06;
+  --success: 142 71% 45%;
+  --warning: 25 95% 53%;
+  --danger: 0 72% 51%;
+  --sidebar-bg: 0 0% 96%;
+  --header-bg: 0 0% 98%;
+}
+
+.dark {
+  --bg: 0 0% 7%;
+  --surface: 0 0% 12%;
+  --elevated: 0 0% 16%;
+  --border: 0 0% 20%;
+  --text-primary: 0 0% 96%;
+  --text-secondary: 0 0% 69%;
+  --text-muted: 0 0% 44%;
+  /* Neutral “brand” in dark mode (not blue). Use `text-bg` on `bg-brand` fills so text stays visible. */
+  --brand: 0 0% 100%;
+  --brand-light: 0 0% 100% / 0.08;
+  --success: 142 71% 45%;
+  --warning: 38 92% 50%;
+  --danger: 0 84% 60%;
+  --sidebar-bg: 0 0% 6%;
+  --header-bg: 0 0% 7%;
+}
+
+body {
+  color: hsl(var(--text-primary));
+  background: hsl(var(--bg));
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
