@@ -1,4 +1,7 @@
+import { useTranslation } from 'react-i18next';
+
 export function ProjectsListEmpty({ hasFilters }: { hasFilters: boolean }) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/5 px-6 py-16 text-center">
       <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-brand/10 text-brand">
@@ -12,12 +15,10 @@ export function ProjectsListEmpty({ hasFilters }: { hasFilters: boolean }) {
         </svg>
       </div>
       <p className="text-sm font-medium text-primary">
-        {hasFilters ? 'No projects match your filters' : 'No projects yet'}
+        {hasFilters ? t('projects.emptyFilteredTitle') : t('projects.emptyTitle')}
       </p>
       <p className="mt-1 max-w-sm text-sm text-secondary">
-        {hasFilters
-          ? 'Try clearing search or filters, or create a new project.'
-          : 'Create your first project to start tracking work, files, and tasks in one place.'}
+        {hasFilters ? t('projects.emptyFilteredHint') : t('projects.emptyHint')}
       </p>
     </div>
   );

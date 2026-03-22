@@ -32,14 +32,16 @@ export interface SelectProps {
   labelClassName?: string;
   /** Extra classes on the trigger button (e.g. `sm:w-48`). */
   triggerClassName?: string;
+  /** `sm` — denser trigger and list (filters, toolbars). */
+  size?: 'md' | 'sm';
   'aria-label'?: string;
   'aria-labelledby'?: string;
 }
 
-function Chevron({ open }: { open: boolean }) {
+function Chevron({ open, className = 'h-4 w-4' }: { open: boolean; className?: string }) {
   return (
     <svg
-      className={`h-4 w-4 shrink-0 text-muted transition-transform ${open ? 'rotate-180' : ''}`}
+      className={`shrink-0 text-muted transition-transform ${className} ${open ? 'rotate-180' : ''}`}
       fill="none"
       stroke="currentColor"
       viewBox="0 0 24 24"
@@ -65,6 +67,7 @@ export function Select({
   className = '',
   labelClassName = '',
   triggerClassName = '',
+  size = 'md',
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
 }: SelectProps) {
@@ -174,6 +177,10 @@ export function Select({
   }
 
   const widthClass = fullWidth ? 'w-full' : '';
+  const sizeTrigger =
+    size === 'sm' ? 'px-2.5 py-1.5 text-xs' : 'px-3 py-2.5 text-sm';
+  const sizeOption = size === 'sm' ? 'px-2 py-1.5 text-xs' : 'px-2.5 py-2 text-sm';
+  const chevronClass = size === 'sm' ? 'h-3.5 w-3.5' : 'h-4 w-4';
   const borderClass = error
     ? 'border-danger focus-visible:ring-danger/40'
     : 'border-border focus-visible:ring-brand/40';
@@ -207,12 +214,12 @@ export function Select({
           disabled={disabled}
           onClick={() => !disabled && setOpen((o) => !o)}
           onKeyDown={onTriggerKeyDown}
-          className={`flex items-center justify-between gap-2 rounded-lg border bg-bg px-3 py-2.5 text-left text-sm text-primary shadow-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 focus-visible:ring-offset-bg disabled:cursor-not-allowed disabled:opacity-50 ${borderClass} ${fullWidth ? 'w-full' : 'w-auto min-w-0'} ${triggerClassName}`}
+          className={`flex items-center justify-between gap-2 rounded-lg border bg-bg text-left text-primary shadow-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 focus-visible:ring-offset-bg disabled:cursor-not-allowed disabled:opacity-50 ${sizeTrigger} ${borderClass} ${fullWidth ? 'w-full' : 'w-auto min-w-0'} ${triggerClassName}`}
         >
           <span className={`min-w-0 flex-1 truncate ${!selected && !value ? 'text-muted' : ''}`}>
             {displayLabel}
           </span>
-          <Chevron open={open} />
+          <Chevron open={open} className={chevronClass} />
         </button>
 
         {open ? (
@@ -231,7 +238,7 @@ export function Select({
                   role="option"
                   aria-selected={isSelected}
                   aria-disabled={opt.disabled}
-                  className={`mx-1 flex cursor-pointer items-center rounded-md px-2.5 py-2 text-sm transition-colors ${
+                  className={`mx-1 flex cursor-pointer items-center rounded-md transition-colors ${sizeOption} ${
                     opt.disabled
                       ? 'cursor-not-allowed text-muted opacity-50'
                       : isHighlighted

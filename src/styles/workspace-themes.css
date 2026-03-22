@@ -1,0 +1,309 @@
+/**
+ * Full workspace presets: surfaces, borders, text, shell, status, and brand.
+ * Set on <html> via `data-ws-theme` (omit or `neutral` = BuildWire default in :root / .dark).
+ * Keep in sync with preview tokens in PreferencesSettingsPage `workspaceThemeMeta`.
+ */
+
+/* —— General contractor —— */
+:root[data-ws-theme='general'] {
+  --bg: 220 10% 96%;
+  --surface: 0 0% 100%;
+  --elevated: 220 12% 98%;
+  --border: 220 12% 86%;
+  --text-primary: 220 18% 11%;
+  --text-secondary: 220 10% 36%;
+  --text-muted: 220 8% 50%;
+  --brand: 215 45% 38%;
+  --brand-light: 215 45% 38% / 0.09;
+  --success: 142 65% 38%;
+  --warning: 32 90% 46%;
+  --danger: 0 70% 46%;
+  --sidebar-bg: 220 11% 94%;
+  --header-bg: 220 11% 94%;
+  --scrollbar-thumb: 220 10% 58%;
+  --scrollbar-thumb-hover: 220 12% 44%;
+}
+.dark[data-ws-theme='general'] {
+  --bg: 215 14% 8%;
+  --surface: 215 12% 11%;
+  --elevated: 215 10% 14%;
+  --border: 215 12% 22%;
+  --text-primary: 210 15% 96%;
+  --text-secondary: 215 10% 68%;
+  --text-muted: 215 8% 48%;
+  --brand: 215 72% 70%;
+  --brand-light: 215 72% 70% / 0.14;
+  --success: 142 60% 48%;
+  --warning: 36 92% 52%;
+  --danger: 0 78% 58%;
+  --sidebar-bg: 215 16% 7%;
+  --header-bg: 215 16% 7%;
+  --scrollbar-thumb: 215 10% 36%;
+  --scrollbar-thumb-hover: 215 12% 50%;
+}
+
+/* —— Civil & infrastructure —— */
+:root[data-ws-theme='civil'] {
+  --bg: 200 12% 95%;
+  --surface: 200 8% 99%;
+  --elevated: 200 10% 97%;
+  --border: 200 14% 82%;
+  --text-primary: 200 28% 12%;
+  --text-secondary: 200 16% 34%;
+  --text-muted: 200 12% 48%;
+  --brand: 204 40% 34%;
+  --brand-light: 204 40% 34% / 0.09;
+  --success: 175 55% 36%;
+  --warning: 28 88% 44%;
+  --danger: 350 70% 44%;
+  --sidebar-bg: 200 14% 93%;
+  --header-bg: 200 14% 93%;
+  --scrollbar-thumb: 200 12% 54%;
+  --scrollbar-thumb-hover: 200 14% 40%;
+}
+.dark[data-ws-theme='civil'] {
+  --bg: 200 18% 7%;
+  --surface: 200 14% 10%;
+  --elevated: 200 12% 13%;
+  --border: 200 14% 20%;
+  --text-primary: 198 20% 95%;
+  --text-secondary: 200 12% 66%;
+  --text-muted: 200 10% 46%;
+  --brand: 198 58% 60%;
+  --brand-light: 198 58% 60% / 0.14;
+  --success: 172 50% 46%;
+  --warning: 32 90% 54%;
+  --danger: 352 75% 58%;
+  --sidebar-bg: 200 20% 6%;
+  --header-bg: 200 20% 6%;
+  --scrollbar-thumb: 200 10% 34%;
+  --scrollbar-thumb-hover: 200 12% 48%;
+}
+
+/* —— MEP & systems —— */
+:root[data-ws-theme='mep'] {
+  --bg: 220 20% 97%;
+  --surface: 0 0% 100%;
+  --elevated: 220 30% 99%;
+  --border: 220 14% 88%;
+  --text-primary: 222 22% 10%;
+  --text-secondary: 220 12% 34%;
+  --text-muted: 220 10% 48%;
+  --brand: 221 78% 44%;
+  --brand-light: 221 78% 44% / 0.1;
+  --success: 152 62% 38%;
+  --warning: 38 92% 48%;
+  --danger: 0 75% 48%;
+  --sidebar-bg: 220 22% 95%;
+  --header-bg: 220 22% 95%;
+  --scrollbar-thumb: 220 12% 58%;
+  --scrollbar-thumb-hover: 220 16% 42%;
+}
+.dark[data-ws-theme='mep'] {
+  --bg: 222 18% 7%;
+  --surface: 222 14% 10%;
+  --elevated: 222 12% 13%;
+  --border: 222 14% 20%;
+  --text-primary: 220 18% 96%;
+  --text-secondary: 220 10% 68%;
+  --text-muted: 220 8% 46%;
+  --brand: 213 90% 66%;
+  --brand-light: 213 90% 66% / 0.15;
+  --success: 150 55% 46%;
+  --warning: 40 95% 54%;
+  --danger: 0 82% 58%;
+  --sidebar-bg: 222 20% 6%;
+  --header-bg: 222 20% 6%;
+  --scrollbar-thumb: 222 10% 34%;
+  --scrollbar-thumb-hover: 222 12% 48%;
+}
+
+/* —— Safety & quality —— */
+:root[data-ws-theme='safety'] {
+  --bg: 38 22% 95%;
+  --surface: 40 35% 99%;
+  --elevated: 38 28% 97%;
+  --border: 35 18% 84%;
+  --text-primary: 28 30% 12%;
+  --text-secondary: 30 18% 32%;
+  --text-muted: 28 12% 46%;
+  --brand: 18 88% 38%;
+  --brand-light: 18 88% 38% / 0.1;
+  --success: 145 60% 34%;
+  --warning: 28 96% 46%;
+  --danger: 0 78% 44%;
+  --sidebar-bg: 36 24% 93%;
+  --header-bg: 36 24% 93%;
+  --scrollbar-thumb: 30 14% 54%;
+  --scrollbar-thumb-hover: 28 18% 40%;
+}
+.dark[data-ws-theme='safety'] {
+  --bg: 28 16% 8%;
+  --surface: 26 14% 11%;
+  --elevated: 24 12% 14%;
+  --border: 28 14% 22%;
+  --text-primary: 40 20% 96%;
+  --text-secondary: 32 12% 68%;
+  --text-muted: 30 10% 46%;
+  --brand: 28 96% 56%;
+  --brand-light: 28 96% 56% / 0.15;
+  --success: 148 55% 44%;
+  --warning: 38 100% 58%;
+  --danger: 0 85% 58%;
+  --sidebar-bg: 28 18% 7%;
+  --header-bg: 28 18% 7%;
+  --scrollbar-thumb: 28 10% 36%;
+  --scrollbar-thumb-hover: 30 12% 50%;
+}
+
+/* —— Site & landscape —— */
+:root[data-ws-theme='landscape'] {
+  --bg: 145 14% 95%;
+  --surface: 140 22% 99%;
+  --elevated: 145 18% 97%;
+  --border: 145 14% 84%;
+  --text-primary: 150 22% 11%;
+  --text-secondary: 145 14% 32%;
+  --text-muted: 140 10% 46%;
+  --brand: 152 58% 28%;
+  --brand-light: 152 58% 28% / 0.09;
+  --success: 152 65% 36%;
+  --warning: 35 90% 46%;
+  --danger: 0 72% 44%;
+  --sidebar-bg: 148 16% 93%;
+  --header-bg: 148 16% 93%;
+  --scrollbar-thumb: 145 12% 52%;
+  --scrollbar-thumb-hover: 145 14% 38%;
+}
+.dark[data-ws-theme='landscape'] {
+  --bg: 150 16% 7%;
+  --surface: 148 14% 10%;
+  --elevated: 146 12% 13%;
+  --border: 148 14% 20%;
+  --text-primary: 145 18% 95%;
+  --text-secondary: 145 10% 66%;
+  --text-muted: 145 8% 44%;
+  --brand: 148 55% 48%;
+  --brand-light: 148 55% 48% / 0.14;
+  --success: 152 58% 42%;
+  --warning: 38 92% 54%;
+  --danger: 0 78% 56%;
+  --sidebar-bg: 150 18% 6%;
+  --header-bg: 150 18% 6%;
+  --scrollbar-thumb: 145 10% 34%;
+  --scrollbar-thumb-hover: 145 12% 48%;
+}
+
+/* —— Interior & finishes —— */
+:root[data-ws-theme='interiors'] {
+  --bg: 28 18% 96%;
+  --surface: 25 28% 99%;
+  --elevated: 28 22% 97%;
+  --border: 22 14% 86%;
+  --text-primary: 20 24% 12%;
+  --text-secondary: 18 14% 34%;
+  --text-muted: 20 10% 48%;
+  --brand: 12 64% 38%;
+  --brand-light: 12 64% 38% / 0.09;
+  --success: 142 58% 36%;
+  --warning: 32 88% 46%;
+  --danger: 0 70% 46%;
+  --sidebar-bg: 26 20% 94%;
+  --header-bg: 26 20% 94%;
+  --scrollbar-thumb: 22 12% 54%;
+  --scrollbar-thumb-hover: 20 14% 40%;
+}
+.dark[data-ws-theme='interiors'] {
+  --bg: 20 14% 8%;
+  --surface: 18 12% 11%;
+  --elevated: 16 10% 14%;
+  --border: 20 12% 22%;
+  --text-primary: 28 18% 96%;
+  --text-secondary: 22 12% 68%;
+  --text-muted: 20 8% 46%;
+  --brand: 22 75% 64%;
+  --brand-light: 22 75% 64% / 0.14;
+  --success: 142 52% 46%;
+  --warning: 36 92% 54%;
+  --danger: 0 78% 58%;
+  --sidebar-bg: 22 16% 7%;
+  --header-bg: 22 16% 7%;
+  --scrollbar-thumb: 20 10% 36%;
+  --scrollbar-thumb-hover: 22 12% 50%;
+}
+
+/* —— Owner & developer —— */
+:root[data-ws-theme='developer'] {
+  --bg: 260 12% 96%;
+  --surface: 260 8% 100%;
+  --elevated: 262 14% 98%;
+  --border: 260 14% 86%;
+  --text-primary: 262 20% 11%;
+  --text-secondary: 260 12% 34%;
+  --text-muted: 260 8% 48%;
+  --brand: 262 44% 44%;
+  --brand-light: 262 44% 44% / 0.1;
+  --success: 152 58% 36%;
+  --warning: 32 90% 46%;
+  --danger: 340 72% 46%;
+  --sidebar-bg: 262 14% 94%;
+  --header-bg: 262 14% 94%;
+  --scrollbar-thumb: 260 10% 54%;
+  --scrollbar-thumb-hover: 262 12% 40%;
+}
+.dark[data-ws-theme='developer'] {
+  --bg: 262 16% 7%;
+  --surface: 260 14% 10%;
+  --elevated: 258 12% 13%;
+  --border: 262 14% 20%;
+  --text-primary: 265 18% 96%;
+  --text-secondary: 262 10% 68%;
+  --text-muted: 260 8% 46%;
+  --brand: 268 58% 70%;
+  --brand-light: 268 58% 70% / 0.15;
+  --success: 150 52% 46%;
+  --warning: 38 92% 54%;
+  --danger: 342 78% 58%;
+  --sidebar-bg: 264 18% 6%;
+  --header-bg: 264 18% 6%;
+  --scrollbar-thumb: 260 10% 34%;
+  --scrollbar-thumb-hover: 262 12% 48%;
+}
+
+/* —— Energy & sustainability —— */
+:root[data-ws-theme='energy'] {
+  --bg: 48 24% 95%;
+  --surface: 52 40% 99%;
+  --elevated: 50 32% 97%;
+  --border: 45 20% 84%;
+  --text-primary: 45 28% 11%;
+  --text-secondary: 42 16% 32%;
+  --text-muted: 40 12% 46%;
+  --brand: 42 90% 38%;
+  --brand-light: 42 90% 38% / 0.1;
+  --success: 152 62% 36%;
+  --warning: 28 92% 44%;
+  --danger: 0 72% 44%;
+  --sidebar-bg: 48 26% 93%;
+  --header-bg: 48 26% 93%;
+  --scrollbar-thumb: 42 14% 52%;
+  --scrollbar-thumb-hover: 45 18% 38%;
+}
+.dark[data-ws-theme='energy'] {
+  --bg: 45 18% 7%;
+  --surface: 42 14% 10%;
+  --elevated: 40 12% 13%;
+  --border: 45 14% 20%;
+  --text-primary: 48 20% 95%;
+  --text-secondary: 42 12% 66%;
+  --text-muted: 40 10% 44%;
+  --brand: 48 92% 54%;
+  --brand-light: 48 92% 54% / 0.15;
+  --success: 150 55% 44%;
+  --warning: 32 96% 56%;
+  --danger: 0 80% 56%;
+  --sidebar-bg: 46 20% 6%;
+  --header-bg: 46 20% 6%;
+  --scrollbar-thumb: 42 10% 34%;
+  --scrollbar-thumb-hover: 45 12% 48%;
+}

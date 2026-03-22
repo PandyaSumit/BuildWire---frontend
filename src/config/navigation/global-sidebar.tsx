@@ -10,16 +10,16 @@ import { icons } from './icons';
 
 const base = (role: OrgRole | null): NavGroupDef[] => {
   const overview: NavGroupDef = {
-    label: 'Overview',
+    groupKey: 'overview',
     items: [
       {
         id: 'dash',
-        label: 'Dashboard',
+        itemKey: 'dashboard',
         to: '/dashboard',
         icon: icons.dashboard,
         endMatch: true,
       },
-      { id: 'projects', label: 'Projects', to: '/projects', icon: icons.projects },
+      { id: 'projects', itemKey: 'projects', to: '/projects', icon: icons.projects },
     ],
   };
 
@@ -27,20 +27,20 @@ const base = (role: OrgRole | null): NavGroupDef[] => {
 
   if (canAccessCommercial(role)) {
     groups.push({
-      label: 'Commercial',
+      groupKey: 'commercial',
       items: [
-        { id: 'sales', label: 'Sales & CRM', to: '/sales', icon: icons.sales },
-        { id: 'brokers', label: 'Brokers', to: '/brokers', icon: icons.brokers },
+        { id: 'sales', itemKey: 'salesCrm', to: '/sales', icon: icons.sales },
+        { id: 'brokers', itemKey: 'brokers', to: '/brokers', icon: icons.brokers },
       ],
     });
   }
 
   groups.push({
-    label: 'Intelligence',
+    groupKey: 'intelligence',
     items: [
       {
         id: 'ai-map',
-        label: 'AI Map',
+        itemKey: 'aiMap',
         to: '/intelligence/ai-map',
         icon: icons.map,
         showAiBadge: true,
@@ -48,16 +48,23 @@ const base = (role: OrgRole | null): NavGroupDef[] => {
     ],
   });
 
-  const settingsItems: NavGroupDef['items'] = [];
+  const settingsItems: NavGroupDef['items'] = [
+    {
+      id: 'preferences',
+      itemKey: 'preferences',
+      to: '/settings/preferences',
+      icon: icons.preferences,
+    },
+  ];
 
   if (canAccessTeamManagement(role)) {
-    settingsItems.push({ id: 'team', label: 'Team', to: '/team', icon: icons.team });
+    settingsItems.push({ id: 'team', itemKey: 'team', to: '/team', icon: icons.team });
   }
 
   if (canAccessAdminOnlyOrgSettings(role)) {
     settingsItems.push({
       id: 'roles',
-      label: 'Roles & permissions',
+      itemKey: 'rolesPermissions',
       to: '/settings/roles',
       icon: icons.roles,
     });
@@ -66,7 +73,7 @@ const base = (role: OrgRole | null): NavGroupDef[] => {
   if (canAccessOrganizationSettings(role)) {
     settingsItems.push({
       id: 'org',
-      label: 'Organization',
+      itemKey: 'organization',
       to: '/settings/organization',
       icon: icons.organization,
     });
@@ -75,20 +82,20 @@ const base = (role: OrgRole | null): NavGroupDef[] => {
   if (canAccessAdminOnlyOrgSettings(role)) {
     settingsItems.push({
       id: 'billing',
-      label: 'Billing',
+      itemKey: 'billing',
       to: '/settings/billing',
       icon: icons.billing,
     });
     settingsItems.push({
       id: 'bots',
-      label: 'Bot integrations',
+      itemKey: 'botIntegrations',
       to: '/settings/bot-integrations',
       icon: icons.bot,
     });
   }
 
   if (settingsItems.length > 0) {
-    groups.push({ label: 'Settings', items: settingsItems });
+    groups.push({ groupKey: 'settings', items: settingsItems });
   }
 
   return groups;

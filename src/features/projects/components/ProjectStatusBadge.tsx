@@ -1,5 +1,6 @@
+import { useTranslation } from 'react-i18next';
 import type { ProjectStatus } from '@/types/project';
-import { projectStatusLabel } from '@/features/projects/lib/display';
+import { projectStatusTKey } from '@/features/projects/lib/display';
 
 const styles: Record<ProjectStatus, string> = {
   planning: 'bg-muted/25 text-secondary ring-1 ring-border',
@@ -10,11 +11,12 @@ const styles: Record<ProjectStatus, string> = {
 };
 
 export function ProjectStatusBadge({ status }: { status: ProjectStatus }) {
+  const { t } = useTranslation();
   return (
     <span
       className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${styles[status]}`}
     >
-      {projectStatusLabel(status)}
+      {t(projectStatusTKey(status))}
     </span>
   );
 }

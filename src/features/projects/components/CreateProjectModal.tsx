@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ProjectStatus } from '@/types/project';
-import { projectStatusLabel } from '@/features/projects/lib/display';
+import { projectStatusTKey } from '@/features/projects/lib/display';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 
@@ -14,6 +15,7 @@ type Props = {
 };
 
 export function CreateProjectModal({ open, onClose, onSubmit }: Props) {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState<ProjectStatus>('planning');
@@ -36,7 +38,7 @@ export function CreateProjectModal({ open, onClose, onSubmit }: Props) {
     setError(null);
     const trimmed = name.trim();
     if (!trimmed) {
-      setError('Project name is required');
+      setError(t('createProject.errorNameRequired'));
       return;
     }
     setSubmitting(true);
@@ -52,7 +54,7 @@ export function CreateProjectModal({ open, onClose, onSubmit }: Props) {
       onClose();
     } catch (err) {
       const msg = err as { response?: { data?: { error?: string; message?: string } } };
-      setError(msg.response?.data?.error || msg.response?.data?.message || 'Could not create project');
+      setError(msg.response?.data?.error || msg.response?.data?.message || t('createProject.errorFailed'));
     } finally {
       setSubmitting(false);
     }
@@ -63,7 +65,7 @@ export function CreateProjectModal({ open, onClose, onSubmit }: Props) {
       <button
         type="button"
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        aria-label="Close dialog"
+        aria-label={t('common.closeDialog')}
         onClick={() => !submitting && onClose()}
       />
       <div
@@ -74,28 +76,28 @@ export function CreateProjectModal({ open, onClose, onSubmit }: Props) {
       >
         <form onSubmit={handleSubmit}>
           <h2 id="create-project-title" className="text-lg font-semibold text-primary">
-            New project
+            {t('projects.newProject')}
           </h2>
-          <p className="mt-1 text-sm text-secondary">Add a project for your organization.</p>
+          <p className="mt-1 text-sm text-secondary">{t('createProject.intro')}</p>
 
           <div className="mt-5 space-y-4">
             <div>
               <label htmlFor="project-name" className="mb-1 block text-sm font-medium text-primary">
-                Name <span className="text-danger">*</span>
+                {t('createProject.name')} <span className="text-danger">*</span>
               </label>
               <input
                 id="project-name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-primary placeholder:text-muted focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
-                placeholder="e.g. Riverside Tower"
+                placeholder={t('createProject.namePlaceholder')}
                 autoFocus
                 disabled={submitting}
               />
             </div>
             <div>
               <label htmlFor="project-desc" className="mb-1 block text-sm font-medium text-primary">
-                Description
+                {t('createProject.description')}
               </label>
               <textarea
                 id="project-desc"
@@ -103,22 +105,22 @@ export function CreateProjectModal({ open, onClose, onSubmit }: Props) {
                 onChange={(e) => setDescription(e.target.value)}
                 rows={3}
                 className="w-full resize-none rounded-lg border border-border bg-bg px-3 py-2 text-sm text-primary placeholder:text-muted focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
-                placeholder="Optional context for your team"
+                placeholder={t('createProject.descPlaceholder')}
                 disabled={submitting}
               />
             </div>
             <div>
               <Select
                 id="project-status"
-                label="Status"
+                label={t('createProject.status')}
                 value={status}
                 onValueChange={(v) => setStatus(v as ProjectStatus)}
                 disabled={submitting}
                 options={statuses.map((s) => ({
                   value: s,
-                  label: projectStatusLabel(s),
+                  label: t(projectStatusTKey(s)),
                 }))}
-                placeholder="Choose status"
+                placeholder={t('createProject.statusPlaceholder')}
               />
             </div>
           </div>
@@ -131,17 +133,17 @@ export function CreateProjectModal({ open, onClose, onSubmit }: Props) {
               className="rounded-lg px-4 py-2 text-sm font-medium text-secondary transition-colors hover:bg-surface"
               onClick={() => !submitting && onClose()}
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <Button
               type="submit"
               variant="primary"
               size="sm"
               loading={submitting}
-              loadingText="Creating…"
+              loadingText={t('createProject.creating')}
               className="font-semibold"
             >
-              Create project
+              {t('createProject.submit')}
             </Button>
           </div>
         </form>

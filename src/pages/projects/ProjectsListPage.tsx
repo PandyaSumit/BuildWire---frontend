@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hooks';
 import { AppPage } from '@/pages/shared/AppPage';
 import { listProjects, createProject } from '@/api/projects';
@@ -9,7 +10,7 @@ import { useDebouncedValue } from '@/hooks/useDebouncedValue';
 import { ProjectCard } from '@/features/projects/components/ProjectCard';
 import { ProjectsListEmpty } from '@/features/projects/components/ProjectsListEmpty';
 import { CreateProjectModal } from '@/features/projects/components/CreateProjectModal';
-import { projectStatusLabel } from '@/features/projects/lib/display';
+import { projectStatusTKey } from '@/features/projects/lib/display';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 
@@ -28,6 +29,7 @@ function isAbortError(err: unknown): boolean {
 }
 
 export default function ProjectsListPage() {
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const orgId = useAppSelector((s) => s.auth.user?.org?.id);
   const orgRole = useAppSelector((s) => s.auth.user?.org?.role);
@@ -69,6 +71,7 @@ export default function ProjectsListPage() {
     }
 
     const controller = new AbortController();
+    const loadErr = t('projects.loadError');
 
     (async () => {
       setLoading(true);
@@ -89,7 +92,7 @@ export default function ProjectsListPage() {
         setPagination(res.pagination);
       } catch (err) {
         if (controller.signal.aborted || isAbortError(err)) return;
-        setError(apiErrorMessage(err, 'Failed to load projects'));
+        setError(apiErrorMessage(err, loadErr));
         setProjects([]);
         setPagination(null);
       } finally {
@@ -100,10 +103,11 @@ export default function ProjectsListPage() {
     })();
 
     return () => controller.abort();
-  }, [orgId, page, debouncedSearch, statusFilter]);
+  }, [orgId, page, debouncedSearch, statusFilter, i18n.language]);
 
   const refreshAfterCreate = useCallback(async () => {
     if (!orgId) return;
+    const loadErr = t('projects.loadError');
     setLoading(true);
     setError(null);
     try {
@@ -116,13 +120,13 @@ export default function ProjectsListPage() {
       setProjects(res.data);
       setPagination(res.pagination);
     } catch (err) {
-      setError(apiErrorMessage(err, 'Failed to load projects'));
+      setError(apiErrorMessage(err, loadErr));
       setProjects([]);
       setPagination(null);
     } finally {
       setLoading(false);
     }
-  }, [orgId, page, debouncedSearch, statusFilter]);
+  }, [orgId, page, debouncedSearch, statusFilter, i18n.language]);
 
   async function handleCreate(body: { name: string; description: string; status: ProjectStatus }) {
     if (!orgId) return;
@@ -138,13 +142,10 @@ export default function ProjectsListPage() {
   const hasFilters = Boolean(debouncedSearch.trim() || statusFilter);
 
   return (
-    <AppPage
-      title="Projects"
-      description="Browse and open projects in your organization. The sidebar switches to project tools when you enter a project."
-    >
+    <AppPage title={t('nav.projects')} description={t('projects.pageDescription')}>
       {!orgId ? (
         <div className="rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 text-sm text-primary">
-          No organization context on your account. Complete onboarding or join an organization to manage projects.
+          {t('projects.noOrg')}
         </div>
       ) : (
         <>
@@ -152,7 +153,7 @@ export default function ProjectsListPage() {
             <div className="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-center">
               <div className="relative min-w-0 flex-1 sm:max-w-md">
                 <svg
-                  className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
+                  className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -169,25 +170,25 @@ export default function ProjectsListPage() {
                   type="search"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search by name…"
-                  className="w-full rounded-lg border border-border bg-bg py-2 pl-10 pr-3 text-sm text-primary placeholder:text-muted focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
-                  aria-label="Search projects"
+                  placeholder={t('projects.searchPlaceholder')}
+                  className="w-full rounded-lg border border-border bg-bg py-2 ps-10 pe-3 text-sm text-primary placeholder:text-muted focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  aria-label={t('projects.searchAria')}
                 />
               </div>
               <Select
                 value={statusFilter}
                 onValueChange={(v) => setStatusFilter(v as '' | ProjectStatus)}
-                placeholder="All statuses"
+                placeholder={t('projects.allStatuses')}
                 fullWidth={false}
                 triggerClassName="w-full sm:w-48"
                 options={[
-                  { value: '', label: 'All statuses' },
+                  { value: '', label: t('projects.allStatuses') },
                   ...(['planning', 'active', 'on_hold', 'completed', 'archived'] as const).map((s) => ({
                     value: s,
-                    label: projectStatusLabel(s),
+                    label: t(projectStatusTKey(s)),
                   })),
                 ]}
-                aria-label="Filter by status"
+                aria-label={t('projects.filterStatusAria')}
               />
             </div>
             {canCreate ? (
@@ -198,7 +199,7 @@ export default function ProjectsListPage() {
                 className="shrink-0 font-semibold"
                 onClick={() => setCreateOpen(true)}
               >
-                New project
+                {t('projects.newProject')}
               </Button>
             ) : null}
           </div>
@@ -231,8 +232,17 @@ export default function ProjectsListPage() {
               {pagination && pagination.pages > 1 ? (
                 <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-border pt-6 sm:flex-row">
                   <p className="text-sm text-secondary">
-                    Page {pagination.page} of {pagination.pages} · {pagination.total} project
-                    {pagination.total === 1 ? '' : 's'}
+                    {pagination.total === 1
+                      ? t('projects.pageSummaryOne', {
+                          page: pagination.page,
+                          pages: pagination.pages,
+                          total: pagination.total,
+                        })
+                      : t('projects.pageSummaryMany', {
+                          page: pagination.page,
+                          pages: pagination.pages,
+                          total: pagination.total,
+                        })}
                   </p>
                   <div className="flex gap-2">
                     <button
@@ -241,7 +251,7 @@ export default function ProjectsListPage() {
                       onClick={() => setPage((p) => Math.max(1, p - 1))}
                       className="rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-muted/10 disabled:cursor-not-allowed disabled:opacity-40"
                     >
-                      Previous
+                      {t('common.previous')}
                     </button>
                     <button
                       type="button"
@@ -249,7 +259,7 @@ export default function ProjectsListPage() {
                       onClick={() => setPage((p) => p + 1)}
                       className="rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-muted/10 disabled:cursor-not-allowed disabled:opacity-40"
                     >
-                      Next
+                      {t('common.next')}
                     </button>
                   </div>
                 </div>

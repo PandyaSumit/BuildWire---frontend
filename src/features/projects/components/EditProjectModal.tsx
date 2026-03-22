@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ProjectDto, ProjectStatus } from '@/types/project';
-import { projectStatusLabel } from '@/features/projects/lib/display';
+import { projectStatusTKey } from '@/features/projects/lib/display';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 
@@ -27,6 +28,7 @@ function dateInputValue(iso: string | null | undefined): string {
 }
 
 export function EditProjectModal({ open, project, onClose, onSubmit }: Props) {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState<ProjectStatus>('planning');
@@ -61,7 +63,7 @@ export function EditProjectModal({ open, project, onClose, onSubmit }: Props) {
     setError(null);
     const trimmed = name.trim();
     if (!trimmed) {
-      setError('Project name is required');
+      setError(t('editProject.errorNameRequired'));
       return;
     }
     setSubmitting(true);
@@ -76,7 +78,7 @@ export function EditProjectModal({ open, project, onClose, onSubmit }: Props) {
       onClose();
     } catch (err) {
       const msg = err as { response?: { data?: { error?: string; message?: string } } };
-      setError(msg.response?.data?.error || msg.response?.data?.message || 'Could not save project');
+      setError(msg.response?.data?.error || msg.response?.data?.message || t('editProject.errorFailed'));
     } finally {
       setSubmitting(false);
     }
@@ -87,7 +89,7 @@ export function EditProjectModal({ open, project, onClose, onSubmit }: Props) {
       <button
         type="button"
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-        aria-label="Close dialog"
+        aria-label={t('common.closeDialog')}
         onClick={() => !submitting && onClose()}
       />
       <div
@@ -98,14 +100,14 @@ export function EditProjectModal({ open, project, onClose, onSubmit }: Props) {
       >
         <form onSubmit={handleSubmit}>
           <h2 id="edit-project-title" className="text-lg font-semibold text-primary">
-            Edit project
+            {t('editProject.title')}
           </h2>
-          <p className="mt-1 text-sm text-secondary">Update details for this project.</p>
+          <p className="mt-1 text-sm text-secondary">{t('editProject.intro')}</p>
 
           <div className="mt-5 space-y-4">
             <div>
               <label htmlFor="edit-project-name" className="mb-1 block text-sm font-medium text-primary">
-                Name <span className="text-danger">*</span>
+                {t('createProject.name')} <span className="text-danger">*</span>
               </label>
               <input
                 id="edit-project-name"
@@ -117,7 +119,7 @@ export function EditProjectModal({ open, project, onClose, onSubmit }: Props) {
             </div>
             <div>
               <label htmlFor="edit-project-desc" className="mb-1 block text-sm font-medium text-primary">
-                Description
+                {t('createProject.description')}
               </label>
               <textarea
                 id="edit-project-desc"
@@ -131,21 +133,21 @@ export function EditProjectModal({ open, project, onClose, onSubmit }: Props) {
             <div>
               <Select
                 id="edit-project-status"
-                label="Status"
+                label={t('createProject.status')}
                 value={status}
                 onValueChange={(v) => setStatus(v as ProjectStatus)}
                 disabled={submitting}
                 options={statuses.map((s) => ({
                   value: s,
-                  label: projectStatusLabel(s),
+                  label: t(projectStatusTKey(s)),
                 }))}
-                placeholder="Choose status"
+                placeholder={t('editProject.statusPlaceholder')}
               />
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <label htmlFor="edit-start" className="mb-1 block text-sm font-medium text-primary">
-                  Start date
+                  {t('editProject.startDate')}
                 </label>
                 <input
                   id="edit-start"
@@ -158,7 +160,7 @@ export function EditProjectModal({ open, project, onClose, onSubmit }: Props) {
               </div>
               <div>
                 <label htmlFor="edit-end" className="mb-1 block text-sm font-medium text-primary">
-                  End date
+                  {t('editProject.endDate')}
                 </label>
                 <input
                   id="edit-end"
@@ -180,17 +182,17 @@ export function EditProjectModal({ open, project, onClose, onSubmit }: Props) {
               className="rounded-lg px-4 py-2 text-sm font-medium text-secondary transition-colors hover:bg-surface"
               onClick={() => !submitting && onClose()}
             >
-              Cancel
+              {t('common.cancel')}
             </button>
             <Button
               type="submit"
               variant="primary"
               size="sm"
               loading={submitting}
-              loadingText="Saving…"
+              loadingText={t('editProject.saving')}
               className="font-semibold"
             >
-              Save changes
+              {t('prefs.saveChanges')}
             </Button>
           </div>
         </form>

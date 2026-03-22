@@ -41,6 +41,10 @@ public/                 # Static assets (favicon, fonts, …)
 
 Static assets are served from **`public/`** (e.g. `/fonts/…`).
 
+### User-facing: project module
+
+See **[docs/PROJECT_MODULE_USER_README.md](docs/PROJECT_MODULE_USER_README.md)** for how users move through the app (org → project → features), how modules connect (including drawings + tasks), and a **Procore-style** workflow comparison.
+
 ### Auth & roles (backend contract)
 
 Login and `GET /auth/me` return `user.org.role` from **`organization_members.role`** on the server (`org_admin`, `project_manager`, `supervisor`, `worker`, `guest`). The UI stores that on `user.org` in Redux and drives the **global** and **project** sidebars via `src/lib/rbac.ts` and `src/config/navigation/*`.

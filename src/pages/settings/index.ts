@@ -7,3 +7,4 @@ export { default as RolesSettingsPage } from './RolesSettingsPage';
 export { default as OrganizationSettingsPage } from './OrganizationSettingsPage';
 export { default as BillingPage } from './BillingPage';
 export { default as BotIntegrationsPage } from './BotIntegrationsPage';
+export { default as PreferencesSettingsPage } from './PreferencesSettingsPage';

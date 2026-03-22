@@ -1,32 +1,63 @@
 import type { OrgRole } from '@/types/rbac';
 import { canAccessCommercial } from '@/lib/rbac';
+import { getMockUiProject } from '@/features/project-ui/fixtures';
 import type { NavGroupDef } from './nav-types';
 import { icons } from './icons';
 
 /**
- * Project-scoped sidebar. Item URLs include `projectId`.
- * Fine-grained visibility should eventually use **project role** from the API (`ProjectMember.role`);
- * until then we use org role to hide commercial/financial areas from workers/guests.
+ * Project-scoped sidebar — full module map (UI-first).
+ * Inventory uses mock project type; financial areas still respect org commercial access.
  */
 export function getProjectSidebarGroups(projectId: string, orgRole: OrgRole | null): NavGroupDef[] {
   const base = `/projects/${projectId}`;
   const p = (suffix: string) => (suffix ? `${base}${suffix}` : base);
+  const { showInventory } = getMockUiProject(projectId);
 
-  const ops: NavGroupDef['items'] = [
-    { id: 'phome', label: 'Project home', to: p(''), icon: icons.home, endMatch: true },
-    { id: 'tasks', label: 'Tasks', to: p('/tasks'), icon: icons.tasks },
-    { id: 'files', label: 'Files', to: p('/files'), icon: icons.files },
-  ];
+  const home: NavGroupDef = {
+    groupKey: 'home',
+    items: [
+      { id: 'overview', itemKey: 'overview', to: p('/overview'), icon: icons.home, endMatch: true },
+    ],
+  };
 
-  const groups: NavGroupDef[] = [{ label: 'Overview', items: ops }];
+  const execution: NavGroupDef = {
+    groupKey: 'execution',
+    items: [
+      { id: 'tasks', itemKey: 'tasks', to: p('/tasks'), icon: icons.tasks },
+      { id: 'drawings', itemKey: 'drawings', to: p('/drawings'), icon: icons.drawings },
+      { id: 'rfis', itemKey: 'rfis', to: p('/rfis'), icon: icons.rfi },
+      { id: 'daily-reports', itemKey: 'dailyReports', to: p('/daily-reports'), icon: icons.dailyReports },
+      { id: 'inspections', itemKey: 'inspections', to: p('/inspections'), icon: icons.inspections },
+      { id: 'files', itemKey: 'files', to: p('/files'), icon: icons.files },
+    ],
+  };
 
-  if (canAccessCommercial(orgRole)) {
+  const planning: NavGroupDef = {
+    groupKey: 'planning',
+    items: [
+      { id: 'schedule', itemKey: 'schedule', to: p('/schedule'), icon: icons.schedule },
+      { id: 'reports', itemKey: 'reports', to: p('/reports'), icon: icons.reports },
+      { id: 'meetings', itemKey: 'meetings', to: p('/meetings'), icon: icons.meetings },
+    ],
+  };
+
+  const management: NavGroupDef = {
+    groupKey: 'management',
+    items: [
+      ...(canAccessCommercial(orgRole)
+        ? [{ id: 'financials', itemKey: 'financials', to: p('/financials'), icon: icons.financials } as const]
+        : []),
+      { id: 'team', itemKey: 'team', to: p('/team'), icon: icons.team },
+      { id: 'activity', itemKey: 'activityLog', to: p('/activity'), icon: icons.activity },
+    ],
+  };
+
+  const groups: NavGroupDef[] = [home, execution, planning, management];
+
+  if (showInventory && canAccessCommercial(orgRole)) {
     groups.push({
-      label: 'Commercial',
-      items: [
-        { id: 'budget', label: 'Budget', to: p('/budget'), icon: icons.budget },
-        { id: 'rfi', label: 'RFIs', to: p('/rfis'), icon: icons.rfi },
-      ],
+      groupKey: 'commercial',
+      items: [{ id: 'inventory', itemKey: 'inventory', to: p('/inventory'), icon: icons.inventory }],
     });
   }
 

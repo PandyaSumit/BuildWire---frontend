@@ -1,15 +1,17 @@
 import { useTheme } from './theme-provider';
 
+/** Not used in app header; kept for showcases or embedded tools. */
 export function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme();
+  const { resolvedTheme, toggleTheme } = useTheme();
 
   return (
     <button
+      type="button"
       onClick={toggleTheme}
-      className="p-2 rounded-lg hover:bg-surface transition-colors"
+      className="rounded-lg p-2 transition-colors hover:bg-surface"
       aria-label="Toggle theme"
     >
-      {theme === 'light' ? (
+      {resolvedTheme === 'light' ? (
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="20"

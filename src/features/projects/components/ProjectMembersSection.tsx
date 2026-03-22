@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { OrganizationMemberRow } from '@/types/organization';
 import type { ProjectMemberDto, ProjectMemberRole } from '@/types/project';
-import { formatPersonName, projectMemberRoleLabel } from '@/features/projects/lib/display';
+import { formatPersonName, projectMemberRoleTKey } from '@/features/projects/lib/display';
 import { Select } from '@/components/ui/select';
 
 const projectRoles: ProjectMemberRole[] = ['project_manager', 'supervisor', 'worker', 'guest'];
@@ -23,6 +24,7 @@ export function ProjectMembersSection({
   onAdd,
   onRemove,
 }: Props) {
+  const { t } = useTranslation();
   const [userIdToAdd, setUserIdToAdd] = useState('');
   const [roleToAdd, setRoleToAdd] = useState<ProjectMemberRole>('worker');
   const [adding, setAdding] = useState(false);
@@ -46,7 +48,7 @@ export function ProjectMembersSection({
       setRoleToAdd('worker');
     } catch (err) {
       const msg = err as { response?: { data?: { error?: string; message?: string } } };
-      setError(msg.response?.data?.error || msg.response?.data?.message || 'Could not add member');
+      setError(msg.response?.data?.error || msg.response?.data?.message || t('projectMembers.errorAdd'));
     } finally {
       setAdding(false);
     }
@@ -59,43 +61,46 @@ export function ProjectMembersSection({
       await onRemove(memberId);
     } catch (err) {
       const msg = err as { response?: { data?: { error?: string; message?: string } } };
-      setError(msg.response?.data?.error || msg.response?.data?.message || 'Could not remove member');
+      setError(msg.response?.data?.error || msg.response?.data?.message || t('projectMembers.errorRemove'));
     } finally {
       setRemovingId(null);
     }
   }
 
+  const selectPlaceholder =
+    orgMembersLoading
+      ? t('projectMembers.loadingPeople')
+      : candidates.length === 0
+        ? t('projectMembers.everyoneOnProject')
+        : t('projectMembers.selectPerson');
+
   return (
     <section className="mt-10 border-t border-border pt-10">
-      <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide text-muted">Team</h2>
-      <p className="mb-4 text-sm text-secondary">Organization members who can access this project.</p>
+      <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide text-muted">{t('projectMembers.teamTitle')}</h2>
+      <p className="mb-4 text-sm text-secondary">{t('projectMembers.teamIntro')}</p>
 
       {canManage ? (
         <div className="mb-6 flex flex-col gap-3 rounded-xl border border-border bg-surface p-4 sm:flex-row sm:items-end">
           <div className="min-w-0 flex-1">
             <Select
               id="add-member-user"
-              label="Add org member"
+              label={t('projectMembers.addOrgMember')}
               value={userIdToAdd}
               onValueChange={setUserIdToAdd}
               disabled={orgMembersLoading || adding || candidates.length === 0}
-              placeholder={
-                orgMembersLoading
-                  ? 'Loading people…'
-                  : candidates.length === 0
-                    ? 'Everyone is already on the project'
-                    : 'Select a person…'
-              }
+              placeholder={selectPlaceholder}
               options={
                 candidates.length === 0
                   ? [
                       {
                         value: '',
-                        label: orgMembersLoading ? 'Loading people…' : 'Everyone is already on the project',
+                        label: orgMembersLoading
+                          ? t('projectMembers.loadingPeople')
+                          : t('projectMembers.everyoneOnProject'),
                       },
                     ]
                   : [
-                      { value: '', label: 'Select a person…' },
+                      { value: '', label: t('projectMembers.selectPerson') },
                       ...candidates.map((row) => ({
                         value: row.user_id,
                         label: formatPersonName(row.user) || row.user?.email || row.user_id,
@@ -108,13 +113,13 @@ export function ProjectMembersSection({
           <div className="w-full sm:w-44">
             <Select
               id="add-member-role"
-              label="Project role"
+              label={t('projectMembers.projectRole')}
               value={roleToAdd}
               onValueChange={(v) => setRoleToAdd(v as ProjectMemberRole)}
               disabled={adding}
               options={projectRoles.map((r) => ({
                 value: r,
-                label: projectMemberRoleLabel(r),
+                label: t(projectMemberRoleTKey(r)),
               }))}
               labelClassName="text-xs font-medium text-secondary"
             />
@@ -125,7 +130,7 @@ export function ProjectMembersSection({
             onClick={() => void handleAdd()}
             className="shrink-0 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white dark:text-bg transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {adding ? 'Adding…' : 'Add'}
+            {adding ? t('projectMembers.adding') : t('projectMembers.add')}
           </button>
         </div>
       ) : null}
@@ -135,20 +140,20 @@ export function ProjectMembersSection({
       ) : null}
 
       <div className="overflow-hidden rounded-xl border border-border">
-        <table className="w-full text-left text-sm">
+        <table className="w-full text-start text-sm">
           <thead className="border-b border-border bg-muted/10 text-xs font-semibold uppercase tracking-wide text-muted">
             <tr>
-              <th className="px-4 py-3">Person</th>
-              <th className="px-4 py-3">Role</th>
-              <th className="hidden px-4 py-3 sm:table-cell">Added by</th>
-              {canManage ? <th className="w-24 px-4 py-3 text-right"> </th> : null}
+              <th className="px-4 py-3">{t('projectMembers.colPerson')}</th>
+              <th className="px-4 py-3">{t('projectMembers.colRole')}</th>
+              <th className="hidden px-4 py-3 sm:table-cell">{t('projectMembers.colAddedBy')}</th>
+              {canManage ? <th className="w-24 px-4 py-3 text-end"> </th> : null}
             </tr>
           </thead>
           <tbody className="divide-y divide-border bg-surface">
             {members.length === 0 ? (
               <tr>
                 <td colSpan={canManage ? 4 : 3} className="px-4 py-8 text-center text-secondary">
-                  No members loaded.
+                  {t('projectMembers.noMembersLoaded')}
                 </td>
               </tr>
             ) : (
@@ -162,17 +167,17 @@ export function ProjectMembersSection({
                       <p className="font-medium text-primary">{name || email}</p>
                       {name ? <p className="text-xs text-muted">{email}</p> : null}
                     </td>
-                    <td className="px-4 py-3 text-secondary">{projectMemberRoleLabel(m.role)}</td>
+                    <td className="px-4 py-3 text-secondary">{t(projectMemberRoleTKey(m.role))}</td>
                     <td className="hidden px-4 py-3 text-secondary sm:table-cell">{addedBy || '—'}</td>
                     {canManage ? (
-                      <td className="px-4 py-3 text-right">
+                      <td className="px-4 py-3 text-end">
                         <button
                           type="button"
                           disabled={removingId === m.id}
                           onClick={() => void handleRemove(m.id)}
                           className="text-xs font-medium text-danger hover:underline disabled:cursor-not-allowed disabled:opacity-40"
                         >
-                          {removingId === m.id ? '…' : 'Remove'}
+                          {removingId === m.id ? '…' : t('projectMembers.remove')}
                         </button>
                       </td>
                     ) : null}
