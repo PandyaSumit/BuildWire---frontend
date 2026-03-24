@@ -1,158 +1,232 @@
 import { useState } from "react";
-import { SegmentedControl } from "@/components/ui/segmented-control";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { DataTable, type DataTableColumn } from "@/components/ui/data-table";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
+import { SegmentedControl } from "@/components/ui/segmented-control";
 import {
   DUMMY_DAILY_REPORTS,
   DUMMY_MARCH_2026_DAYS,
   type CalendarDot,
+  type DailyReportRow,
 } from "@/features/project-ui/projectDummyData";
 
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
 
-function dotClass(dot: CalendarDot): string {
-  switch (dot) {
-    case "approved":
-      return "bg-success";
-    case "pending":
-      return "bg-blue-500";
-    case "draft":
-      return "bg-warning";
-    case "missing":
-      return "bg-danger";
-    case "weekend":
-    default:
-      return "bg-muted/50";
-  }
-}
+const DOT_CONFIG: Record<CalendarDot, { cls: string; label: string }> = {
+  approved: { cls: "bg-success", label: "Approved" },
+  pending: { cls: "bg-blue-500", label: "Pending" },
+  draft: { cls: "bg-warning", label: "Draft" },
+  missing: { cls: "bg-danger", label: "Missing" },
+  weekend: { cls: "bg-muted/40", label: "Weekend" },
+};
+
+const STATUS_VARIANT: Record<
+  DailyReportRow["status"],
+  "success" | "warning" | "danger" | "secondary"
+> = {
+  Approved: "success",
+  Pending: "warning",
+  Rejected: "danger",
+  Draft: "secondary",
+};
+
+const LIST_COLUMNS: DataTableColumn<DailyReportRow>[] = [
+  {
+    id: "date",
+    header: "Date",
+    headerClassName: "pl-4 pr-3",
+    cellClassName: "pl-4 pr-3 whitespace-nowrap",
+    cell: (r) => (
+      <span className="font-mono text-[13px] text-primary">{r.date}</span>
+    ),
+  },
+  {
+    id: "submittedBy",
+    header: "Submitted by",
+    headerClassName: "px-3",
+    cellClassName: "px-3",
+    cell: (r) => (
+      <span className="text-[13px] font-medium text-primary">{r.submittedBy}</span>
+    ),
+  },
+  {
+    id: "crew",
+    header: "Crew",
+    headerClassName: "px-3",
+    cellClassName: "px-3",
+    align: "right",
+    cell: (r) => (
+      <span className="text-[13px] tabular-nums text-secondary">{r.crew}</span>
+    ),
+  },
+  {
+    id: "weather",
+    header: "Weather",
+    headerClassName: "px-3",
+    cellClassName: "px-3",
+    cell: (r) => (
+      <span className="text-[13px] text-secondary">{r.weather}</span>
+    ),
+  },
+  {
+    id: "status",
+    header: "Status",
+    headerClassName: "px-3 pr-4",
+    cellClassName: "px-3 pr-4",
+    cell: (r) => (
+      <Badge variant={STATUS_VARIANT[r.status]} size="sm">
+        {r.status}
+      </Badge>
+    ),
+  },
+];
 
 export default function ProjectDailyReportsPage() {
   const [mode, setMode] = useState<"calendar" | "list">("calendar");
 
   return (
-    <div className="p-6">
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="font-[family-name:var(--font-dm-sans)] text-xl font-bold text-primary">
-            Daily Reports
-          </h1>
-          <p className="text-sm text-secondary">
-            Field narrative, crew, weather, and photos — under 5 minutes.
-          </p>
-        </div>
-        <SegmentedControl
-          value={mode}
-          onChange={setMode}
-          options={[
-            { value: "calendar", label: "Calendar" },
-            { value: "list", label: "List" },
-          ]}
-        />
-      </div>
+    <div className="flex min-h-full flex-col gap-5 p-6">
+      <PageHeader
+        title="Daily Reports"
+        description="Field narrative, crew, weather, and photos — under 5 minutes."
+        actions={
+          <>
+            <SegmentedControl
+              value={mode}
+              onChange={setMode}
+              options={[
+                { value: "calendar", label: "Calendar" },
+                { value: "list", label: "List" },
+              ]}
+            />
+            <Button size="sm">+ New report</Button>
+          </>
+        }
+      />
 
-      <div className="mb-4 flex flex-wrap gap-3 text-xs text-secondary">
-        <span className="inline-flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-success" /> Approved
+      {/* Missing report banner */}
+      <div className="flex items-center gap-3 rounded-xl border border-warning/35 bg-warning/8 px-4 py-2.5 text-sm">
+        <span className="text-warning">⚠</span>
+        <span className="text-primary">
+          <span className="font-semibold">Missing report:</span> today is a
+          working day — submit before 6 PM.
         </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-blue-500" /> Pending
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-warning" /> Draft
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-danger" /> Missing
-        </span>
-        <span className="inline-flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-muted/50" /> Weekend
-        </span>
+        <button
+          type="button"
+          className="ml-auto shrink-0 rounded-lg border border-warning/40 bg-warning/10 px-3 py-1 text-xs font-medium text-warning hover:bg-warning/15"
+        >
+          Submit now
+        </button>
       </div>
 
       {mode === "calendar" && (
-        <div className="rounded-2xl border border-border bg-surface p-4">
+        <div className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+          {/* Calendar header */}
           <div className="mb-4 flex items-center justify-between">
-            <p className="text-sm font-semibold text-primary">March 2026</p>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                className="rounded-lg border border-border px-2 py-1 text-xs"
-              >
-                Prev
-              </button>
-              <button
-                type="button"
-                className="rounded-lg border border-border px-2 py-1 text-xs"
-              >
-                Next
-              </button>
+            <p className="text-base font-semibold text-primary">March 2026</p>
+            <div className="flex items-center gap-2">
+              {/* Legend */}
+              <div className="hidden items-center gap-3 text-xs text-muted sm:flex">
+                {(
+                  Object.entries(DOT_CONFIG) as [
+                    CalendarDot,
+                    { cls: string; label: string },
+                  ][]
+                ).map(([key, v]) => (
+                  <span key={key} className="inline-flex items-center gap-1.5">
+                    <span className={`h-2 w-2 rounded-full ${v.cls}`} />
+                    {v.label}
+                  </span>
+                ))}
+              </div>
+              <div className="flex gap-1">
+                <button
+                  type="button"
+                  className="rounded-lg border border-border px-2.5 py-1 text-xs text-secondary hover:bg-muted/10 hover:text-primary"
+                >
+                  ‹
+                </button>
+                <button
+                  type="button"
+                  className="rounded-lg border border-border px-2.5 py-1 text-xs text-secondary hover:bg-muted/10 hover:text-primary"
+                >
+                  ›
+                </button>
+              </div>
             </div>
           </div>
-          <div className="grid grid-cols-7 gap-2 text-center text-xs text-muted">
+
+          {/* Mobile legend */}
+          <div className="mb-3 flex flex-wrap gap-3 text-xs text-muted sm:hidden">
+            {(
+              Object.entries(DOT_CONFIG) as [
+                CalendarDot,
+                { cls: string; label: string },
+              ][]
+            ).map(([key, v]) => (
+              <span key={key} className="inline-flex items-center gap-1.5">
+                <span className={`h-2 w-2 rounded-full ${v.cls}`} />
+                {v.label}
+              </span>
+            ))}
+          </div>
+
+          {/* Weekday headers */}
+          <div className="mb-1 grid grid-cols-7 gap-1 text-center">
             {WEEKDAYS.map((d) => (
-              <div key={d} className="py-2 font-semibold">
+              <div
+                key={d}
+                className="py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted"
+              >
                 {d}
               </div>
             ))}
-            {DUMMY_MARCH_2026_DAYS.map(({ day, dot }) => (
-              <div
-                key={day}
-                className="flex aspect-square flex-col items-center justify-center rounded-lg border border-border/60 bg-bg text-sm text-primary"
-              >
-                <span>{day}</span>
-                <span
-                  className={`mt-1 h-2 w-2 rounded-full ${dotClass(dot)}`}
-                  title={dot}
-                />
-              </div>
-            ))}
+          </div>
+
+          {/* Days grid */}
+          <div className="grid grid-cols-7 gap-1">
+            {DUMMY_MARCH_2026_DAYS.map(({ day, dot }) => {
+              const { cls } = DOT_CONFIG[dot];
+              const isWeekend = dot === "weekend";
+              return (
+                <button
+                  key={day}
+                  type="button"
+                  disabled={isWeekend}
+                  className={`flex aspect-square flex-col items-center justify-center rounded-xl text-sm transition-colors ${
+                    isWeekend
+                      ? "cursor-default opacity-50"
+                      : "hover:bg-muted/10 hover:text-primary"
+                  } text-primary`}
+                >
+                  <span className="tabular-nums leading-none">{day}</span>
+                  <span className={`mt-1.5 h-1.5 w-1.5 rounded-full ${cls}`} />
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
 
       {mode === "list" && (
-        <div className="overflow-x-auto rounded-xl border border-border">
-          <table className="min-w-full text-left text-sm">
-            <thead className="border-b border-border bg-surface text-xs uppercase text-muted">
-              <tr>
-                <th className="px-4 py-3">Date</th>
-                <th className="px-4 py-3">Submitted by</th>
-                <th className="px-4 py-3">Crew</th>
-                <th className="px-4 py-3">Weather</th>
-                <th className="px-4 py-3">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {DUMMY_DAILY_REPORTS.map((r) => (
-                <tr key={r.date} className="border-b border-border/60">
-                  <td className="px-4 py-3">{r.date}</td>
-                  <td className="px-4 py-3">{r.submittedBy}</td>
-                  <td className="px-4 py-3">{r.crew}</td>
-                  <td className="px-4 py-3">{r.weather}</td>
-                  <td className="px-4 py-3">
-                    <Badge
-                      variant={
-                        r.status === "Approved"
-                          ? "success"
-                          : r.status === "Pending"
-                            ? "warning"
-                            : r.status === "Rejected"
-                              ? "danger"
-                              : "secondary"
-                      }
-                    >
-                      {r.status}
-                    </Badge>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <DataTable<DailyReportRow>
+          variant="card"
+          columns={LIST_COLUMNS}
+          data={DUMMY_DAILY_REPORTS}
+          rowKey={(r) => r.date}
+          maxHeightClassName="max-h-none"
+          onRowClick={() => {}}
+          emptyFallback={
+            <EmptyState
+              title="No daily reports yet"
+              description="Submit your first daily report to start tracking field progress."
+              action={{ label: "+ New report" }}
+            />
+          }
+        />
       )}
-
-      <div className="mt-6 rounded-lg border border-warning/40 bg-warning/10 px-4 py-3 text-sm text-primary">
-        <strong>Missing report:</strong> today is a working day — submit before
-        6 PM (sample banner).
-      </div>
     </div>
   );
 }

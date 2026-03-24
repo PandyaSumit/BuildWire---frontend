@@ -1,58 +1,80 @@
-import { DUMMY_ACTIVITY_LOG } from "@/features/project-ui/projectDummyData";
+import { Avatar } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/page-header";
+import {
+  DUMMY_ACTIVITY_LOG,
+  type LogEvent,
+} from "@/features/project-ui/projectDummyData";
+
+const ENTITY_ICON: Record<string, string> = {
+  task: "✓",
+  rfi: "?",
+  report: "📋",
+  drawing: "📐",
+  expense: "₹",
+  inspection: "🔍",
+};
+
+function EventRow({ event }: { event: LogEvent }) {
+  const icon = event.entity ? ENTITY_ICON[event.entity] : "·";
+  return (
+    <li className="group flex gap-3 rounded-xl border border-transparent px-3 py-2.5 transition-colors hover:border-border hover:bg-surface">
+      <div className="relative mt-0.5 flex shrink-0 flex-col items-center">
+        <Avatar name={event.user} size="sm" />
+        {/* Connector line – rendered by parent */}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="text-[13px] text-primary">
+          <span className="font-semibold">{event.user}</span>{" "}
+          <span className="text-secondary">{event.text}</span>
+        </p>
+        <p className="mt-0.5 text-[11px] text-muted">{event.when}</p>
+      </div>
+      {event.entity && (
+        <span className="mt-1 shrink-0 rounded-md border border-border bg-bg px-1.5 py-0.5 text-[11px] text-muted">
+          {icon}
+        </span>
+      )}
+    </li>
+  );
+}
 
 export default function ProjectActivityPage() {
   return (
-    <div className="p-6">
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="font-[family-name:var(--font-dm-sans)] text-xl font-bold text-primary">
-            Activity log
-          </h1>
-          <p className="text-sm text-secondary">
-            Immutable audit trail — export for compliance.
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            className="rounded-lg border border-border px-3 py-2 text-sm"
-          >
-            Filter
-          </button>
-          <button
-            type="button"
-            className="rounded-lg border border-border px-3 py-2 text-sm"
-          >
-            Export CSV
-          </button>
-        </div>
-      </div>
+    <div className="flex min-h-full flex-col gap-5 p-6">
+      <PageHeader
+        title="Activity log"
+        description="Immutable audit trail — export for compliance."
+        actions={
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              className="rounded-lg border border-border px-3 py-2 text-sm text-secondary hover:bg-muted/10 hover:text-primary"
+            >
+              Filter
+            </button>
+            <Button size="sm" variant="secondary">
+              Export CSV
+            </Button>
+          </div>
+        }
+      />
 
       <div className="space-y-8">
         {DUMMY_ACTIVITY_LOG.map((group) => (
-          <div key={group.label}>
-            <p className="mb-3 text-xs font-semibold uppercase text-muted">
-              {group.label}
-            </p>
-            <ul className="space-y-2">
+          <section key={group.label}>
+            <div className="mb-2 flex items-center gap-3">
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">
+                {group.label}
+              </p>
+              <div className="h-px flex-1 bg-border/60" />
+            </div>
+            <ul className="space-y-0.5">
               {group.events.map((e, i) => (
-                <li
-                  key={`${group.label}-${i}`}
-                  className="flex gap-3 rounded-xl border border-border bg-surface px-4 py-3 text-sm"
-                >
-                  <div className="h-9 w-9 shrink-0 rounded-full bg-brand-light text-center text-xs font-bold leading-9 text-brand">
-                    {e.user[0]}
-                  </div>
-                  <div>
-                    <p className="text-primary">
-                      <span className="font-semibold">{e.user}</span> {e.text}
-                    </p>
-                    <p className="text-xs text-muted">{e.when}</p>
-                  </div>
-                </li>
+                <EventRow key={`${group.label}-${i}`} event={e} />
               ))}
             </ul>
-          </div>
+          </section>
         ))}
       </div>
     </div>

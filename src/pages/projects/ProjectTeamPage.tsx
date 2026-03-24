@@ -1,113 +1,219 @@
+import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { DataTable, type DataTableColumn } from "@/components/ui/data-table";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PageHeader } from "@/components/ui/page-header";
+import { StatsBar } from "@/components/ui/stats-bar";
 import {
   DUMMY_SUBCONTRACTORS,
   DUMMY_TEAM_MEMBERS,
   DUMMY_TEAM_STATS,
+  type DummySub,
+  type DummyTeamMember,
 } from "@/features/project-ui/projectDummyData";
 
-export default function ProjectTeamPage() {
-  return (
-    <div className="p-6">
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="font-[family-name:var(--font-dm-sans)] text-xl font-bold text-primary">
-            Team
-          </h1>
-          <p className="text-sm text-secondary">
-            Roles, companies, and who is on site today.
-          </p>
+const ROLE_VARIANT: Record<string, "secondary" | "success" | "warning" | "default"> = {
+  PM: "secondary",
+  Supervisor: "default",
+  Guest: "secondary",
+  Worker: "default",
+};
+
+const MEMBER_COLUMNS: DataTableColumn<DummyTeamMember>[] = [
+  {
+    id: "name",
+    header: "Member",
+    headerClassName: "pl-4 pr-3",
+    cellClassName: "pl-4 pr-3",
+    cell: (r) => (
+      <div className="flex items-center gap-2.5">
+        <Avatar name={r.name} size="sm" />
+        <div className="min-w-0">
+          <p className="text-[13px] font-medium text-primary">{r.name}</p>
+          <p className="text-[11px] text-muted">{r.company}</p>
         </div>
-        <button
-          type="button"
-          className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white dark:text-bg"
-        >
-          + Add member
-        </button>
       </div>
-
-      <div className="mb-4 flex flex-wrap gap-3 text-sm">
-        <span className="rounded-lg border border-border bg-surface px-3 py-2">
-          Total {DUMMY_TEAM_STATS.total}
+    ),
+  },
+  {
+    id: "role",
+    header: "Role",
+    headerClassName: "px-3",
+    cellClassName: "px-3",
+    cell: (r) => (
+      <Badge variant={ROLE_VARIANT[r.role] ?? "default"} size="sm">
+        {r.role}
+      </Badge>
+    ),
+  },
+  {
+    id: "joined",
+    header: "Joined",
+    headerClassName: "px-3",
+    cellClassName: "px-3",
+    cell: (r) => (
+      <span className="text-[13px] text-secondary">{r.joined}</span>
+    ),
+  },
+  {
+    id: "lastActive",
+    header: "Last active",
+    headerClassName: "px-3",
+    cellClassName: "px-3",
+    cell: (r) => (
+      <span className="text-[13px] text-secondary">{r.lastActive}</span>
+    ),
+  },
+  {
+    id: "tasks",
+    header: "Tasks",
+    headerClassName: "px-3",
+    cellClassName: "px-3",
+    align: "right",
+    cell: (r) => (
+      <span className="text-[13px] tabular-nums text-secondary">{r.tasks}</span>
+    ),
+  },
+  {
+    id: "onSite",
+    header: "On site",
+    headerClassName: "px-3 pr-4",
+    cellClassName: "px-3 pr-4",
+    align: "center",
+    cell: (r) =>
+      r.onSite ? (
+        <span className="inline-flex items-center gap-1 text-[13px] text-success">
+          <span className="h-1.5 w-1.5 rounded-full bg-success" />
+          Yes
         </span>
-        <span className="rounded-lg border border-border bg-surface px-3 py-2">
-          Active today {DUMMY_TEAM_STATS.activeToday}
+      ) : (
+        <span className="text-[13px] text-muted">—</span>
+      ),
+  },
+];
+
+const SUB_COLUMNS: DataTableColumn<DummySub>[] = [
+  {
+    id: "name",
+    header: "Company",
+    headerClassName: "pl-4 pr-3",
+    cellClassName: "pl-4 pr-3",
+    cell: (r) => (
+      <span className="text-[13px] font-medium text-primary">{r.name}</span>
+    ),
+  },
+  {
+    id: "trade",
+    header: "Trade",
+    headerClassName: "px-3",
+    cellClassName: "px-3",
+    cell: (r) => (
+      <span className="text-[13px] text-secondary">{r.trade}</span>
+    ),
+  },
+  {
+    id: "contact",
+    header: "Contact",
+    headerClassName: "px-3",
+    cellClassName: "px-3",
+    cell: (r) => (
+      <span className="text-[13px] text-secondary">{r.contact}</span>
+    ),
+  },
+  {
+    id: "workers",
+    header: "Active workers",
+    headerClassName: "px-3",
+    cellClassName: "px-3",
+    align: "right",
+    cell: (r) => (
+      <span className="text-[13px] tabular-nums text-secondary">{r.workers}</span>
+    ),
+  },
+  {
+    id: "tasks",
+    header: "Tasks",
+    headerClassName: "px-3 pr-4",
+    cellClassName: "px-3 pr-4",
+    align: "right",
+    cell: (r) => (
+      <span className="text-[13px] tabular-nums text-secondary">{r.tasks}</span>
+    ),
+  },
+];
+
+export default function ProjectTeamPage() {
+  const s = DUMMY_TEAM_STATS;
+
+  return (
+    <div className="flex min-h-full flex-col gap-6 p-6">
+      <PageHeader
+        title="Team"
+        description="Roles, companies, and who is on site today."
+        actions={<Button size="sm">+ Add member</Button>}
+      />
+
+      <StatsBar
+        stats={[
+          { label: "Total", value: s.total },
+          { label: "Active today", value: s.activeToday, accent: "success" },
+          { label: "Companies", value: s.companies },
+        ]}
+      />
+
+      {/* On-site alert */}
+      <div className="flex items-center gap-3 rounded-xl border border-success/25 bg-success/5 px-4 py-2.5 text-sm">
+        <span className="h-2 w-2 animate-pulse rounded-full bg-success" />
+        <span className="text-secondary">
+          <span className="font-medium text-primary">On site now:</span> Raj
+          Kumar — active 5m ago (L3) · Amit Verma — active 12m ago (Gate)
         </span>
-        <span className="rounded-lg border border-border bg-surface px-3 py-2">
-          Companies {DUMMY_TEAM_STATS.companies}
-        </span>
       </div>
 
-      <div className="overflow-x-auto rounded-xl border border-border">
-        <table className="min-w-full text-left text-sm">
-          <thead className="border-b border-border bg-surface text-xs uppercase text-muted">
-            <tr>
-              <th className="px-4 py-3">Member</th>
-              <th className="px-4 py-3">Role</th>
-              <th className="px-4 py-3">Company</th>
-              <th className="px-4 py-3">Joined</th>
-              <th className="px-4 py-3">Last active</th>
-              <th className="px-4 py-3">Tasks</th>
-              <th className="px-4 py-3">On site</th>
-            </tr>
-          </thead>
-          <tbody>
-            {DUMMY_TEAM_MEMBERS.map((m) => (
-              <tr key={m.name} className="border-b border-border/60">
-                <td className="px-4 py-3">
-                  <span className="font-medium text-primary">{m.name}</span>
-                </td>
-                <td className="px-4 py-3">
-                  <Badge variant="secondary">{m.role}</Badge>
-                </td>
-                <td className="px-4 py-3">{m.company}</td>
-                <td className="px-4 py-3 text-secondary">{m.joined}</td>
-                <td className="px-4 py-3">{m.lastActive}</td>
-                <td className="px-4 py-3">{m.tasks}</td>
-                <td className="px-4 py-3">
-                  {m.onSite ? (
-                    <span className="text-success">●</span>
-                  ) : (
-                    <span className="text-muted">○</span>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {/* Members table */}
+      <section>
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted">
+          Members
+        </p>
+        <DataTable<DummyTeamMember>
+          variant="card"
+          columns={MEMBER_COLUMNS}
+          data={DUMMY_TEAM_MEMBERS}
+          rowKey={(r) => r.name}
+          tableMinWidthClassName="min-w-[580px]"
+          maxHeightClassName="max-h-none"
+          emptyFallback={
+            <EmptyState
+              title="No team members yet"
+              description="Add members to your project team."
+              action={{ label: "+ Add member" }}
+            />
+          }
+        />
+      </section>
 
-      <h2 className="mb-3 mt-10 font-[family-name:var(--font-dm-sans)] text-sm font-semibold uppercase tracking-wide text-muted">
-        Subcontractor companies
-      </h2>
-      <div className="overflow-x-auto rounded-xl border border-border">
-        <table className="min-w-full text-left text-sm">
-          <thead className="border-b border-border bg-surface text-xs uppercase text-muted">
-            <tr>
-              <th className="px-4 py-3">Company</th>
-              <th className="px-4 py-3">Trade</th>
-              <th className="px-4 py-3">Contact</th>
-              <th className="px-4 py-3">Active workers</th>
-              <th className="px-4 py-3">Tasks</th>
-            </tr>
-          </thead>
-          <tbody>
-            {DUMMY_SUBCONTRACTORS.map((s) => (
-              <tr key={s.name} className="border-b border-border/60">
-                <td className="px-4 py-3 font-medium">{s.name}</td>
-                <td className="px-4 py-3">{s.trade}</td>
-                <td className="px-4 py-3">{s.contact}</td>
-                <td className="px-4 py-3">{s.workers}</td>
-                <td className="px-4 py-3">{s.tasks}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      <div className="mt-6 rounded-lg border border-border bg-surface px-4 py-3 text-sm text-secondary">
-        <strong className="text-primary">On site now (sample):</strong> Raj
-        Kumar — active 5m ago (L3) · Amit Verma — active 12m ago (Gate)
-      </div>
+      {/* Subcontractors table */}
+      <section>
+        <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted">
+          Subcontractor companies
+        </p>
+        <DataTable<DummySub>
+          variant="card"
+          columns={SUB_COLUMNS}
+          data={DUMMY_SUBCONTRACTORS}
+          rowKey={(r) => r.name}
+          tableMinWidthClassName="min-w-[480px]"
+          maxHeightClassName="max-h-none"
+          emptyFallback={
+            <EmptyState
+              title="No subcontractors yet"
+              description="Add subcontractor companies to this project."
+              action={{ label: "+ Add company" }}
+            />
+          }
+        />
+      </section>
     </div>
   );
 }

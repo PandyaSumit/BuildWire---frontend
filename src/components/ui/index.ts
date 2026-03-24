@@ -30,3 +30,5 @@ export {
   type DataTableProps,
   type DataTableVariant,
 } from './data-table';
+export { PageHeader } from './page-header';
+export { StatsBar } from './stats-bar';

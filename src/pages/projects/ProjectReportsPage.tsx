@@ -1,56 +1,76 @@
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/page-header";
 import { DUMMY_REPORTS_BY_CATEGORY } from "@/features/project-ui/projectDummyData";
 
 const CATS = ["Overview", "Field", "Financial", "Quality", "Custom"] as const;
+type Cat = (typeof CATS)[number];
+
+const CAT_ICONS: Record<Cat, string> = {
+  Overview: "◈",
+  Field: "⛏",
+  Financial: "₹",
+  Quality: "✓",
+  Custom: "⊞",
+};
 
 export default function ProjectReportsPage() {
-  const [cat, setCat] = useState<(typeof CATS)[number]>("Overview");
-
+  const [cat, setCat] = useState<Cat>("Overview");
   const items = DUMMY_REPORTS_BY_CATEGORY[cat] ?? [];
 
   return (
-    <div className="flex min-h-[calc(100vh-4rem)] gap-0">
+    <div className="flex min-h-full">
+      {/* Sidebar */}
       <aside className="w-56 shrink-0 border-r border-border bg-surface p-4">
-        <p className="mb-3 text-xs font-semibold uppercase text-muted">
+        <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted">
           Categories
         </p>
-        <nav className="space-y-1">
+        <nav className="space-y-0.5">
           {CATS.map((c) => (
             <button
               key={c}
               type="button"
               onClick={() => setCat(c)}
-              className={`w-full rounded-lg px-3 py-2 text-left text-sm font-medium ${
+              className={`flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
                 cat === c
-                  ? "bg-brand-light text-primary"
-                  : "text-secondary hover:bg-muted/10"
+                  ? "bg-brand-light font-medium text-primary"
+                  : "text-secondary hover:bg-muted/10 hover:text-primary"
               }`}
             >
-              {c} reports
+              <span className="shrink-0 text-base leading-none text-muted">
+                {CAT_ICONS[c]}
+              </span>
+              <span>{c}</span>
             </button>
           ))}
         </nav>
       </aside>
-      <div className="flex-1 p-6">
-        <h1 className="font-[family-name:var(--font-dm-sans)] text-xl font-bold text-primary">
-          Reports
-        </h1>
-        <p className="mt-1 text-sm text-secondary">
-          {cat} — pick a report to run (sample list).
-        </p>
-        <ul className="mt-6 space-y-2">
+
+      {/* Main content */}
+      <div className="flex flex-1 flex-col gap-5 p-6">
+        <PageHeader
+          title="Reports"
+          description={`${cat} reports — pick a report to run.`}
+          actions={<Button size="sm">Export bundle</Button>}
+        />
+
+        <ul className="space-y-2">
           {items.map((r) => (
             <li
               key={r.title}
-              className="flex flex-col gap-1 rounded-xl border border-border bg-surface px-4 py-3 text-sm sm:flex-row sm:items-center sm:justify-between"
+              className="group flex flex-col gap-2 rounded-xl border border-border bg-surface px-4 py-3 transition-colors hover:border-brand/30 sm:flex-row sm:items-center"
             >
-              <span className="font-medium text-primary">{r.title}</span>
-              <span className="text-xs text-secondary">{r.subtitle}</span>
+              <div className="min-w-0 flex-1">
+                <p className="text-[13px] font-semibold text-primary">
+                  {r.title}
+                </p>
+                <p className="mt-0.5 text-xs text-secondary">{r.subtitle}</p>
+              </div>
               <button
                 type="button"
-                className="mt-2 shrink-0 rounded-lg border border-border px-3 py-1 text-xs font-medium sm:mt-0"
+                className="shrink-0 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-secondary opacity-0 transition-opacity hover:border-brand/40 hover:text-primary group-hover:opacity-100 sm:opacity-100"
               >
-                Run
+                Run →
               </button>
             </li>
           ))}
