@@ -44,7 +44,7 @@
 }
 
 .dark {
-  --bg: 0 0% 7%;
+  --bg: 210 6.5% 12.2%;
   --surface: 0 0% 12%;
   --elevated: 0 0% 16%;
   --border: 0 0% 20%;
@@ -57,8 +57,8 @@
   --success: 142 71% 45%;
   --warning: 38 92% 50%;
   --danger: 0 84% 60%;
-  --sidebar-bg: 0 0% 7%;
-  --header-bg: 0 0% 7%;
+  --sidebar-bg: 210 6.5% 12.2%;
+  --header-bg: 210 6.5% 12.2%;
   --scrollbar-thumb: 0 0% 34%;
   --scrollbar-thumb-hover: 0 0% 48%;
 }

@@ -36,11 +36,11 @@ function ThemePreview({ kind }: { kind: ThemePreference }) {
   }
   if (kind === "dark") {
     return (
-      <div className="mt-3 overflow-hidden rounded-md border border-border bg-[hsl(0_0%_10%)]">
+      <div className="mt-3 overflow-hidden rounded-md border border-border bg-[hsl(210_6.5%_12.2%)]">
         <div className="flex h-14 gap-0.5 p-1">
-          <div className="w-2 rounded-sm bg-[hsl(0_0%_14%)]" />
-          <div className="min-w-0 flex-1 rounded-sm bg-[hsl(0_0%_12%)]">
-            <div className="h-2 w-8 bg-[hsl(0_0%_22%)]" />
+          <div className="w-2 rounded-sm bg-[hsl(210_8%_10%)]" />
+          <div className="min-w-0 flex-1 rounded-sm bg-[hsl(210_5%_14%)]">
+            <div className="h-2 w-8 bg-[hsl(210_10%_22%)]" />
           </div>
         </div>
       </div>
@@ -52,9 +52,9 @@ function ThemePreview({ kind }: { kind: ThemePreference }) {
         <div className="w-1.5 rounded-sm bg-[hsl(0_0%_90%)]" />
         <div className="min-w-0 flex-1 rounded-sm bg-white" />
       </div>
-      <div className="flex h-14 flex-1 gap-0.5 bg-[hsl(0_0%_10%)] p-1">
-        <div className="w-1.5 rounded-sm bg-[hsl(0_0%_18%)]" />
-        <div className="min-w-0 flex-1 rounded-sm bg-[hsl(0_0%_12%)]" />
+      <div className="flex h-14 flex-1 gap-0.5 bg-[hsl(210_6.5%_12.2%)] p-1">
+        <div className="w-1.5 rounded-sm bg-[hsl(210_8%_10%)]" />
+        <div className="min-w-0 flex-1 rounded-sm bg-[hsl(210_5%_14%)]" />
       </div>
     </div>
   );
@@ -88,10 +88,10 @@ const workspaceThemeMeta: {
       brand: "0 0% 9%",
     },
     dark: {
-      bg: "0 0% 7%",
+      bg: "210 6.5% 12.2%",
       surface: "0 0% 12%",
       border: "0 0% 20%",
-      sidebar: "0 0% 7%",
+      sidebar: "210 6.5% 12.2%",
       brand: "0 0% 100%",
     },
   },
