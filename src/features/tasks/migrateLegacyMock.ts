@@ -106,9 +106,48 @@ export function buildWireTaskFromUi(u: UiTask, index: number): BuildWireTask {
       (Math.min(95, (u.id.charCodeAt(0) * 17 + index * 23) % 96) || 40),
     pinned: u.pinned,
     is_milestone: u.number.endsWith('0') && u.number.includes('T-0'),
+    kanban_section_id: 'recent',
+    kanban_order: 0,
   };
 }
 
+function kanbanSectionIdForTask(
+  task: BuildWireTask,
+  index: number,
+): 'recent' | 'today' | 'next-week' | 'later' {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const in7Days = new Date(today);
+  in7Days.setDate(today.getDate() + 7);
+  const in14Days = new Date(today);
+  in14Days.setDate(today.getDate() + 14);
+  if (index < 2) return 'recent';
+  const dueRaw = task.due_date.slice(0, 10);
+  const due = new Date(`${dueRaw}T12:00:00`);
+  if (Number.isNaN(due.getTime()) || due <= today) return 'today';
+  if (due <= in7Days || due <= in14Days) return 'next-week';
+  return 'later';
+}
+
+function assignKanbanPlacements(tasks: BuildWireTask[]): BuildWireTask[] {
+  const perSection: Record<string, string[]> = {
+    recent: [],
+    today: [],
+    'next-week': [],
+    later: [],
+  };
+  tasks.forEach((task, index) => {
+    const sid = kanbanSectionIdForTask(task, index);
+    perSection[sid].push(task.id);
+  });
+  return tasks.map((task, index) => {
+    const sid = kanbanSectionIdForTask(task, index);
+    const ord = perSection[sid].indexOf(task.id);
+    return { ...task, kanban_section_id: sid, kanban_order: Math.max(0, ord) };
+  });
+}
+
 export function seedBuildWireTasks(): BuildWireTask[] {
-  return MOCK_TASKS.map((u, i) => buildWireTaskFromUi(u, i));
+  const base = MOCK_TASKS.map((u, i) => buildWireTaskFromUi(u, i));
+  return assignKanbanPlacements(base);
 }

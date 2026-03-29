@@ -1,9 +1,11 @@
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { Outlet, useLocation, useParams } from 'react-router-dom';
+import { PageSkeletonModule } from '@/components/ui/skeleton';
 import { writeLastProjectPath } from './lastRoute';
 
 /**
  * Syncs last visited path under `/projects/:projectId/*` for restore-on-entry.
+ * Suspense boundary wraps lazy-loaded child routes.
  */
 export function ProjectRouteLayout() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -16,5 +18,9 @@ export function ProjectRouteLayout() {
     writeLastProjectPath(projectId, suffix);
   }, [pathname, projectId]);
 
-  return <Outlet />;
+  return (
+    <Suspense fallback={<PageSkeletonModule />}>
+      <Outlet />
+    </Suspense>
+  );
 }

@@ -21,7 +21,10 @@ export async function listProjectTasks(
       assignees: params?.assigneeIds?.join(','),
       trades: params?.trades?.join(','),
       floors: params?.floors?.join(','),
-      search: params?.search,
+      search: params?.search?.trim() || undefined,
+      overdue_only: params?.overdueOnly || undefined,
+      blocked_only: params?.blockedOnly || undefined,
+      my_work_only: params?.myWorkOnly || undefined,
     },
     signal: params?.signal,
   });

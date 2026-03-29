@@ -2,6 +2,7 @@ import { useState } from "react";
 import { PageHeader } from "@/components/ui/page-header";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { SegmentedControl } from "@/components/ui/segmented-control";
+import { ModulePageShell } from "@/features/project-ui/components";
 import { DUMMY_SCHEDULE_PHASES } from "@/features/project-ui/projectDummyData";
 
 type Tab = "timeline" | "milestones" | "workload";
@@ -10,7 +11,7 @@ export default function ProjectSchedulePage() {
   const [tab, setTab] = useState<Tab>("timeline");
 
   return (
-    <div className="flex min-h-full flex-col gap-5 p-6">
+    <ModulePageShell>
       <PageHeader
         title="Schedule"
         description="Phases, Gantt, dependencies, and workload — sample hierarchy."
@@ -27,9 +28,9 @@ export default function ProjectSchedulePage() {
         }
       />
 
-      <div className="grid min-h-[480px] gap-0 rounded-2xl border border-border bg-surface lg:grid-cols-12">
+      <div className="grid min-h-[480px] gap-0 rounded-2xl border border-border/60 bg-surface lg:grid-cols-12">
         {/* Hierarchy panel */}
-        <div className="border-b border-border p-5 lg:col-span-4 lg:border-b-0 lg:border-r">
+        <div className="border-b border-border/60 p-5 lg:col-span-4 lg:border-b-0 lg:border-r lg:border-border/60">
           <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted">
             Hierarchy
           </p>
@@ -37,7 +38,7 @@ export default function ProjectSchedulePage() {
             {DUMMY_SCHEDULE_PHASES.map((ph) => (
               <li
                 key={ph.name}
-                className="rounded-xl border border-border/60 bg-bg p-3 transition-colors hover:border-border"
+                className="rounded-xl border border-border/50 bg-bg p-3 transition-colors hover:border-border/80"
               >
                 <div className="flex items-center justify-between gap-2">
                   <p className="text-[13px] font-semibold text-primary">
@@ -130,6 +131,6 @@ export default function ProjectSchedulePage() {
           </div>
         </div>
       </div>
-    </div>
+    </ModulePageShell>
   );
 }

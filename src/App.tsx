@@ -1,3 +1,4 @@
+import { lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
@@ -24,23 +25,54 @@ import {
 
 import ProjectsListPage from "./pages/projects/ProjectsListPage";
 import { ProjectRouteLayout } from "@/features/project-ui/ProjectRouteLayout";
-import { ProjectIndexEntry } from "@/features/project-ui/ProjectIndexEntry";
-import ProjectTasksPage from "./pages/projects/ProjectTasksPage";
-import ProjectFilesPage from "./pages/projects/ProjectFilesPage";
-import ProjectRfisPage from "./pages/projects/ProjectRfisPage";
-import ProjectBudgetRedirect from "./pages/projects/ProjectBudgetRedirect";
-import ProjectDrawingsPage from "./pages/projects/ProjectDrawingsPage";
-import ProjectDrawingViewerPage from "./pages/projects/ProjectDrawingViewerPage";
-import ProjectDailyReportsPage from "./pages/projects/ProjectDailyReportsPage";
-import ProjectInspectionsPage from "./pages/projects/ProjectInspectionsPage";
-import ProjectSchedulePage from "./pages/projects/ProjectSchedulePage";
-import ProjectReportsPage from "./pages/projects/ProjectReportsPage";
-import ProjectMeetingsPage from "./pages/projects/ProjectMeetingsPage";
-import ProjectFinancialsPage from "./pages/projects/ProjectFinancialsPage";
-import ProjectTeamPage from "./pages/projects/ProjectTeamPage";
-import ProjectActivityPage from "./pages/projects/ProjectActivityPage";
-import ProjectInventoryPage from "./pages/projects/ProjectInventoryPage";
-import { ProjectOverviewPage } from "./pages/projects/ProjectOverviewPage";
+
+const ProjectIndexEntry = lazy(() =>
+  import("@/features/project-ui/ProjectIndexEntry").then((m) => ({
+    default: m.ProjectIndexEntry,
+  })),
+);
+const ProjectOverviewPage = lazy(() =>
+  import("@/pages/projects/ProjectOverviewPage").then((m) => ({
+    default: m.ProjectOverviewPage,
+  })),
+);
+const ProjectTasksPage = lazy(() => import("./pages/projects/ProjectTasksPage"));
+const ProjectFilesPage = lazy(() => import("./pages/projects/ProjectFilesPage"));
+const ProjectRfisPage = lazy(() => import("./pages/projects/ProjectRfisPage"));
+const ProjectBudgetRedirect = lazy(
+  () => import("./pages/projects/ProjectBudgetRedirect"),
+);
+const ProjectDrawingsPage = lazy(
+  () => import("./pages/projects/ProjectDrawingsPage"),
+);
+const ProjectDrawingViewerPage = lazy(
+  () => import("./pages/projects/ProjectDrawingViewerPage"),
+);
+const ProjectDailyReportsPage = lazy(
+  () => import("./pages/projects/ProjectDailyReportsPage"),
+);
+const ProjectInspectionsPage = lazy(
+  () => import("./pages/projects/ProjectInspectionsPage"),
+);
+const ProjectSchedulePage = lazy(
+  () => import("./pages/projects/ProjectSchedulePage"),
+);
+const ProjectReportsPage = lazy(
+  () => import("./pages/projects/ProjectReportsPage"),
+);
+const ProjectMeetingsPage = lazy(
+  () => import("./pages/projects/ProjectMeetingsPage"),
+);
+const ProjectFinancialsPage = lazy(
+  () => import("./pages/projects/ProjectFinancialsPage"),
+);
+const ProjectTeamPage = lazy(() => import("./pages/projects/ProjectTeamPage"));
+const ProjectActivityPage = lazy(
+  () => import("./pages/projects/ProjectActivityPage"),
+);
+const ProjectInventoryPage = lazy(
+  () => import("./pages/projects/ProjectInventoryPage"),
+);
 
 /** Authenticated app shell: each feature has its own top-level path (not nested under `/dashboard`). */
 export default function App() {

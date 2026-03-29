@@ -2,6 +2,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -15,9 +16,15 @@ import type {
 } from '@/types/task';
 import { EMPTY_TASK_FILTERS } from '@/types/task';
 import { seedBuildWireTasks } from '@/features/tasks/migrateLegacyMock';
+import { applyConstructionFilters } from '@/features/tasks/taskFilterUtils';
 import { patchProjectTask } from '@/api/tasks';
 import { emitTaskNotification } from '@/features/notifications/taskNotifications';
-import { KANBAN_STATUSES } from '@/features/tasks/taskConstants';
+import {
+  cloneDefaultKanbanSections,
+  readKanbanSections,
+  writeKanbanSections,
+  type KanbanBoardSectionPersisted,
+} from '@/lib/kanbanBoardPrefs';
 
 type Ctx = {
   projectId: string;
@@ -37,23 +44,18 @@ type Ctx = {
   bulkSetPriority: (ids: TaskId[], priority: TaskPriorityKey) => void;
   bulkAssign: (ids: TaskId[], assigneeIds: string[]) => void;
   nextDisplayNumber: () => string;
+  kanbanSections: KanbanBoardSectionPersisted[];
+  addKanbanSection: () => void;
+  renameKanbanSection: (sectionId: string, title: string) => void;
+  deleteKanbanSection: (sectionId: string) => void;
+  reorderKanbanSections: (fromIndex: number, toIndex: number) => void;
+  toggleKanbanSectionCollapsed: (sectionId: string) => void;
+  moveTaskKanban: (taskId: TaskId, toSectionId: string, toIndex: number) => void;
+  getNextKanbanOrder: (sectionId: string) => number;
+  resolveKanbanSectionId: (id: string | undefined) => string;
 };
 
 const TaskProjectContext = createContext<Ctx | null>(null);
-
-function applyFilters(tasks: BuildWireTask[], f: TaskListFilters): BuildWireTask[] {
-  return tasks.filter((t) => {
-    if (f.types.length && !f.types.includes(t.type)) return false;
-    if (f.priorities.length && !f.priorities.includes(t.priority)) return false;
-    if (f.trades.length && !f.trades.includes(t.trade)) return false;
-    if (f.floors.length && !f.floors.includes(t.floor)) return false;
-    if (f.assigneeIds.length) {
-      const hit = t.assignees.some((a) => f.assigneeIds.includes(a));
-      if (!hit) return false;
-    }
-    return true;
-  });
-}
 
 function maxTaskNumber(tasks: BuildWireTask[]): number {
   let max = 0;
@@ -75,8 +77,167 @@ export function TaskProjectProvider({
   const [filters, setFilters] = useState<TaskListFilters>(EMPTY_TASK_FILTERS);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
   const [bulkSelectMode, setBulkSelectMode] = useState(false);
+  const [kanbanSections, setKanbanSections] = useState<KanbanBoardSectionPersisted[]>(() => {
+    return readKanbanSections(projectId) ?? cloneDefaultKanbanSections();
+  });
 
-  const filteredTasks = useMemo(() => applyFilters(tasks, filters), [tasks, filters]);
+  useEffect(() => {
+    writeKanbanSections(projectId, kanbanSections);
+  }, [projectId, kanbanSections]);
+
+  const resolveKanbanSectionId = useCallback(
+    (id: string | undefined) => {
+      if (id && kanbanSections.some((s) => s.id === id)) return id;
+      return kanbanSections[0]?.id ?? 'recent';
+    },
+    [kanbanSections],
+  );
+
+  const getNextKanbanOrder = useCallback(
+    (sectionId: string) => {
+      const sid = resolveKanbanSectionId(sectionId);
+      let max = -1;
+      for (const t of tasks) {
+        if (t.status === 'void') continue;
+        if (t.kanban_section_id === sid) max = Math.max(max, t.kanban_order);
+      }
+      return max + 1;
+    },
+    [tasks, resolveKanbanSectionId],
+  );
+
+  const moveTaskKanban = useCallback(
+    (taskId: TaskId, toSectionId: string, toIndex: number) => {
+      const targetSection = resolveKanbanSectionId(toSectionId);
+      setTasks((prev) => {
+        const now = new Date().toISOString();
+        const next = prev.map((t) => ({ ...t }));
+        const taskIdx = next.findIndex((t) => t.id === taskId);
+        if (taskIdx < 0) return prev;
+        const task = next[taskIdx];
+        if (task.status === 'void') return prev;
+        const fromSection = task.kanban_section_id;
+
+        const orderedIds = (sid: string) =>
+          next
+            .filter((t) => t.status !== 'void' && t.kanban_section_id === sid)
+            .sort((a, b) => a.kanban_order - b.kanban_order || a.id.localeCompare(b.id))
+            .map((t) => t.id);
+
+        if (fromSection === targetSection) {
+          const ids = orderedIds(fromSection).filter((id) => id !== taskId);
+          const clamped = Math.max(0, Math.min(toIndex, ids.length));
+          ids.splice(clamped, 0, taskId);
+          ids.forEach((id, order) => {
+            const i = next.findIndex((t) => t.id === id);
+            if (i >= 0) {
+              next[i] = {
+                ...next[i],
+                kanban_section_id: targetSection,
+                kanban_order: order,
+                updated_at: now,
+              };
+            }
+          });
+          return next;
+        }
+
+        const srcIds = orderedIds(fromSection).filter((id) => id !== taskId);
+        const destIds = orderedIds(targetSection).filter((id) => id !== taskId);
+        const clamped = Math.max(0, Math.min(toIndex, destIds.length));
+        destIds.splice(clamped, 0, taskId);
+
+        srcIds.forEach((id, order) => {
+          const i = next.findIndex((t) => t.id === id);
+          if (i >= 0) {
+            next[i] = {
+              ...next[i],
+              kanban_section_id: fromSection,
+              kanban_order: order,
+              updated_at: now,
+            };
+          }
+        });
+        destIds.forEach((id, order) => {
+          const i = next.findIndex((t) => t.id === id);
+          if (i >= 0) {
+            next[i] = {
+              ...next[i],
+              kanban_section_id: targetSection,
+              kanban_order: order,
+              updated_at: now,
+            };
+          }
+        });
+        return next;
+      });
+      void patchProjectTask(projectId, taskId, {
+        kanban_section_id: targetSection,
+        kanban_order: toIndex,
+      }).catch(() => {});
+    },
+    [projectId, resolveKanbanSectionId],
+  );
+
+  const addKanbanSection = useCallback(() => {
+    const id = `sec_${crypto.randomUUID().slice(0, 8)}`;
+    setKanbanSections((prev) => [...prev, { id, title: '', collapsed: false }]);
+  }, []);
+
+  const renameKanbanSection = useCallback((sectionId: string, title: string) => {
+    setKanbanSections((prev) =>
+      prev.map((s) => (s.id === sectionId ? { ...s, title } : s)),
+    );
+  }, []);
+
+  const deleteKanbanSection = useCallback(
+    (sectionId: string) => {
+      if (kanbanSections.length <= 1) return;
+      const idx = kanbanSections.findIndex((s) => s.id === sectionId);
+      if (idx < 0) return;
+      const fallbackId = kanbanSections[idx === 0 ? 1 : idx - 1].id;
+      setTasks((prev) => {
+        const now = new Date().toISOString();
+        const next = prev.map((t) =>
+          t.kanban_section_id === sectionId
+            ? { ...t, kanban_section_id: fallbackId, updated_at: now }
+            : t,
+        );
+        const ids = next
+          .filter((t) => t.status !== 'void' && t.kanban_section_id === fallbackId)
+          .sort((a, b) => a.kanban_order - b.kanban_order || a.id.localeCompare(b.id))
+          .map((t) => t.id);
+        ids.forEach((id, order) => {
+          const i = next.findIndex((t) => t.id === id);
+          if (i >= 0) next[i] = { ...next[i], kanban_order: order, updated_at: now };
+        });
+        return next;
+      });
+      setKanbanSections((prev) => prev.filter((s) => s.id !== sectionId));
+    },
+    [kanbanSections],
+  );
+
+  const reorderKanbanSections = useCallback((fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return;
+    setKanbanSections((prev) => {
+      const copy = [...prev];
+      const [x] = copy.splice(fromIndex, 1);
+      copy.splice(toIndex, 0, x);
+      return copy;
+    });
+  }, []);
+
+  const toggleKanbanSectionCollapsed = useCallback((sectionId: string) => {
+    setKanbanSections((prev) =>
+      prev.map((s) => (s.id === sectionId ? { ...s, collapsed: !s.collapsed } : s)),
+    );
+  }, []);
+
+  const filteredTasks = useMemo(
+    () => applyConstructionFilters(tasks, filters),
+    [tasks, filters],
+  );
 
   const nextDisplayNumber = useCallback(() => {
     const n = maxTaskNumber(tasks) + 1;
@@ -171,6 +332,15 @@ export function TaskProjectProvider({
       bulkSetPriority,
       bulkAssign,
       nextDisplayNumber,
+      kanbanSections,
+      addKanbanSection,
+      renameKanbanSection,
+      deleteKanbanSection,
+      reorderKanbanSections,
+      toggleKanbanSectionCollapsed,
+      moveTaskKanban,
+      getNextKanbanOrder,
+      resolveKanbanSectionId,
     }),
     [
       projectId,
@@ -187,6 +357,15 @@ export function TaskProjectProvider({
       bulkSetPriority,
       bulkAssign,
       nextDisplayNumber,
+      kanbanSections,
+      addKanbanSection,
+      renameKanbanSection,
+      deleteKanbanSection,
+      reorderKanbanSections,
+      toggleKanbanSectionCollapsed,
+      moveTaskKanban,
+      getNextKanbanOrder,
+      resolveKanbanSectionId,
     ],
   );
 
@@ -197,8 +376,4 @@ export function useTaskProject(): Ctx {
   const x = useContext(TaskProjectContext);
   if (!x) throw new Error('useTaskProject must be used within TaskProjectProvider');
   return x;
-}
-
-export function isKanbanColumnId(id: string): id is TaskStatus {
-  return (KANBAN_STATUSES as string[]).includes(id);
 }

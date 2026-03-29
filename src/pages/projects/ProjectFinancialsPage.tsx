@@ -7,6 +7,7 @@ import { KpiStatCard } from "@/components/ui/kpi-stat-card";
 import { PageHeader } from "@/components/ui/page-header";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { SegmentedControl } from "@/components/ui/segmented-control";
+import { ModulePageShell } from "@/features/project-ui/components";
 import {
   DUMMY_BUDGET_LINES,
   DUMMY_CHANGE_ORDERS,
@@ -330,7 +331,7 @@ export default function ProjectFinancialsPage() {
   const [tab, setTab] = useState<Tab>("budget");
 
   return (
-    <div className="flex min-h-full flex-col gap-5 p-6">
+    <ModulePageShell>
       <PageHeader
         title="Financials"
         description="Budget, expenses, change orders, and payment plans."
@@ -443,6 +444,6 @@ export default function ProjectFinancialsPage() {
           }
         />
       )}
-    </div>
+    </ModulePageShell>
   );
 }

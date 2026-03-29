@@ -195,7 +195,6 @@ export default function ProjectsListPage() {
               <Button
                 type="button"
                 variant="primary"
-                size="sm"
                 className="shrink-0 font-semibold"
                 onClick={() => setCreateOpen(true)}
               >

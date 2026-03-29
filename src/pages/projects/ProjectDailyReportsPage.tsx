@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DataTable, type DataTableColumn } from "@/components/ui/data-table";
@@ -6,31 +6,46 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import {
+  DAILY_REPORT_CALENDAR_LEGEND,
+  DAILY_REPORT_STATUS_BADGE,
+  WEEKDAY_LABELS,
+} from "@/config/pm/daily-reports";
+import { ModulePageShell } from "@/features/project-ui/components";
+import {
   DUMMY_DAILY_REPORTS,
   DUMMY_MARCH_2026_DAYS,
   type CalendarDot,
   type DailyReportRow,
 } from "@/features/project-ui/projectDummyData";
 
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+/** Calendar month shown in the UI (demo). */
+const CAL_YEAR = 2026;
+const CAL_MONTH_INDEX = 2; // March — 0-based
 
-const DOT_CONFIG: Record<CalendarDot, { cls: string; label: string }> = {
-  approved: { cls: "bg-success", label: "Approved" },
-  pending: { cls: "bg-blue-500", label: "Pending" },
-  draft: { cls: "bg-warning", label: "Draft" },
-  missing: { cls: "bg-danger", label: "Missing" },
-  weekend: { cls: "bg-muted/40", label: "Weekend" },
-};
+/** Fixed row height — avoids `aspect-square` growing with column width on wide monitors. */
+const calCellH = "h-9 w-full min-w-0 sm:h-10";
 
-const STATUS_VARIANT: Record<
-  DailyReportRow["status"],
-  "success" | "warning" | "danger" | "secondary"
-> = {
-  Approved: "success",
-  Pending: "warning",
-  Rejected: "danger",
-  Draft: "secondary",
-};
+function buildMonthGrid(
+  year: number,
+  monthIndex: number,
+  dayDots: { day: number; dot: CalendarDot }[],
+): ({ kind: "pad" } | { kind: "day"; day: number; dot: CalendarDot; weekend: boolean })[] {
+  const dotByDay = new Map(dayDots.map((d) => [d.day, d.dot]));
+  const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+  const startWeekday = new Date(year, monthIndex, 1).getDay();
+  const cells: (
+    | { kind: "pad" }
+    | { kind: "day"; day: number; dot: CalendarDot; weekend: boolean }
+  )[] = [];
+  for (let i = 0; i < startWeekday; i++) cells.push({ kind: "pad" });
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dot = dotByDay.get(day) ?? "missing";
+    const wd = new Date(year, monthIndex, day).getDay();
+    cells.push({ kind: "day", day, dot, weekend: wd === 0 || wd === 6 });
+  }
+  while (cells.length % 7 !== 0) cells.push({ kind: "pad" });
+  return cells;
+}
 
 const LIST_COLUMNS: DataTableColumn<DailyReportRow>[] = [
   {
@@ -38,6 +53,7 @@ const LIST_COLUMNS: DataTableColumn<DailyReportRow>[] = [
     header: "Date",
     headerClassName: "pl-4 pr-3",
     cellClassName: "pl-4 pr-3 whitespace-nowrap",
+    sortValue: (r) => r.date,
     cell: (r) => (
       <span className="font-mono text-[13px] text-primary">{r.date}</span>
     ),
@@ -47,6 +63,7 @@ const LIST_COLUMNS: DataTableColumn<DailyReportRow>[] = [
     header: "Submitted by",
     headerClassName: "px-3",
     cellClassName: "px-3",
+    sortValue: (r) => r.submittedBy,
     cell: (r) => (
       <span className="text-[13px] font-medium text-primary">{r.submittedBy}</span>
     ),
@@ -57,6 +74,7 @@ const LIST_COLUMNS: DataTableColumn<DailyReportRow>[] = [
     headerClassName: "px-3",
     cellClassName: "px-3",
     align: "right",
+    sortValue: (r) => r.crew,
     cell: (r) => (
       <span className="text-[13px] tabular-nums text-secondary">{r.crew}</span>
     ),
@@ -66,6 +84,7 @@ const LIST_COLUMNS: DataTableColumn<DailyReportRow>[] = [
     header: "Weather",
     headerClassName: "px-3",
     cellClassName: "px-3",
+    sortValue: (r) => r.weather,
     cell: (r) => (
       <span className="text-[13px] text-secondary">{r.weather}</span>
     ),
@@ -75,8 +94,9 @@ const LIST_COLUMNS: DataTableColumn<DailyReportRow>[] = [
     header: "Status",
     headerClassName: "px-3 pr-4",
     cellClassName: "px-3 pr-4",
+    sortValue: (r) => r.status,
     cell: (r) => (
-      <Badge variant={STATUS_VARIANT[r.status]} size="sm">
+      <Badge variant={DAILY_REPORT_STATUS_BADGE[r.status]} size="sm">
         {r.status}
       </Badge>
     ),
@@ -86,11 +106,16 @@ const LIST_COLUMNS: DataTableColumn<DailyReportRow>[] = [
 export default function ProjectDailyReportsPage() {
   const [mode, setMode] = useState<"calendar" | "list">("calendar");
 
+  const calendarCells = useMemo(
+    () => buildMonthGrid(CAL_YEAR, CAL_MONTH_INDEX, DUMMY_MARCH_2026_DAYS),
+    [],
+  );
+
   return (
-    <div className="flex min-h-full flex-col gap-5 p-6">
+    <ModulePageShell>
       <PageHeader
         title="Daily Reports"
-        description="Field narrative, crew, weather, and photos — under 5 minutes."
+        description="Field narrative, crew, weather, and photos — fast to submit."
         actions={
           <>
             <SegmentedControl
@@ -106,37 +131,31 @@ export default function ProjectDailyReportsPage() {
         }
       />
 
-      {/* Missing report banner */}
-      <div className="flex items-center gap-3 rounded-xl border border-warning/35 bg-warning/8 px-4 py-2.5 text-sm">
-        <span className="text-warning">⚠</span>
-        <span className="text-primary">
-          <span className="font-semibold">Missing report:</span> today is a
-          working day — submit before 6 PM.
+      <div className="flex w-full min-w-0 flex-col gap-3 rounded-md border border-warning/25 bg-warning/[0.06] px-4 py-3 text-sm sm:flex-row sm:items-center">
+        <span className="font-medium text-warning">Missing report</span>
+        <span className="text-secondary">
+          Today is a working day — submit before 6 PM.
         </span>
         <button
           type="button"
-          className="ml-auto shrink-0 rounded-lg border border-warning/40 bg-warning/10 px-3 py-1 text-xs font-medium text-warning hover:bg-warning/15"
+          className="rounded-lg border border-warning/35 bg-warning/10 px-3 py-1.5 text-xs font-medium text-warning hover:bg-warning/15 sm:ms-auto"
         >
           Submit now
         </button>
       </div>
 
-      {mode === "calendar" && (
-        <div className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
-          {/* Calendar header */}
-          <div className="mb-4 flex items-center justify-between">
-            <p className="text-base font-semibold text-primary">March 2026</p>
-            <div className="flex items-center gap-2">
-              {/* Legend */}
-              <div className="hidden items-center gap-3 text-xs text-muted sm:flex">
-                {(
-                  Object.entries(DOT_CONFIG) as [
-                    CalendarDot,
-                    { cls: string; label: string },
-                  ][]
-                ).map(([key, v]) => (
+      {mode === "calendar" ? (
+        <div className="w-full min-w-0 rounded-md border border-border/60 bg-surface p-3 sm:p-5">
+          <div className="mb-3 flex flex-col gap-2 sm:mb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+            <p className="text-sm font-semibold text-primary sm:text-base">March 2026</p>
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="hidden flex-wrap items-center gap-3 text-xs text-muted sm:flex">
+                {(Object.entries(DAILY_REPORT_CALENDAR_LEGEND) as [
+                  CalendarDot,
+                  { className: string; label: string },
+                ][]).map(([key, v]) => (
                   <span key={key} className="inline-flex items-center gap-1.5">
-                    <span className={`h-2 w-2 rounded-full ${v.cls}`} />
+                    <span className={`h-2 w-2 rounded-full ${v.className}`} />
                     {v.label}
                   </span>
                 ))}
@@ -144,13 +163,13 @@ export default function ProjectDailyReportsPage() {
               <div className="flex gap-1">
                 <button
                   type="button"
-                  className="rounded-lg border border-border px-2.5 py-1 text-xs text-secondary hover:bg-muted/10 hover:text-primary"
+                  className="rounded-lg border border-border/60 px-2.5 py-1 text-xs text-secondary hover:bg-muted/10 hover:text-primary"
                 >
                   ‹
                 </button>
                 <button
                   type="button"
-                  className="rounded-lg border border-border px-2.5 py-1 text-xs text-secondary hover:bg-muted/10 hover:text-primary"
+                  className="rounded-lg border border-border/60 px-2.5 py-1 text-xs text-secondary hover:bg-muted/10 hover:text-primary"
                 >
                   ›
                 </button>
@@ -158,66 +177,76 @@ export default function ProjectDailyReportsPage() {
             </div>
           </div>
 
-          {/* Mobile legend */}
           <div className="mb-3 flex flex-wrap gap-3 text-xs text-muted sm:hidden">
-            {(
-              Object.entries(DOT_CONFIG) as [
-                CalendarDot,
-                { cls: string; label: string },
-              ][]
-            ).map(([key, v]) => (
+            {(Object.entries(DAILY_REPORT_CALENDAR_LEGEND) as [
+              CalendarDot,
+              { className: string; label: string },
+            ][]).map(([key, v]) => (
               <span key={key} className="inline-flex items-center gap-1.5">
-                <span className={`h-2 w-2 rounded-full ${v.cls}`} />
+                <span className={`h-2 w-2 rounded-full ${v.className}`} />
                 {v.label}
               </span>
             ))}
           </div>
 
-          {/* Weekday headers */}
-          <div className="mb-1 grid grid-cols-7 gap-1 text-center">
-            {WEEKDAYS.map((d) => (
+          <div className="mb-0.5 grid w-full min-w-0 grid-cols-7 gap-px sm:mb-1 sm:gap-1">
+            {WEEKDAY_LABELS.map((d) => (
               <div
                 key={d}
-                className="py-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted"
+                className="px-0.5 py-1 text-center text-[9px] font-semibold uppercase leading-tight tracking-wide text-muted sm:py-1.5 sm:text-[11px]"
               >
                 {d}
               </div>
             ))}
           </div>
 
-          {/* Days grid */}
-          <div className="grid grid-cols-7 gap-1">
-            {DUMMY_MARCH_2026_DAYS.map(({ day, dot }) => {
-              const { cls } = DOT_CONFIG[dot];
-              const isWeekend = dot === "weekend";
+          <div className="grid w-full min-w-0 grid-cols-7 gap-px sm:gap-1">
+            {calendarCells.map((cell, idx) => {
+              if (cell.kind === "pad") {
+                return (
+                  <div
+                    key={`pad-${idx}`}
+                    className={`${calCellH} rounded-md bg-muted/[0.04]`}
+                    aria-hidden
+                  />
+                );
+              }
+              const { className: dotCls } = DAILY_REPORT_CALENDAR_LEGEND[cell.dot];
               return (
                 <button
-                  key={day}
+                  key={cell.day}
                   type="button"
-                  disabled={isWeekend}
-                  className={`flex aspect-square flex-col items-center justify-center rounded-xl text-sm transition-colors ${
-                    isWeekend
+                  disabled={cell.weekend}
+                  className={`flex ${calCellH} touch-manipulation flex-row items-center justify-center gap-0.5 rounded-md px-0.5 text-[11px] transition-colors sm:gap-1 sm:text-xs ${
+                    cell.weekend
                       ? "cursor-default opacity-50"
-                      : "hover:bg-muted/10 hover:text-primary"
+                      : "hover:bg-muted/10 hover:text-primary active:bg-muted/15"
                   } text-primary`}
                 >
-                  <span className="tabular-nums leading-none">{day}</span>
-                  <span className={`mt-1.5 h-1.5 w-1.5 rounded-full ${cls}`} />
+                  <span className="shrink-0 tabular-nums font-medium leading-none">
+                    {cell.day}
+                  </span>
+                  <span
+                    className={`h-1.5 w-1.5 shrink-0 rounded-full ${dotCls}`}
+                    aria-hidden
+                  />
                 </button>
               );
             })}
           </div>
         </div>
-      )}
+      ) : null}
 
-      {mode === "list" && (
+      {mode === "list" ? (
         <DataTable<DailyReportRow>
           variant="card"
           columns={LIST_COLUMNS}
           data={DUMMY_DAILY_REPORTS}
           rowKey={(r) => r.date}
+          tableMinWidthClassName="min-w-0 sm:min-w-full"
+          minWidthTableLayout="fixed"
           maxHeightClassName="max-h-none"
-          onRowClick={() => {}}
+          className="w-full min-w-0"
           emptyFallback={
             <EmptyState
               title="No daily reports yet"
@@ -226,7 +255,7 @@ export default function ProjectDailyReportsPage() {
             />
           }
         />
-      )}
-    </div>
+      ) : null}
+    </ModulePageShell>
   );
 }

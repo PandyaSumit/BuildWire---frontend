@@ -22,7 +22,8 @@ export type NewTaskFormValues = {
 export function createBuildWireTask(
   displayNumber: string,
   values: NewTaskFormValues,
-  createdBy: string
+  createdBy: string,
+  kanban?: { sectionId: string; order: number },
 ): BuildWireTask {
   const now = new Date().toISOString();
   return {
@@ -63,5 +64,7 @@ export function createBuildWireTask(
     progress: 0,
     pinned: false,
     is_milestone: false,
+    kanban_section_id: kanban?.sectionId ?? 'recent',
+    kanban_order: kanban?.order ?? 0,
   };
 }

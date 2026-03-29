@@ -2,6 +2,9 @@
 
 export type DemoUser = { id: string; name: string; initials: string };
 
+/** Demo “current user” for My work / field assignment chips until auth is wired */
+export const DEMO_ACTOR_USER_ID = 'u_raj';
+
 export const DEMO_USERS: DemoUser[] = [
   { id: 'u_raj', name: 'Raj Kumar', initials: 'RK' },
   { id: 'u_priya', name: 'Priya Shah', initials: 'PS' },

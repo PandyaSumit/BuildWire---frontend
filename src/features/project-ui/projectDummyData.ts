@@ -17,14 +17,15 @@ export type DummyRfiRow = {
   num: string;
   title: string;
   trade: string;
-  pri: 'Normal' | 'Urgent';
+  priority: 'Normal' | 'Urgent';
   status: string;
-  bic: string;
+  /** Ball in court */
+  ballInCourt: string;
   submittedBy: string;
   assignedTo: string;
   due: string;
-  days: number;
-  cost: boolean;
+  daysOpen: number;
+  costImpact: boolean;
   highlight?: boolean;
 };
 
@@ -33,94 +34,94 @@ export const DUMMY_RFIS: DummyRfiRow[] = [
     num: 'RFI-014',
     title: 'Beam opening at grid C — confirm reinforcement lap length',
     trade: 'Structural',
-    pri: 'Urgent',
+    priority: 'Urgent',
     status: 'Open',
-    bic: 'Arch',
+    ballInCourt: 'Arch',
     submittedBy: 'Raj K.',
     assignedTo: 'Neha Desai',
     due: 'Mar 20',
-    days: 9,
-    cost: true,
+    daysOpen: 9,
+    costImpact: true,
     highlight: true,
   },
   {
     num: 'RFI-013',
     title: 'Façade anchor spacing vs shop drawing FA-12',
     trade: 'Finishing',
-    pri: 'Normal',
+    priority: 'Normal',
     status: 'Under Review',
-    bic: 'Reviewer',
+    ballInCourt: 'Reviewer',
     submittedBy: 'Priya S.',
     assignedTo: 'Consultant',
     due: 'Mar 22',
-    days: 5,
-    cost: false,
+    daysOpen: 5,
+    costImpact: false,
   },
   {
     num: 'RFI-012',
     title: 'Riser sleeve fire seal rating',
     trade: 'MEP',
-    pri: 'Urgent',
+    priority: 'Urgent',
     status: 'Open',
-    bic: 'PM',
+    ballInCourt: 'PM',
     submittedBy: 'Amit V.',
     assignedTo: 'MEP Lead',
     due: 'Mar 18',
-    days: 11,
-    cost: true,
+    daysOpen: 11,
+    costImpact: true,
     highlight: true,
   },
   {
     num: 'RFI-011',
     title: 'Waterproofing membrane overlap at planter',
     trade: 'Waterproofing',
-    pri: 'Normal',
+    priority: 'Normal',
     status: 'Draft',
-    bic: 'Submitter',
+    ballInCourt: 'Submitter',
     submittedBy: 'You',
     assignedTo: '—',
     due: 'Mar 25',
-    days: 2,
-    cost: false,
+    daysOpen: 2,
+    costImpact: false,
   },
   {
     num: 'RFI-009',
     title: 'Slab penetration for riser — core drill allowed?',
     trade: 'MEP',
-    pri: 'Normal',
+    priority: 'Normal',
     status: 'Answered',
-    bic: 'PM',
+    ballInCourt: 'PM',
     submittedBy: 'Site Eng.',
     assignedTo: 'Architect',
     due: 'Mar 10',
-    days: 12,
-    cost: false,
+    daysOpen: 12,
+    costImpact: false,
   },
   {
     num: 'RFI-008',
     title: 'Stair flight width vs NBC exit width',
     trade: 'Architectural',
-    pri: 'Normal',
+    priority: 'Normal',
     status: 'Closed',
-    bic: '—',
+    ballInCourt: '—',
     submittedBy: 'QC',
     assignedTo: 'Architect',
     due: 'Feb 28',
-    days: 21,
-    cost: false,
+    daysOpen: 21,
+    costImpact: false,
   },
   {
     num: 'RFI-006',
     title: 'Lightning protection down conductor route',
     trade: 'Electrical',
-    pri: 'Urgent',
+    priority: 'Urgent',
     status: 'Void',
-    bic: '—',
+    ballInCourt: '—',
     submittedBy: 'MEP',
     assignedTo: '—',
     due: '—',
-    days: 0,
-    cost: false,
+    daysOpen: 0,
+    costImpact: false,
   },
 ];
 

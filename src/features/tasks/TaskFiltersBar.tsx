@@ -51,7 +51,11 @@ export function TaskFiltersBar() {
       filters.priorities.length +
       filters.assigneeIds.length +
       filters.trades.length +
-      filters.floors.length >
+      filters.floors.length +
+      (filters.search.trim() ? 1 : 0) +
+      (filters.overdueOnly ? 1 : 0) +
+      (filters.blockedOnly ? 1 : 0) +
+      (filters.myWorkOnly ? 1 : 0) >
     0;
 
   const typeOptions = useMemo(

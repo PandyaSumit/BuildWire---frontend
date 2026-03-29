@@ -33,20 +33,20 @@ export const darkTheme: Theme = {
 };
 
 export const lightTheme: Theme = {
-    bg: '#FAFAFA',
+    bg: '#F7FAFC',
     surface: '#FFFFFF',
     elevated: '#FFFFFF',
-    border: '#E5E5E5',
-    textPrimary: '#0A0A0A',
-    textSecondary: '#525252',
-    textMuted: '#A3A3A3',
-    brand: '#171717',
-    brandLight: '#17171710',
+    border: '#E2E8F0',
+    textPrimary: '#0F172A',
+    textSecondary: '#334155',
+    textMuted: '#64748B',
+    brand: '#2563EB',
+    brandLight: '#2563EB1A',
     success: '#16A34A',
-    warning: '#D97706',
-    danger: '#DC2626',
-    sidebarBg: '#F5F5F5',
-    headerBg: '#FAFAFA',
+    warning: '#F59E0B',
+    danger: '#F87171',
+    sidebarBg: '#F3F7FB',
+    headerBg: '#F3F7FB',
 };
 
 export const themes = {

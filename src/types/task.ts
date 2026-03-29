@@ -103,6 +103,10 @@ export interface BuildWireTask {
   progress: number;
   pinned?: boolean;
   is_milestone?: boolean;
+  /** Kanban (section board): which section this task belongs to */
+  kanban_section_id: string;
+  /** Sort order within `kanban_section_id` (lower = higher in column) */
+  kanban_order: number;
 }
 
 export type TaskListFilters = {
@@ -111,6 +115,13 @@ export type TaskListFilters = {
   assigneeIds: string[];
   trades: TaskTradeKey[];
   floors: string[];
+  /** Case-insensitive substring across title, number, location, floor, category */
+  search: string;
+  /** Active tasks where due date is before today (excludes done / void) */
+  overdueOnly: boolean;
+  blockedOnly: boolean;
+  /** Assigned to the signed-in field user (demo: DEMO_ACTOR_USER_ID) */
+  myWorkOnly: boolean;
 };
 
 export const EMPTY_TASK_FILTERS: TaskListFilters = {
@@ -119,4 +130,8 @@ export const EMPTY_TASK_FILTERS: TaskListFilters = {
   assigneeIds: [],
   trades: [],
   floors: [],
+  search: '',
+  overdueOnly: false,
+  blockedOnly: false,
+  myWorkOnly: false,
 };

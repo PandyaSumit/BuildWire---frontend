@@ -259,6 +259,7 @@
     "floorPlanBeforeLink": "फ़्लोर प्लान पिन — खोलें",
     "floorPlanLink": "ड्राइंग",
     "floorPlanAfterLink": "पूरे व्यूअर के लिए।",
+    "cardPinned": "पिन की गई",
     "pinnedTitle": "प्लान पर पिन",
     "photoCount": "📷 {{count}}",
     "commentCount": "💬 {{count}}",
@@ -327,7 +328,11 @@
       "zoomWeek": "सप्ताह",
       "zoomMonth": "महीना",
       "zoomQuarter": "तिमाही",
-      "phaseDefault": "सामान्य"
+      "phaseDefault": "सामान्य",
+      "emptyTitle": "अनुसूची में कोई कार्य नहीं",
+      "emptyDesc": "रद्द चिह्नित कार्य यहाँ नहीं दिखते। समयरेखा देखने के लिए कार्य जोड़ें या फ़िल्टर बदलें।",
+      "scrollHint": "सभी पंक्तियों के लिए ऊपर-नीचे स्क्रॉल करें; पूरी समयरेखा के लिए बाएँ-दाएँ स्क्रॉल करें।",
+      "chartAria": "कार्य समयरेखा चार्ट"
     },
     "floorBanner": "फ़्लोर प्लान पर कार्य पिन करने के लिए ड्राइंग खोलें।",
     "wipLimit": "WIP",

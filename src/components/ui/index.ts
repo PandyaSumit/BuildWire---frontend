@@ -23,12 +23,14 @@ export {
   type ConfirmDialogVariant,
   type DeleteConfirmDialogProps,
 } from './confirm-dialog';
-export { Skeleton, PageSkeletonOverview } from './skeleton';
+export { Skeleton, PageSkeletonOverview, PageSkeletonModule } from './skeleton';
 export {
   DataTable,
   type DataTableColumn,
   type DataTableProps,
+  type DataTableSortState,
   type DataTableVariant,
+  type DataTableDensity,
 } from './data-table';
 export { PageHeader } from './page-header';
 export { StatsBar } from './stats-bar';

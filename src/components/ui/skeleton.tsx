@@ -18,3 +18,15 @@ export function PageSkeletonOverview() {
     </div>
   );
 }
+
+/** Lightweight fallback while lazy project modules load */
+export function PageSkeletonModule() {
+  return (
+    <div className="min-h-[50vh] space-y-5 p-4 sm:p-6">
+      <Skeleton className="h-8 w-44 max-w-[60%]" />
+      <Skeleton className="h-4 w-full max-w-lg" />
+      <Skeleton className="h-px w-full max-w-xl bg-transparent" />
+      <Skeleton className="h-64 w-full rounded-xl" />
+    </div>
+  );
+}

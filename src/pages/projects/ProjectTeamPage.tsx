@@ -5,6 +5,8 @@ import { DataTable, type DataTableColumn } from "@/components/ui/data-table";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatsBar } from "@/components/ui/stats-bar";
+import { TEAM_ROLE_BADGE_VARIANT } from "@/config/pm/team";
+import { ModulePageShell } from "@/features/project-ui/components";
 import {
   DUMMY_SUBCONTRACTORS,
   DUMMY_TEAM_MEMBERS,
@@ -12,13 +14,6 @@ import {
   type DummySub,
   type DummyTeamMember,
 } from "@/features/project-ui/projectDummyData";
-
-const ROLE_VARIANT: Record<string, "secondary" | "success" | "warning" | "default"> = {
-  PM: "secondary",
-  Supervisor: "default",
-  Guest: "secondary",
-  Worker: "default",
-};
 
 const MEMBER_COLUMNS: DataTableColumn<DummyTeamMember>[] = [
   {
@@ -42,7 +37,7 @@ const MEMBER_COLUMNS: DataTableColumn<DummyTeamMember>[] = [
     headerClassName: "px-3",
     cellClassName: "px-3",
     cell: (r) => (
-      <Badge variant={ROLE_VARIANT[r.role] ?? "default"} size="sm">
+      <Badge variant={TEAM_ROLE_BADGE_VARIANT[r.role] ?? "default"} size="sm">
         {r.role}
       </Badge>
     ),
@@ -147,7 +142,7 @@ export default function ProjectTeamPage() {
   const s = DUMMY_TEAM_STATS;
 
   return (
-    <div className="flex min-h-full flex-col gap-6 p-6">
+    <ModulePageShell className="gap-6">
       <PageHeader
         title="Team"
         description="Roles, companies, and who is on site today."
@@ -163,7 +158,7 @@ export default function ProjectTeamPage() {
       />
 
       {/* On-site alert */}
-      <div className="flex items-center gap-3 rounded-xl border border-success/25 bg-success/5 px-4 py-2.5 text-sm">
+      <div className="flex items-center gap-3 rounded-xl border border-success/25 bg-success/[0.06] px-4 py-2.5 text-sm">
         <span className="h-2 w-2 animate-pulse rounded-full bg-success" />
         <span className="text-secondary">
           <span className="font-medium text-primary">On site now:</span> Raj
@@ -214,6 +209,6 @@ export default function ProjectTeamPage() {
           }
         />
       </section>
-    </div>
+    </ModulePageShell>
   );
 }

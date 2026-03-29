@@ -24,6 +24,8 @@ type Props = {
   projectId?: string;
   error?: string | null;
   autoFocusTitle?: boolean;
+  /** Omit fields surfaced in document-style task header; keep site + links + advanced. */
+  layoutVariant?: 'default' | 'embedded';
 };
 
 export function TaskFormSections({
@@ -38,9 +40,11 @@ export function TaskFormSections({
   projectId,
   error,
   autoFocusTitle,
+  layoutVariant = 'default',
 }: Props) {
   const { t } = useTranslation();
   const base = projectId ? `/projects/${projectId}` : '';
+  const embedded = layoutVariant === 'embedded';
 
   const pf = (s: string) => `${idPrefix}-${s}`;
 
@@ -56,6 +60,7 @@ export function TaskFormSections({
         />
       ) : null}
 
+      {!embedded ? (
       <div>
         <label htmlFor={pf('title')} className="mb-1 block text-sm font-medium text-primary">
           {t('newTaskDrawer.fieldTitle')} <span className="text-danger">*</span>
@@ -69,7 +74,9 @@ export function TaskFormSections({
           autoFocus={autoFocusTitle}
         />
       </div>
+      ) : null}
 
+      {!embedded ? (
       <Select
         id={pf('type')}
         label={t('newTaskDrawer.type')}
@@ -80,7 +87,9 @@ export function TaskFormSections({
           label: t(taskTypeKeyTKey(k)),
         }))}
       />
+      ) : null}
 
+      {!embedded ? (
       <Select
         id={pf('status')}
         label={t('newTaskDrawer.status')}
@@ -94,8 +103,9 @@ export function TaskFormSections({
           { value: 'void', label: t(taskWorkflowTKey('void')) },
         ]}
       />
+      ) : null}
 
-      {draft.status === 'blocked' ? (
+      {!embedded && draft.status === 'blocked' ? (
         <div>
           <label htmlFor={pf('blocked')} className="mb-1 block text-sm font-medium text-danger">
             {t('newTaskDrawer.blockedReasonLabel')} <span className="text-danger">*</span>
@@ -110,6 +120,7 @@ export function TaskFormSections({
         </div>
       ) : null}
 
+      {!embedded ? (
       <Select
         id={pf('priority')}
         label={t('newTaskDrawer.priority')}
@@ -120,6 +131,7 @@ export function TaskFormSections({
           label: t(taskPriorityTKey(p)),
         }))}
       />
+      ) : null}
 
       <Select
         id={pf('trade')}
@@ -153,6 +165,7 @@ export function TaskFormSections({
         />
       </div>
 
+      {!embedded ? (
       <fieldset className="rounded-lg border border-border/60 p-3">
         <legend className="px-1 text-xs font-semibold text-muted">
           {t('newTaskDrawer.assignees')}
@@ -171,6 +184,7 @@ export function TaskFormSections({
           ))}
         </div>
       </fieldset>
+      ) : null}
 
       <fieldset className="rounded-lg border border-border/60 p-3">
         <legend className="px-1 text-xs font-semibold text-muted">
@@ -191,7 +205,7 @@ export function TaskFormSections({
         </div>
       </fieldset>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className={`grid grid-cols-1 gap-3 ${embedded ? '' : 'sm:grid-cols-2'}`}>
         <div>
           <label htmlFor={pf('start')} className="mb-1 block text-sm font-medium text-primary">
             {t('newTaskDrawer.startDate')}
@@ -204,6 +218,7 @@ export function TaskFormSections({
             className="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-primary"
           />
         </div>
+        {!embedded ? (
         <div>
           <label htmlFor={pf('due')} className="mb-1 block text-sm font-medium text-primary">
             {t('newTaskDrawer.dueDate')}
@@ -216,8 +231,10 @@ export function TaskFormSections({
             className="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-primary"
           />
         </div>
+        ) : null}
       </div>
 
+      {!embedded ? (
       <div>
         <label htmlFor={pf('desc')} className="mb-1 block text-sm font-medium text-primary">
           {t('newTaskDrawer.description')}
@@ -230,7 +247,9 @@ export function TaskFormSections({
           className="w-full resize-y rounded-lg border border-border bg-bg px-3 py-2 text-sm text-primary"
         />
       </div>
+      ) : null}
 
+      {!embedded ? (
       <label className="flex cursor-pointer items-center gap-2 text-sm text-primary">
         <input
           type="checkbox"
@@ -240,6 +259,7 @@ export function TaskFormSections({
         />
         {t('newTaskDrawer.private')}
       </label>
+      ) : null}
 
       <div>
         <label htmlFor={pf('tags')} className="mb-1 block text-sm font-medium text-primary">

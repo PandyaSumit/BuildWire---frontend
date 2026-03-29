@@ -36,7 +36,7 @@ export function StatsBar({ stats, className = '' }: StatsBarProps) {
         return (
           <span
             key={s.label}
-            className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm ${accentClass}`}
+            className={`inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-sm ${accentClass}`}
           >
             <span className={`font-semibold tabular-nums ${valueClass}`}>{s.value}</span>
             <span>{s.label}</span>

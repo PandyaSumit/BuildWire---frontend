@@ -259,6 +259,7 @@
     "floorPlanBeforeLink": "دبابيس مخطط الطابق — افتح",
     "floorPlanLink": "المخططات",
     "floorPlanAfterLink": "للعارض الكامل.",
+    "cardPinned": "مثبتة",
     "pinnedTitle": "مثبت على المخطط",
     "photoCount": "📷 {{count}}",
     "commentCount": "💬 {{count}}",
@@ -327,7 +328,11 @@
       "zoomWeek": "أسبوع",
       "zoomMonth": "شهر",
       "zoomQuarter": "ربع",
-      "phaseDefault": "عام"
+      "phaseDefault": "عام",
+      "emptyTitle": "لا توجد مهام في الجدول الزمني",
+      "emptyDesc": "المهام الملغاة لا تظهر هنا. أضف مهامًا أو عدّل عوامل التصفية لعرض الخط الزمني.",
+      "scrollHint": "مرر عموديًا لرؤية كل الصفوف؛ وأفقيًا لرؤية الخط الزمني كاملًا.",
+      "chartAria": "مخطط الخط الزمني للمهام"
     },
     "floorBanner": "افتح المخططات لتثبيت المهام على مخططات الطوابق.",
     "wipLimit": "حد العمل",
