@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useSidebarMode } from '@/hooks/useSidebarMode';
 import { LanguageMenu } from '@/components/layout/LanguageMenu';
+import { GlobalSearchBar } from '@/components/layout/GlobalSearchBar';
 
 interface HeaderProps {
   title?: string;
@@ -19,8 +20,8 @@ export function Header({ title, subtitle, actions }: HeaderProps) {
   const showProjectBack = sidebarMode.mode === 'project';
 
   return (
-    <header className="sticky top-0 z-40 flex h-[52px] items-center justify-between border-b border-border/50 bg-header px-5 dark:border-white/[0.06]">
-      <div className="flex min-w-0 items-center gap-3">
+    <header className="sticky top-0 z-40 grid h-[52px] grid-cols-[minmax(0,1fr)_minmax(0,32rem)_minmax(0,1fr)] items-center gap-2 border-b border-border/50 bg-header px-3 sm:gap-3 sm:px-5 dark:border-white/[0.06]">
+      <div className="flex min-w-0 items-center gap-2 sm:gap-3">
         <button
           type="button"
           className="rounded-lg p-2 text-muted transition-colors hover:bg-muted/12 hover:text-primary lg:hidden"
@@ -61,16 +62,14 @@ export function Header({ title, subtitle, actions }: HeaderProps) {
         )}
       </div>
 
-      <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+      <div className="flex min-w-0 justify-center px-1 sm:px-2">
+        <GlobalSearchBar className="max-w-full" />
+      </div>
+
+      <div className="flex min-w-0 items-center justify-end gap-1 sm:gap-2">
         {actions}
 
         <LanguageMenu />
-
-        <button type="button" className={iconBtn} aria-label={t('header.search')}>
-          <svg className="h-[18px] w-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </button>
 
         <button type="button" className={iconBtn} aria-label={t('header.notifications')}>
           <svg className="h-[18px] w-[18px]" fill="none" stroke="currentColor" viewBox="0 0 24 24">

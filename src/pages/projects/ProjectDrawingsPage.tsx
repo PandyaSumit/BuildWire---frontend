@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { DRAWING_DISCIPLINE_CLASSES } from "@/config/pm/drawings";
+import { PM_DRAWING_SHEET_STATUS_BADGE } from "@/design-system/pm-label-system";
 import {
   FilterChipGroup,
   ModulePageShell,
@@ -46,7 +47,7 @@ function DrawingCard({
             </p>
           </div>
           <Badge
-            variant={plan.status === "Current" ? "success" : "secondary"}
+            variant={PM_DRAWING_SHEET_STATUS_BADGE[plan.status] ?? "secondary"}
             size="sm"
             className="shrink-0"
           >

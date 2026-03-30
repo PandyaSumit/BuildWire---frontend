@@ -14,10 +14,7 @@ import { DUMMY_REPORTS_BY_CATEGORY } from "@/features/project-ui/projectDummyDat
 
 export default function ProjectReportsPage() {
   const [cat, setCat] = useState<ReportCategoryId>("Overview");
-  const items = useMemo(
-    () => DUMMY_REPORTS_BY_CATEGORY[cat] ?? [],
-    [cat],
-  );
+  const items = useMemo(() => DUMMY_REPORTS_BY_CATEGORY[cat] ?? [], [cat]);
 
   const sidebar = (
     <nav className="flex flex-row gap-1 overflow-x-auto md:flex-col md:gap-0.5 md:overflow-visible">
@@ -57,7 +54,9 @@ export default function ProjectReportsPage() {
               className="group flex flex-col gap-2 rounded-xl bg-surface/80 px-4 py-3 transition-colors hover:bg-muted/[0.06] sm:flex-row sm:items-center"
             >
               <div className="min-w-0 flex-1">
-                <p className="text-[13px] font-semibold text-primary">{r.title}</p>
+                <p className="text-[13px] font-semibold text-primary">
+                  {r.title}
+                </p>
                 <p className="mt-0.5 text-xs text-secondary">{r.subtitle}</p>
               </div>
               <button

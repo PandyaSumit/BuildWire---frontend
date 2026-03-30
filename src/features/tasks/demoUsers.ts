@@ -39,6 +39,21 @@ export function demoPrimaryAssigneeName(task: { assignees: string[] }): string {
   return demoUserById(first)?.name ?? first;
 }
 
+/** Unique assignees in order, with demo directory names (falls back to raw id). */
+export function demoAssigneesDisplayList(task: {
+  assignees: string[];
+}): { id: string; name: string }[] {
+  const seen = new Set<string>();
+  const out: { id: string; name: string }[] = [];
+  for (const id of task.assignees) {
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    const u = demoUserById(id);
+    out.push({ id, name: u?.name ?? id });
+  }
+  return out;
+}
+
 export function demoPrimaryInitials(task: { assignees: string[] }): string {
   const first = task.assignees[0];
   if (!first) return '?';

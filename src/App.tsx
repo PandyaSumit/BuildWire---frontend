@@ -36,8 +36,12 @@ const ProjectOverviewPage = lazy(() =>
     default: m.ProjectOverviewPage,
   })),
 );
-const ProjectTasksPage = lazy(() => import("./pages/projects/ProjectTasksPage"));
-const ProjectFilesPage = lazy(() => import("./pages/projects/ProjectFilesPage"));
+const ProjectTasksPage = lazy(
+  () => import("./pages/projects/ProjectTasksPage"),
+);
+const ProjectFilesPage = lazy(
+  () => import("./pages/projects/ProjectFilesPage"),
+);
 const ProjectRfisPage = lazy(() => import("./pages/projects/ProjectRfisPage"));
 const ProjectBudgetRedirect = lazy(
   () => import("./pages/projects/ProjectBudgetRedirect"),
@@ -103,7 +107,10 @@ export default function App() {
           <Route path="overview" element={<ProjectOverviewPage />} />
           <Route path="tasks" element={<ProjectTasksPage />} />
           <Route path="drawings" element={<ProjectDrawingsPage />} />
-          <Route path="drawings/viewer/:planId" element={<ProjectDrawingViewerPage />} />
+          <Route
+            path="drawings/viewer/:planId"
+            element={<ProjectDrawingViewerPage />}
+          />
           <Route path="rfis" element={<ProjectRfisPage />} />
           <Route path="daily-reports" element={<ProjectDailyReportsPage />} />
           <Route path="inspections" element={<ProjectInspectionsPage />} />
@@ -123,12 +130,24 @@ export default function App() {
         <Route path="intelligence/ai-map" element={<AiMapPage />} />
         <Route path="team" element={<TeamPage />} />
 
-        <Route path="settings" element={<Navigate to="/settings/preferences" replace />} />
-        <Route path="settings/preferences" element={<PreferencesSettingsPage />} />
+        <Route
+          path="settings"
+          element={<Navigate to="/settings/preferences" replace />}
+        />
+        <Route
+          path="settings/preferences"
+          element={<PreferencesSettingsPage />}
+        />
         <Route path="settings/roles" element={<RolesSettingsPage />} />
-        <Route path="settings/organization" element={<OrganizationSettingsPage />} />
+        <Route
+          path="settings/organization"
+          element={<OrganizationSettingsPage />}
+        />
         <Route path="settings/billing" element={<BillingPage />} />
-        <Route path="settings/bot-integrations" element={<BotIntegrationsPage />} />
+        <Route
+          path="settings/bot-integrations"
+          element={<BotIntegrationsPage />}
+        />
       </Route>
     </Routes>
   );

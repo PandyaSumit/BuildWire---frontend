@@ -15,7 +15,9 @@ import {
 import type { BuildWireTask } from '@/types/task';
 import type { KanbanBoardSectionPersisted } from '@/lib/kanbanBoardPrefs';
 import { useTaskProject } from '@/features/tasks/TaskProjectContext';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { PM_TASK_STATUS_BADGE } from '@/design-system/pm-label-system';
 import { useOptionalProjectUi } from '@/features/project-ui/ProjectUiContext';
 import { priorityBorderClassKey } from '@/features/tasks/taskPresentation';
 import { taskWorkflowTKey } from '@/features/tasks/fixtures';
@@ -149,7 +151,6 @@ const CompactCard = memo(function CompactCard({
   const placeLine = locationLine || projectLabel;
   const assigneeName = demoPrimaryAssigneeName(task);
   const assigneeInitials = demoPrimaryInitials(task);
-  const showProgress = task.progress > 0 && task.progress < 100;
 
   return (
     <button
@@ -180,28 +181,16 @@ const CompactCard = memo(function CompactCard({
       <p className="mt-0.5 truncate text-[10px] leading-snug text-muted" title={placeLine}>
         {placeLine}
       </p>
-      {showProgress ? (
-        <div
-          className="mt-1.5 h-0.5 w-full overflow-hidden rounded-full bg-muted/40"
-          title={`${task.progress}%`}
-        >
-          <div className="h-full rounded-full bg-brand/70" style={{ width: `${task.progress}%` }} />
-        </div>
-      ) : null}
       <div className="mt-1.5 flex items-center justify-between gap-1.5">
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
-          <span
-            className={`max-w-[6.5rem] truncate rounded px-1 py-px text-[9px] font-medium leading-tight ${
-              task.status === 'blocked'
-                ? 'bg-danger/15 text-danger'
-                : task.status === 'done'
-                  ? 'bg-muted/35 text-secondary'
-                  : 'bg-muted/25 text-secondary'
-            }`}
+          <Badge
+            variant={PM_TASK_STATUS_BADGE[task.status]}
+            size="sm"
+            className="max-w-[6.5rem] shrink-0 truncate !px-1.5 !py-px !text-[10px] !font-medium !leading-tight"
             title={t(taskWorkflowTKey(task.status))}
           >
             {t(taskWorkflowTKey(task.status))}
-          </span>
+          </Badge>
           <span
             className="max-w-[5rem] truncate rounded border border-border/40 px-1 py-px text-[9px] leading-tight text-muted"
             title={t(taskTradeKeyTKey(task.trade))}
@@ -583,9 +572,15 @@ export function TaskKanbanBoard({
             <p className="mt-0.5 truncate text-[10px] text-muted">
               {[activeTask.floor, activeTask.location_detail].filter(Boolean).join(' — ') || projectLabel}
             </p>
-            <p className="mt-1.5 text-[9px] font-medium text-secondary">
-              {t(taskWorkflowTKey(activeTask.status))}
-            </p>
+            <div className="mt-1.5">
+              <Badge
+                variant={PM_TASK_STATUS_BADGE[activeTask.status]}
+                size="sm"
+                className="max-w-full truncate !px-1.5 !py-px !text-[10px] !font-medium !leading-tight"
+              >
+                {t(taskWorkflowTKey(activeTask.status))}
+              </Badge>
+            </div>
           </div>
         ) : null}
       </DragOverlay>

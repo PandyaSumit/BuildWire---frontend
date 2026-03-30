@@ -16,13 +16,14 @@ import { TaskKanbanBoard } from "@/features/tasks/TaskKanbanBoard";
 import { TaskFiltersBar } from "@/features/tasks/TaskFiltersBar";
 import { TaskBulkToolbar } from "@/features/tasks/TaskBulkToolbar";
 import { TaskGanttView } from "@/features/tasks/TaskGanttView";
-import { demoPrimaryAssigneeName } from "@/features/tasks/demoUsers";
+import { demoAssigneesDisplayList } from "@/features/tasks/demoUsers";
 import { taskWorkflowTKey, taskPriorityTKey } from "@/features/tasks/fixtures";
 import { taskTypeKeyTKey } from "@/features/tasks/taskI18nKeys";
 import {
   taskTablePriorityPillClassKey,
   taskTableTypePillClassKey,
 } from "@/features/tasks/taskPresentation";
+import { taskDrawingListCell } from "@/features/tasks/taskDrawingDisplay";
 import { getTasksDefaultViewPref } from "@/lib/userPreferences";
 import type { BuildWireTask } from "@/types/task";
 
@@ -124,6 +125,57 @@ function TaskDoneIcon({ className }: { className?: string }) {
   );
 }
 
+/** Asana-style: show a tight face stack; names only in tooltips. */
+const COLLAB_AVATAR_STACK_MAX = 3;
+
+function TaskCollaboratorsCell({ task }: { task: BuildWireTask }) {
+  const people = demoAssigneesDisplayList(task);
+  if (!people.length) {
+    return <span className="text-[12px] text-muted">—</span>;
+  }
+  const shown = people.slice(0, COLLAB_AVATAR_STACK_MAX);
+  const overflow = people.length - shown.length;
+  const allNamesLabel = people.map((p) => p.name).join(" · ");
+  const overflowNames = people
+    .slice(COLLAB_AVATAR_STACK_MAX)
+    .map((p) => p.name)
+    .join(" · ");
+
+  return (
+    <div
+      className="flex w-full min-w-0 items-center justify-center"
+      title={allNamesLabel}
+      aria-label={allNamesLabel}
+    >
+      <div className="flex shrink-0 items-center">
+        {shown.map((p, i) => (
+          <span
+            key={p.id}
+            title={p.name}
+            className={`relative inline-block ${i > 0 ? "-ml-1.5" : ""}`}
+            style={{ zIndex: i + 1 }}
+          >
+            <Avatar
+              name={p.name}
+              size="sm"
+              className="ring-2 ring-bg shadow-sm"
+            />
+          </span>
+        ))}
+        {overflow > 0 ? (
+          <div
+            className="relative -ml-1.5 flex h-8 w-8 shrink-0 cursor-default items-center justify-center rounded-full border border-border/80 bg-muted text-[10px] font-semibold tabular-nums text-secondary ring-2 ring-bg shadow-sm"
+            style={{ zIndex: shown.length + 1 }}
+            title={overflowNames}
+          >
+            +{overflow}
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 function TaskCommentIcon({ className }: { className?: string }) {
   return (
     <svg
@@ -137,24 +189,8 @@ function TaskCommentIcon({ className }: { className?: string }) {
   );
 }
 
-function TaskAttachmentIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-    </svg>
-  );
-}
-
 function AsanaTaskList({
+  projectId,
   sections,
   onOpenTask,
   onAddTask,
@@ -163,6 +199,7 @@ function AsanaTaskList({
   filtersOpen,
   onToggleFilters,
 }: {
+  projectId: string | undefined;
   sections: AsanaSection[];
   onOpenTask: (task: BuildWireTask) => void;
   onAddTask: () => void;
@@ -235,18 +272,15 @@ function AsanaTaskList({
       </div>
 
       <div className="min-h-0 min-w-0 flex-1 overflow-auto pt-3">
-        <table className="w-full min-w-[1320px] table-fixed border-separate border-spacing-0 text-[13px]">
+        <table className="w-full min-w-[1032px] table-fixed border-separate border-spacing-0 text-[13px]">
           <colgroup>
             <col className="min-w-0 sm:w-[28%]" />
             <col className="w-[120px]" />
             <col className="w-[100px]" />
             <col className="w-[120px]" />
             <col className="w-[120px]" />
-            <col className="w-[72px]" />
-            <col className="w-[156px]" />
-            <col className="w-[140px]" />
-            <col className="w-[88px]" />
-            <col className="w-[100px]" />
+            <col className="w-[116px]" />
+            <col className="w-[160px]" />
             <col className="w-10" />
           </colgroup>
           <thead className="sticky top-0 z-10 bg-bg">
@@ -314,20 +348,8 @@ function AsanaTaskList({
                   </button>
                 </div>
               </th>
-              <th className="border-b border-r border-border/30 px-3 py-2 text-left text-xs font-medium text-secondary">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="truncate">{t("tasks.listColProgress")}</span>
-                  <button
-                    type="button"
-                    aria-label="Column options"
-                    className="shrink-0 rounded p-0.5 text-xs text-muted hover:bg-muted/25 hover:text-primary"
-                  >
-                    ▾
-                  </button>
-                </div>
-              </th>
-              <th className="border-b border-r border-border/30 px-3 py-2 text-left text-xs font-medium text-secondary">
-                <div className="flex items-center justify-between gap-2">
+              <th className="border-b border-r border-border/30 px-2 py-2 text-center text-xs font-medium text-secondary">
+                <div className="flex items-center justify-center gap-1">
                   <span className="truncate">{t("tasks.listColCollaborators")}</span>
                   <button
                     type="button"
@@ -340,31 +362,7 @@ function AsanaTaskList({
               </th>
               <th className="border-b border-r border-border/30 px-3 py-2 text-left text-xs font-medium text-secondary">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="truncate">{t("tasks.listColProjects")}</span>
-                  <button
-                    type="button"
-                    aria-label="Column options"
-                    className="shrink-0 rounded p-0.5 text-xs text-muted hover:bg-muted/25 hover:text-primary"
-                  >
-                    ▾
-                  </button>
-                </div>
-              </th>
-              <th className="border-b border-r border-border/30 px-3 py-2 text-left text-xs font-medium text-secondary">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="truncate">{t("tasks.listColAttachments")}</span>
-                  <button
-                    type="button"
-                    aria-label="Column options"
-                    className="shrink-0 rounded p-0.5 text-xs text-muted hover:bg-muted/25 hover:text-primary"
-                  >
-                    ▾
-                  </button>
-                </div>
-              </th>
-              <th className="border-b border-r border-border/30 px-3 py-2 text-left text-xs font-medium text-secondary">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="truncate">{t("tasks.listColVisibility")}</span>
+                  <span className="truncate">{t("tasks.listColDrawing")}</span>
                   <button
                     type="button"
                     aria-label="Column options"
@@ -392,7 +390,7 @@ function AsanaTaskList({
                 <Fragment key={section.id}>
                   <tr className="bg-bg">
                     <td
-                      colSpan={11}
+                      colSpan={8}
                       className="border-b border-border/30 px-0 py-0"
                     >
                       <button
@@ -409,7 +407,6 @@ function AsanaTaskList({
                   </tr>
                   {!isCollapsed
                     ? section.rows.map((task) => {
-                        const collaborator = demoPrimaryAssigneeName(task);
                         const dueRange = formatShortDueRange(
                           task.start_date,
                           task.due_date,
@@ -418,7 +415,7 @@ function AsanaTaskList({
                         const isDone = task.status === "done";
                         const categoryLabel =
                           task.category.trim() || t(taskTypeKeyTKey(task.type));
-                        const attCount = task.attachments.length;
+                        const drawingCell = taskDrawingListCell(task);
                         return (
                           <tr
                             key={task.id}
@@ -490,48 +487,31 @@ function AsanaTaskList({
                             <td className="whitespace-nowrap border-r border-border/30 px-3 py-1.5 align-middle text-[12px] text-secondary">
                               {dueRange}
                             </td>
-                            <td className="border-r border-border/30 px-3 py-1.5 align-middle text-[12px] tabular-nums text-secondary">
-                              {task.progress}%
-                            </td>
-                            <td className="border-r border-border/30 px-3 py-1.5 align-middle">
-                              {collaborator === "—" ? (
-                                <span className="text-[12px] text-muted">—</span>
-                              ) : (
-                                <span className="inline-flex max-w-full items-center gap-2">
-                                  <Avatar name={collaborator} size="sm" />
-                                  <span className="truncate text-[12px] text-primary">
-                                    {collaborator}
-                                  </span>
-                                </span>
-                              )}
-                            </td>
-                            <td className="border-r border-border/30 px-3 py-1.5 align-middle">
-                              <span className="inline-flex max-w-full items-center gap-1.5 rounded border border-border/45 bg-muted/12 px-2 py-0.5 text-[11px] text-secondary">
-                                <span className="h-1.5 w-1.5 shrink-0 rounded-sm bg-success" />
-                                <span className="truncate">
-                                  {t("tasks.listWorkspaceLabel")}
-                                </span>
-                              </span>
+                            <td className="border-r border-border/30 px-2 py-1.5 align-middle">
+                              <TaskCollaboratorsCell task={task} />
                             </td>
                             <td className="border-r border-border/30 px-3 py-1.5 align-middle text-[12px] text-secondary">
-                              {attCount > 0 ? (
-                                <span
-                                  className="inline-flex items-center gap-1"
-                                  title={t("tasks.attachmentCount", {
-                                    count: attCount,
-                                  })}
+                              {drawingCell.planId && projectId ? (
+                                <Link
+                                  to={`/projects/${projectId}/drawings/viewer/${drawingCell.planId}`}
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="inline-flex max-w-full min-w-0 items-center gap-1.5 font-medium text-brand hover:underline"
+                                  title={drawingCell.title}
                                 >
-                                  <TaskAttachmentIcon className="h-3.5 w-3.5 shrink-0 text-muted" />
-                                  <span className="tabular-nums">{attCount}</span>
+                                  <span className="h-1.5 w-1.5 shrink-0 rounded-sm bg-brand/80" />
+                                  <span className="truncate">{drawingCell.label}</span>
+                                </Link>
+                              ) : drawingCell.label ? (
+                                <span
+                                  className="inline-flex max-w-full items-center gap-1.5 text-[12px] text-primary"
+                                  title={drawingCell.title}
+                                >
+                                  <span className="h-1.5 w-1.5 shrink-0 rounded-sm bg-primary/70" />
+                                  <span className="truncate">{drawingCell.label}</span>
                                 </span>
                               ) : (
                                 <span className="text-muted">—</span>
                               )}
-                            </td>
-                            <td className="border-r border-border/30 px-3 py-1.5 align-middle text-[12px] text-secondary">
-                              {task.is_private
-                                ? t("tasks.listVisibilityPrivate")
-                                : t("tasks.listVisibilityTeam")}
                             </td>
                             <td className="px-1 py-1.5 align-middle" />
                           </tr>
@@ -540,7 +520,7 @@ function AsanaTaskList({
                     : null}
                   <tr className="bg-bg">
                     <td
-                      colSpan={11}
+                      colSpan={8}
                       className="border-b border-border/25 py-1.5 pl-8 pr-3"
                     >
                       <button
@@ -706,6 +686,7 @@ function ProjectTasksInner() {
       {view === "list" ? (
         <div className="mt-0 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <AsanaTaskList
+            projectId={projectId}
             sections={asanaSections}
             onOpenTask={openTask}
             onAddTask={openCreate}

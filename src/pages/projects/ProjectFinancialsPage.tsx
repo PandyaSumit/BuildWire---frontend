@@ -7,6 +7,10 @@ import { KpiStatCard } from "@/components/ui/kpi-stat-card";
 import { PageHeader } from "@/components/ui/page-header";
 import { ProgressBar } from "@/components/ui/progress-bar";
 import { SegmentedControl } from "@/components/ui/segmented-control";
+import {
+  PM_APPROVAL_TRI_STATE_BADGE,
+  PM_APPROVED_PENDING_BADGE,
+} from "@/design-system/pm-label-system";
 import { ModulePageShell } from "@/features/project-ui/components";
 import {
   DUMMY_BUDGET_LINES,
@@ -79,7 +83,9 @@ const BUDGET_COLUMNS: DataTableColumn<BudgetLine>[] = [
     cellClassName: "px-3",
     align: "right",
     cell: (r) => (
-      <span className="font-mono text-[13px] text-secondary">{r.remaining}</span>
+      <span className="font-mono text-[13px] text-secondary">
+        {r.remaining}
+      </span>
     ),
   },
   {
@@ -131,9 +137,7 @@ const EXPENSE_COLUMNS: DataTableColumn<Expense>[] = [
     header: "Vendor",
     headerClassName: "px-3",
     cellClassName: "px-3",
-    cell: (r) => (
-      <span className="text-[13px] text-secondary">{r.vendor}</span>
-    ),
+    cell: (r) => <span className="text-[13px] text-secondary">{r.vendor}</span>,
   },
   {
     id: "amount",
@@ -169,16 +173,7 @@ const EXPENSE_COLUMNS: DataTableColumn<Expense>[] = [
     headerClassName: "px-3 pr-4",
     cellClassName: "px-3 pr-4",
     cell: (r) => (
-      <Badge
-        variant={
-          r.status === "Approved"
-            ? "success"
-            : r.status === "Pending"
-              ? "warning"
-              : "danger"
-        }
-        size="sm"
-      >
+      <Badge variant={PM_APPROVAL_TRI_STATE_BADGE[r.status]} size="sm">
         {r.status}
       </Badge>
     ),
@@ -195,7 +190,9 @@ const CO_COLUMNS: DataTableColumn<ChangeOrder>[] = [
     headerClassName: "pl-4 pr-3 w-[80px]",
     cellClassName: "pl-4 pr-3",
     cell: (r) => (
-      <span className="font-mono text-xs font-semibold text-brand">{r.num}</span>
+      <span className="font-mono text-xs font-semibold text-brand">
+        {r.num}
+      </span>
     ),
   },
   {
@@ -212,9 +209,7 @@ const CO_COLUMNS: DataTableColumn<ChangeOrder>[] = [
     header: "Reason",
     headerClassName: "px-3",
     cellClassName: "px-3",
-    cell: (r) => (
-      <span className="text-[13px] text-secondary">{r.reason}</span>
-    ),
+    cell: (r) => <span className="text-[13px] text-secondary">{r.reason}</span>,
   },
   {
     id: "amount",
@@ -236,10 +231,7 @@ const CO_COLUMNS: DataTableColumn<ChangeOrder>[] = [
     headerClassName: "px-3",
     cellClassName: "px-3",
     cell: (r) => (
-      <Badge
-        variant={r.status === "Approved" ? "success" : "warning"}
-        size="sm"
-      >
+      <Badge variant={PM_APPROVED_PENDING_BADGE[r.status]} size="sm">
         {r.status}
       </Badge>
     ),
@@ -275,9 +267,7 @@ const PP_COLUMNS: DataTableColumn<PaymentPlan>[] = [
     header: "Buyer",
     headerClassName: "px-3",
     cellClassName: "px-3",
-    cell: (r) => (
-      <span className="text-[13px] text-secondary">{r.buyer}</span>
-    ),
+    cell: (r) => <span className="text-[13px] text-secondary">{r.buyer}</span>,
   },
   {
     id: "value",

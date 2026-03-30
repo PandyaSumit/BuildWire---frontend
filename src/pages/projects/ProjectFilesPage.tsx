@@ -134,7 +134,9 @@ export default function ProjectFilesPage() {
         <PageHeader
           title="Files"
           description={
-            folder ? `Showing: ${folder}` : "All folders · project document library"
+            folder
+              ? `Showing: ${folder}`
+              : "All folders · project document library"
           }
           actions={
             <div className="flex items-center gap-2">

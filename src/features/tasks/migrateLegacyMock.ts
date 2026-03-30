@@ -48,6 +48,20 @@ function isoFromDue(due: string): string {
   return new Date().toISOString().slice(0, 10);
 }
 
+/** Links demo tasks to drawings (ids match floor-plan / drawings demo data). */
+const DEMO_TASK_DRAWING_LINK: Record<
+  string,
+  { drawingId: string; pin?: { x: number; y: number } }
+> = {
+  'T-042': { drawingId: 'a101', pin: { x: 420, y: 320 } },
+  'T-041': { drawingId: 'a101', pin: { x: 720, y: 540 } },
+  'T-038': { drawingId: 'a102', pin: { x: 380, y: 410 } },
+  'T-020': { drawingId: 's201', pin: { x: 520, y: 380 } },
+  'T-029': { drawingId: 'p101', pin: { x: 460, y: 340 } },
+  'T-035': { drawingId: 'e401' },
+  'T-028': { drawingId: 'm301' },
+};
+
 export function buildWireTaskFromUi(u: UiTask, index: number): BuildWireTask {
   const now = new Date().toISOString();
   const due = isoFromDue(u.due);
@@ -61,6 +75,16 @@ export function buildWireTaskFromUi(u: UiTask, index: number): BuildWireTask {
     uploaded_by: 'u_system',
   }));
 
+  const drawingLink = DEMO_TASK_DRAWING_LINK[u.number];
+  const sheet_pin = drawingLink?.pin
+    ? {
+        drawing_id: drawingLink.drawingId,
+        x: drawingLink.pin.x,
+        y: drawingLink.pin.y,
+      }
+    : null;
+  const related_drawings = drawingLink ? [drawingLink.drawingId] : [];
+
   return {
     id: `task_${u.id}`,
     display_number: u.number,
@@ -72,7 +96,7 @@ export function buildWireTaskFromUi(u: UiTask, index: number): BuildWireTask {
     category: '',
     floor: u.floor,
     location_detail: '',
-    sheet_pin: null,
+    sheet_pin,
     status: mapStatus(u.status),
     blocked_reason:
       u.status === 'blocked'
@@ -81,7 +105,18 @@ export function buildWireTaskFromUi(u: UiTask, index: number): BuildWireTask {
           : u.title
         : '',
     is_private: false,
-    assignees: [demoUserIdFromName(u.assignee)],
+    assignees: (() => {
+      const primary = demoUserIdFromName(u.assignee);
+      const extra: string[] =
+        index % 5 === 0
+          ? ['u_priya']
+          : index % 5 === 1
+            ? ['u_amit', 'u_neha']
+            : index % 7 === 0
+              ? ['u_mep', 'u_qclead']
+              : [];
+      return [...new Set([primary, ...extra])];
+    })(),
     created_by: 'u_system',
     watchers: [],
     due_date: due,
@@ -89,7 +124,7 @@ export function buildWireTaskFromUi(u: UiTask, index: number): BuildWireTask {
     created_at: start,
     updated_at: now,
     related_rfis: [],
-    related_drawings: [],
+    related_drawings,
     related_files: [],
     related_inspections: [],
     parent_task_id: null,

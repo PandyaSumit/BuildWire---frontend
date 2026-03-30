@@ -4,6 +4,7 @@ import { Header } from './header';
 import { EmailVerificationBanner } from '@/components/auth/EmailVerificationBanner';
 import { ProjectUiProvider } from '@/features/project-ui/ProjectUiContext';
 import { SidebarLayoutProvider, useSidebarLayout } from './SidebarLayoutContext';
+import { GlobalSearchProvider } from '@/components/layout/GlobalSearchContext';
 
 function DashboardShell() {
   const { collapsed } = useSidebarLayout();
@@ -34,13 +35,15 @@ export function DashboardLayout() {
   return (
     <div className="h-dvh max-h-dvh overflow-hidden bg-bg">
       <SidebarLayoutProvider>
-        {projectId ? (
-          <ProjectUiProvider projectId={projectId}>
+        <GlobalSearchProvider>
+          {projectId ? (
+            <ProjectUiProvider projectId={projectId}>
+              <DashboardShell />
+            </ProjectUiProvider>
+          ) : (
             <DashboardShell />
-          </ProjectUiProvider>
-        ) : (
-          <DashboardShell />
-        )}
+          )}
+        </GlobalSearchProvider>
       </SidebarLayoutProvider>
     </div>
   );

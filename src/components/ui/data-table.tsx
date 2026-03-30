@@ -1,10 +1,10 @@
-import type { MouseEvent, ReactNode } from 'react';
-import { useMemo, useState } from 'react';
-import { Skeleton } from './skeleton';
+import type { MouseEvent, ReactNode } from "react";
+import { useMemo, useState } from "react";
+import { Skeleton } from "./skeleton";
 
 export type DataTableSortState = {
   columnId: string;
-  direction: 'asc' | 'desc';
+  direction: "asc" | "desc";
 };
 
 export type DataTableColumn<T> = {
@@ -12,15 +12,15 @@ export type DataTableColumn<T> = {
   header: ReactNode;
   headerClassName?: string;
   cellClassName?: string;
-  align?: 'left' | 'right' | 'center';
+  align?: "left" | "right" | "center";
   cell: (row: T, rowIndex: number) => ReactNode;
   /** Enables header sort control; return string or number for stable ordering */
   sortValue?: (row: T) => string | number | null | undefined;
 };
 
-export type DataTableVariant = 'card' | 'flush';
+export type DataTableVariant = "card" | "flush";
 
-export type DataTableDensity = 'compact' | 'comfortable';
+export type DataTableDensity = "compact" | "comfortable";
 
 export type DataTableProps<T> = {
   columns: DataTableColumn<T>[];
@@ -45,8 +45,8 @@ export type DataTableProps<T> = {
    * Default `auto` (content-sized columns + horizontal scroll on narrow viewports).
    * Use `fixed` when the table should stretch to the container width on large screens (e.g. RFIs).
    */
-  minWidthTableLayout?: 'auto' | 'fixed';
-  tableLayout?: 'auto' | 'fixed';
+  minWidthTableLayout?: "auto" | "fixed";
+  tableLayout?: "auto" | "fixed";
   className?: string;
   /** Shown as a single full-width row when `data` is empty. */
   emptyFallback?: ReactNode;
@@ -66,12 +66,13 @@ export type DataTableProps<T> = {
   /** Skeleton placeholder rows (keeps column layout stable) */
   loading?: boolean;
   loadingRows?: number;
+  rowClassName?: (row: T, rowIndex: number) => string | undefined;
 };
 
-function alignClass(align: 'left' | 'right' | 'center' = 'left') {
-  if (align === 'right') return 'text-right';
-  if (align === 'center') return 'text-center';
-  return 'text-left';
+function alignClass(align: "left" | "right" | "center" = "left") {
+  if (align === "right") return "text-right";
+  if (align === "center") return "text-center";
+  return "text-left";
 }
 
 /**
@@ -79,35 +80,36 @@ function alignClass(align: 'left' | 'right' | 'center' = 'left') {
  * Define columns with `cell` renderers for each screen (tasks, RFIs, team, etc.).
  */
 const shellByVariant: Record<DataTableVariant, string> = {
-  card: 'rounded-md border border-border bg-bg',
-  flush:
-    'rounded-none border-x-0 border-b-0 border-t border-border bg-bg',
+  card: "rounded-md border border-border bg-bg",
+  flush: "rounded-none border-x-0 border-b-0 border-t border-border bg-bg",
 };
 
 function compareSortValues(
   a: string | number | null | undefined,
   b: string | number | null | undefined,
-  direction: 'asc' | 'desc',
+  direction: "asc" | "desc",
 ): number {
-  const mult = direction === 'asc' ? 1 : -1;
+  const mult = direction === "asc" ? 1 : -1;
   if (a == null && b == null) return 0;
   if (a == null) return 1 * mult;
   if (b == null) return -1 * mult;
-  if (typeof a === 'number' && typeof b === 'number') return (a - b) * mult;
-  return String(a).localeCompare(String(b), undefined, { numeric: true }) * mult;
+  if (typeof a === "number" && typeof b === "number") return (a - b) * mult;
+  return (
+    String(a).localeCompare(String(b), undefined, { numeric: true }) * mult
+  );
 }
 
 export function DataTable<T>({
   columns,
   data,
   rowKey,
-  variant = 'flush',
-  density = 'compact',
-  maxHeightClassName = 'max-h-[min(32rem,calc(100vh-14rem))]',
+  variant = "flush",
+  density = "compact",
+  maxHeightClassName = "max-h-[min(32rem,calc(100vh-14rem))]",
   tableMinWidthClassName,
-  minWidthTableLayout = 'auto',
-  tableLayout = 'fixed',
-  className = '',
+  minWidthTableLayout = "auto",
+  tableLayout = "fixed",
+  className = "",
   emptyFallback,
   hideScrollbar,
   onRowClick,
@@ -115,9 +117,13 @@ export function DataTable<T>({
   onSortChange,
   loading = false,
   loadingRows = 5,
+  rowClassName,
 }: DataTableProps<T>) {
-  const [sortInternal, setSortInternal] = useState<DataTableSortState | null>(null);
-  const sortState = sortControlled !== undefined ? sortControlled : sortInternal;
+  const [sortInternal, setSortInternal] = useState<DataTableSortState | null>(
+    null,
+  );
+  const sortState =
+    sortControlled !== undefined ? sortControlled : sortInternal;
   const setSortState = onSortChange ?? setSortInternal;
 
   const sortedData = useMemo(() => {
@@ -125,41 +131,45 @@ export function DataTable<T>({
     const col = columns.find((c) => c.id === sortState.columnId);
     if (!col?.sortValue) return data;
     return [...data].sort((a, b) =>
-      compareSortValues(col.sortValue!(a), col.sortValue!(b), sortState.direction),
+      compareSortValues(
+        col.sortValue!(a),
+        col.sortValue!(b),
+        sortState.direction,
+      ),
     );
   }, [columns, data, sortState]);
 
   const displayData = sortedData;
 
-  const minW = tableMinWidthClassName ?? '';
-  const thPad = density === 'comfortable' ? 'py-3' : 'py-2.5';
-  const tdPad = density === 'comfortable' ? 'py-3.5' : 'py-2.5';
+  const minW = tableMinWidthClassName ?? "";
+  const thPad = density === "comfortable" ? "py-3" : "py-2.5";
+  const tdPad = density === "comfortable" ? "py-3.5" : "py-2.5";
   const layoutResolved = minW
-    ? minWidthTableLayout === 'fixed'
-      ? 'table-fixed'
-      : 'table-auto'
-    : tableLayout === 'fixed'
-      ? 'table-fixed'
-      : 'table-auto';
-  const hideBar = hideScrollbar ?? variant === 'flush';
+    ? minWidthTableLayout === "fixed"
+      ? "table-fixed"
+      : "table-auto"
+    : tableLayout === "fixed"
+      ? "table-fixed"
+      : "table-auto";
+  const hideBar = hideScrollbar ?? variant === "flush";
   /** `min-w-*` + `w-full`: fill the scroll container when it is wider than the floor; still scrolls when narrower. */
-  const tableWidthClass = minW ? `${minW} w-full` : 'w-full';
+  const tableWidthClass = minW ? `${minW} w-full` : "w-full";
 
   function toggleSort(columnId: string) {
     const col = columns.find((c) => c.id === columnId);
     if (!col?.sortValue) return;
     const next: DataTableSortState | null =
       sortState?.columnId === columnId
-        ? sortState.direction === 'asc'
-          ? { columnId, direction: 'desc' }
+        ? sortState.direction === "asc"
+          ? { columnId, direction: "desc" }
           : null
-        : { columnId, direction: 'asc' };
+        : { columnId, direction: "asc" };
     setSortState(next);
   }
 
   function isInteractiveTarget(target: EventTarget | null): boolean {
     const el = target as HTMLElement | null;
-    if (!el || typeof el.closest !== 'function') return false;
+    if (!el || typeof el.closest !== "function") return false;
     return Boolean(
       el.closest(
         'button, a, input, textarea, select, option, [role="menuitem"], [role="combobox"]',
@@ -167,14 +177,18 @@ export function DataTable<T>({
     );
   }
 
-  function handleRowClick(row: T, rowIndex: number, e: MouseEvent<HTMLTableRowElement>) {
+  function handleRowClick(
+    row: T,
+    rowIndex: number,
+    e: MouseEvent<HTMLTableRowElement>,
+  ) {
     if (!onRowClick || isInteractiveTarget(e.target)) return;
     onRowClick(row, rowIndex);
   }
 
   return (
     <div
-      className={`min-h-0 min-w-0 overflow-auto ${shellByVariant[variant]} ${maxHeightClassName} ${hideBar ? 'scrollbar-none' : ''} ${className}`.trim()}
+      className={`min-h-0 min-w-0 overflow-auto ${shellByVariant[variant]} ${maxHeightClassName} ${hideBar ? "scrollbar-none" : ""} ${className}`.trim()}
     >
       <table
         className={`border-separate border-spacing-0 text-sm ${layoutResolved} ${tableWidthClass} [&_tbody>tr:last-child>td]:border-b-0`.trim()}
@@ -187,16 +201,16 @@ export function DataTable<T>({
               const ariaSort = !sortable
                 ? undefined
                 : !active
-                  ? 'none'
-                  : sortState!.direction === 'asc'
-                    ? 'ascending'
-                    : 'descending';
+                  ? "none"
+                  : sortState!.direction === "asc"
+                    ? "ascending"
+                    : "descending";
               return (
                 <th
                   key={col.id}
                   scope="col"
                   aria-sort={ariaSort}
-                  className={`whitespace-nowrap ${thPad} align-middle text-[11px] font-semibold leading-none text-secondary ${alignClass(col.align)} ${col.headerClassName ?? ''}`.trim()}
+                  className={`whitespace-nowrap ${thPad} align-middle text-[11px] font-semibold leading-none text-secondary ${alignClass(col.align)} ${col.headerClassName ?? ""}`.trim()}
                 >
                   {sortable ? (
                     <button
@@ -205,8 +219,15 @@ export function DataTable<T>({
                       className={`inline-flex max-w-full items-center gap-1 rounded-md px-0.5 text-left text-inherit hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 ${alignClass(col.align)}`}
                     >
                       <span className="min-w-0 truncate">{col.header}</span>
-                      <span className="shrink-0 font-normal text-muted tabular-nums" aria-hidden>
-                        {active ? (sortState!.direction === 'asc' ? '↑' : '↓') : '↕'}
+                      <span
+                        className="shrink-0 font-normal text-muted tabular-nums"
+                        aria-hidden
+                      >
+                        {active
+                          ? sortState!.direction === "asc"
+                            ? "↑"
+                            : "↓"
+                          : "↕"}
                       </span>
                     </button>
                   ) : (
@@ -224,7 +245,7 @@ export function DataTable<T>({
                 {columns.map((col) => (
                   <td
                     key={col.id}
-                    className={`border-b border-border/45 ${tdPad} align-middle ${alignClass(col.align)} ${col.cellClassName ?? ''}`.trim()}
+                    className={`border-b border-border/45 ${tdPad} align-middle ${alignClass(col.align)} ${col.cellClassName ?? ""}`.trim()}
                   >
                     <Skeleton className="h-4 w-full max-w-[8rem]" />
                   </td>
@@ -246,15 +267,19 @@ export function DataTable<T>({
                 key={rowKey(row, rowIndex)}
                 className={`transition-colors odd:bg-transparent even:bg-muted/[0.025] ${
                   onRowClick
-                    ? 'cursor-pointer hover:bg-muted/[0.08] active:bg-muted/[0.12]'
-                    : 'hover:bg-muted/[0.04]'
-                }`.trim()}
-                onClick={onRowClick ? (e) => handleRowClick(row, rowIndex, e) : undefined}
+                    ? "cursor-pointer hover:bg-muted/[0.08] active:bg-muted/[0.12]"
+                    : "hover:bg-muted/[0.04]"
+                } ${rowClassName?.(row, rowIndex) ?? ""}`.trim()}
+                onClick={
+                  onRowClick
+                    ? (e) => handleRowClick(row, rowIndex, e)
+                    : undefined
+                }
               >
                 {columns.map((col) => (
                   <td
                     key={col.id}
-                    className={`border-b border-border/45 ${tdPad} align-middle text-[13px] leading-5 ${alignClass(col.align)} ${col.cellClassName ?? ''}`.trim()}
+                    className={`border-b border-border/45 ${tdPad} align-middle text-[13px] leading-5 ${alignClass(col.align)} ${col.cellClassName ?? ""}`.trim()}
                   >
                     {col.cell(row, rowIndex)}
                   </td>

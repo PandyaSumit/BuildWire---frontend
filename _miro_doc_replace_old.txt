@@ -1,0 +1,71 @@
+# BuildWire — construction PM data dictionary
+
+This board documents **domain tools** in the BuildWire frontend: field keys, types, and how modules connect. Canonical task model: BuildWireTask in src/types/task.ts. Demo list shapes: src/features/project-ui/projectDummyData.ts.
+
+## Tasks
+
+Work items aligned with REST-style **/projects/:id/tasks**. Supports Kanban columns (kanban\_section\_id, kanban\_order), sheet pins on drawings, dependencies (depends\_on), related RFIs/drawings/files/inspections, photos, attachments, milestones, and progress (0–100).
+
+**Status values:** open, in\_progress, in\_review, blocked, awaiting\_inspection, done, void.
+
+**Type values:** general, safety, quality, punch\_list, rfi\_action, inspection\_action.
+
+**Priority:** critical, high, medium, low.
+
+**Trade:** civil, mep, finishing, waterproofing, safety, structural, electrical, plumbing, qc, management.
+
+## RFIs
+
+Requests for information: numbering, trade, priority (Normal/Urgent), workflow status, ball-in-court, submitter/assignee, due date, aging (daysOpen), cost impact flag.
+
+## Meetings
+
+Site/design/safety/owner meetings: name, type, date/time, attendee count, open action count, status (e.g. Scheduled, Completed).
+
+## Inspections
+
+Field QC/safety/MEP/structural: title, type, location, inspector, date, result (Pass, Fail, Conditional), lifecycle status.
+
+## Daily reports
+
+Per-day site log: date, submitter, crew size, weather summary, approval status (Approved, Pending, Rejected, Draft). Calendar uses dot states: approved, pending, draft, missing, weekend.
+
+## Drawings
+
+Sheet registry: id, sheet code, name, discipline, pin count, last updated, revision, current/superseded, viewer URL. Pins link tasks to x/y on the sheet.
+
+## Files
+
+Foldered documents: name, file type category (pdf, spreadsheet, doc, other), size, uploaded by, date, folder path.
+
+## Team
+
+Directory: name, role, company, joined, last active, task count, optional on-site flag.
+
+## Subcontractors
+
+Company, trade, contact, workers, linked task count.
+
+## Financials
+
+**Budget lines:** category, budgeted, approved COs, revised, spent, remaining, percent used.
+
+**Expenses:** description, category, vendor, amount, date, submitter, status (Pending, Approved, Rejected).
+
+**Change orders:** number, title, reason, amount, status, date.
+
+**Payment plans (units):** unit id, buyer, total value, paid to date, next due, days overdue.
+
+## Activity
+
+Feed: who, text, when. Log events: user, text, when, optional entity (task, rfi, report, drawing, expense, inspection).
+
+## Reports catalog
+
+Saved report templates by category (Overview, Field, Financial, Quality, Custom) with title and subtitle — export/dashboard metadata, not transactional rows.
+
+## Inventory / units
+
+Unit: id, status (available, reserved, booked, sold, handed), unit type (e.g. 2BHK). Portfolio stats: counts and revenue summary.
+
+**Miro tables** on this board list **Field**, **Type**, and **Description** per module. Code blocks and markdown tables are omitted here because Miro docs do not render them.
