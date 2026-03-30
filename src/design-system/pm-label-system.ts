@@ -109,12 +109,13 @@ export const PM_MEETING_STATUS_BADGE: Record<string, PmBadgeVariant> = {
     Scheduled: 'secondary',
 };
 
-export type PmInspectionResult = 'Pass' | 'Fail' | 'Conditional';
+export type PmInspectionResult = 'Pass' | 'Fail' | 'Conditional' | 'Pending';
 
 export const PM_INSPECTION_RESULT_BADGE: Record<PmInspectionResult, PmBadgeVariant> = {
     Pass: 'success',
     Fail: 'danger',
     Conditional: 'warning',
+    Pending: 'secondary',
 };
 
 export const PM_DAILY_REPORT_STATUS_BADGE: Record<

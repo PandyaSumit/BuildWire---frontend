@@ -945,79 +945,196 @@ export const DUMMY_DAILY_REPORTS: DailyReportRow[] = [
     },
 ];
 
-export const DUMMY_INSPECTION_STATS = {
-    total: 24,
-    passRate: 91,
-    month: 8,
-    scheduled: 3,
+export type InspectionChecklistItem = {
+    id: string;
+    label: string;
+    response: 'pass' | 'fail' | 'na' | 'pending';
 };
 
+export type InspectionObservation = {
+    id: string;
+    severity: 'Major' | 'Minor' | 'Observation';
+    description: string;
+    /** Demo link to a corrective task id */
+    linkedTaskId?: string;
+};
+
+export type InspectionSignature = {
+    role: string;
+    name: string;
+    signedAt?: string;
+};
+
+export type InspectionResult = 'Pass' | 'Fail' | 'Conditional' | 'Pending';
+
 export type DummyInspection = {
+    id: string;
     title: string;
     type: string;
+    trade?: string;
     location: string;
     by: string;
     date: string;
-    result: 'Pass' | 'Fail' | 'Conditional';
+    result: InspectionResult;
     status: string;
+    templateName: string;
+    checklistItems: InspectionChecklistItem[];
+    observations: InspectionObservation[];
+    attachmentLabels?: string[];
+    signatures?: InspectionSignature[];
 };
+
+export function computeInspectionStats(rows: DummyInspection[], referenceDate = new Date()) {
+    const total = rows.length;
+    const concluded = rows.filter((r) => r.result !== 'Pending');
+    const passCount = rows.filter((r) => r.result === 'Pass').length;
+    const passRate =
+        concluded.length > 0 ? Math.round((passCount / concluded.length) * 100) : 0;
+    const ym = `${referenceDate.getFullYear()}-${String(referenceDate.getMonth() + 1).padStart(2, '0')}`;
+    const month = rows.filter((r) => r.date.startsWith(ym)).length;
+    const scheduled = rows.filter((r) => r.status === 'Scheduled').length;
+    return { total, passRate, month, scheduled } as const;
+}
 
 export const DUMMY_INSPECTIONS: DummyInspection[] = [
     {
+        id: 'ins-001',
         title: 'Waterproofing Check — L3',
         type: 'Quality',
+        trade: 'Waterproofing',
         location: 'Floor 3 planter',
         by: 'QC Lead',
         date: '2026-03-18',
         result: 'Fail',
         status: 'Completed',
+        templateName: 'WP-STD-01 · Liquid membrane',
+        checklistItems: [
+            { id: 'c1', label: 'Surface dry, clean, free of laitance', response: 'pass' },
+            { id: 'c2', label: 'Primer coverage per manufacturer', response: 'pass' },
+            {
+                id: 'c3',
+                label: 'Detail at drains / penetrations per detail WP-12',
+                response: 'fail',
+            },
+            { id: 'c4', label: 'Cure protection in place', response: 'na' },
+        ],
+        observations: [
+            {
+                id: 'o1',
+                severity: 'Major',
+                description:
+                    'Missed fillet at planter drain — specify rework and re-inspect before flood test.',
+                linkedTaskId: 'TSK-INSP-101',
+            },
+        ],
+        attachmentLabels: ['planter-nw-drain.jpg', 'flood-test-log.pdf'],
+        signatures: [
+            { role: 'Inspector', name: 'QC Lead', signedAt: '2026-03-18 16:20' },
+            { role: 'Subcontractor', name: 'Apex Waterproofing', signedAt: '2026-03-18 16:45' },
+        ],
     },
     {
+        id: 'ins-002',
         title: 'MEP Rough-in',
         type: 'MEP',
+        trade: 'MEP',
         location: 'Level 2',
         by: 'MEP Lead',
         date: '2026-03-20',
-        result: 'Pass',
+        result: 'Pending',
         status: 'Scheduled',
+        templateName: 'MEP-ROUGH-04 · Above-ceiling',
+        checklistItems: [
+            { id: 'c1', label: 'Hanger spacing per spec', response: 'pending' },
+            { id: 'c2', label: 'Firestop preliminary', response: 'pending' },
+            { id: 'c3', label: 'Identified riser / room', response: 'pending' },
+        ],
+        observations: [],
     },
     {
+        id: 'ins-003',
         title: 'Concrete Pre-Pour — Grid B',
         type: 'Structural',
+        trade: 'Structural',
         location: 'Tower A Podium',
         by: 'Raj Kumar',
         date: '2026-03-21',
         result: 'Pass',
         status: 'Completed',
+        templateName: 'STR-PREPOUR-GC',
+        checklistItems: [
+            { id: 'c1', label: 'Rebar cover / chairs', response: 'pass' },
+            { id: 'c2', label: 'Embed locations', response: 'pass' },
+            { id: 'c3', label: 'Formwork bracing', response: 'pass' },
+        ],
+        observations: [],
+        attachmentLabels: ['grid-b-rebar-01.jpg'],
+        signatures: [{ role: 'Inspector', name: 'Raj Kumar', signedAt: '2026-03-21 09:15' }],
     },
     {
+        id: 'ins-004',
         title: 'Safety Toolbox Talk',
         type: 'Safety',
+        trade: 'GC',
         location: 'Site gate',
         by: 'Safety Off.',
         date: '2026-03-19',
         result: 'Pass',
         status: 'Completed',
+        templateName: 'GC-SAFE-TBT-WEEKLY',
+        checklistItems: [
+            { id: 'c1', label: 'Attendance log complete', response: 'pass' },
+            { id: 'c2', label: 'PPE topics covered', response: 'pass' },
+        ],
+        observations: [],
     },
     {
+        id: 'ins-005',
         title: 'Pre-Handover Unit 1204',
         type: 'Quality',
+        trade: 'Finishing',
         location: 'Unit 1204',
         by: 'QC',
         date: '2026-03-22',
         result: 'Conditional',
         status: 'In progress',
+        templateName: 'RES-HANDOVER-V1',
+        checklistItems: [
+            { id: 'c1', label: 'Paint finish visual', response: 'pass' },
+            { id: 'c2', label: 'Joinery alignment', response: 'fail' },
+            { id: 'c3', label: 'MEP fixtures operational', response: 'pass' },
+        ],
+        observations: [
+            {
+                id: 'o1',
+                severity: 'Minor',
+                description: 'Wardrobe door out of plane 3 mm — punch before sign-off.',
+                linkedTaskId: 'TSK-INSP-102',
+            },
+        ],
+        attachmentLabels: ['unit-1204-master.jpg'],
+        signatures: [{ role: 'Inspector', name: 'QC', signedAt: '2026-03-22 11:00' }],
     },
     {
+        id: 'ins-006',
         title: 'Fire Protection — Sprinkler head spacing',
         type: 'Fire',
-        location: 'L6 corridor',
+        trade: 'Fire protection',
+        location: 'L15 corridor',
         by: 'MEP',
         date: '2026-03-25',
-        result: 'Pass',
+        result: 'Pending',
         status: 'Scheduled',
+        templateName: 'FIRE-SPRNK-LAYOUT',
+        checklistItems: [
+            { id: 'c1', label: 'Head spacing vs approved shop drawing', response: 'pending' },
+            { id: 'c2', label: 'Deflector clearance', response: 'pending' },
+        ],
+        observations: [],
     },
 ];
+
+export const DUMMY_INSPECTION_STATS = computeInspectionStats(DUMMY_INSPECTIONS);
 
 export const DUMMY_FOLDERS = [
     'Contracts',
@@ -1037,19 +1154,111 @@ export type DummyFile = {
     by: string;
     date: string;
     folder: string;
+    version: string;
+    status: 'Current' | 'Superseded' | 'For review';
 };
 
 export const DUMMY_FILES: DummyFile[] = [
-    { name: 'GC Master Agreement — signed.pdf', type: 'pdf', size: '2.4 MB', by: 'PM', date: 'Mar 1', folder: 'Contracts' },
-    { name: 'Structural GA — Rev C.pdf', type: 'pdf', size: '8.1 MB', by: 'Consultant', date: 'Feb 26', folder: 'Specifications' },
-    { name: 'Fire NOC — scanned.pdf', type: 'pdf', size: '1.2 MB', by: 'Admin', date: 'Jan 12', folder: 'Permits & Approvals' },
-    { name: 'Architectural IFB — Tower A.xlsx', type: 'spreadsheet', size: '420 KB', by: 'Architect', date: 'Mar 5', folder: 'Specifications' },
-    { name: 'MEP shop drawing — riser.dwg', type: 'other', size: '3.8 MB', by: 'MEP', date: 'Mar 14', folder: 'Submittals' },
-    { name: 'O&M — DG set.pdf', type: 'pdf', size: '6.0 MB', by: 'Vendor', date: 'Feb 2', folder: 'O&M Manuals' },
-    { name: 'Weekly coordination — Mar 10.docx', type: 'doc', size: '88 KB', by: 'PM', date: 'Mar 10', folder: 'Correspondence' },
-    { name: 'Concrete test reports — Mar.zip', type: 'other', size: '12 MB', by: 'QC', date: 'Mar 16', folder: 'Reports' },
-    { name: 'Facade mock-up photos.zip', type: 'other', size: '24 MB', by: 'Site', date: 'Mar 8', folder: 'Reports' },
-    { name: 'Insurance — CAR policy.pdf', type: 'pdf', size: '900 KB', by: 'Admin', date: 'Dec 1', folder: 'Contracts' },
+    {
+        name: 'GC Master Agreement — signed.pdf',
+        type: 'pdf',
+        size: '2.4 MB',
+        by: 'PM',
+        date: 'Mar 1',
+        folder: 'Contracts',
+        version: 'Signed',
+        status: 'Current',
+    },
+    {
+        name: 'Structural GA — Rev C.pdf',
+        type: 'pdf',
+        size: '8.1 MB',
+        by: 'Consultant',
+        date: 'Feb 26',
+        folder: 'Specifications',
+        version: 'Rev C2026-02-26',
+        status: 'Current',
+    },
+    {
+        name: 'Fire NOC — scanned.pdf',
+        type: 'pdf',
+        size: '1.2 MB',
+        by: 'Admin',
+        date: 'Jan 12',
+        folder: 'Permits & Approvals',
+        version: '—',
+        status: 'Current',
+    },
+    {
+        name: 'Architectural IFB — Tower A.xlsx',
+        type: 'spreadsheet',
+        size: '420 KB',
+        by: 'Architect',
+        date: 'Mar 5',
+        folder: 'Specifications',
+        version: 'v2',
+        status: 'For review',
+    },
+    {
+        name: 'MEP shop drawing — riser.dwg',
+        type: 'other',
+        size: '3.8 MB',
+        by: 'MEP',
+        date: 'Mar 14',
+        folder: 'Submittals',
+        version: 'SD-104 Rev A',
+        status: 'Current',
+    },
+    {
+        name: 'O&M — DG set.pdf',
+        type: 'pdf',
+        size: '6.0 MB',
+        by: 'Vendor',
+        date: 'Feb 2',
+        folder: 'O&M Manuals',
+        version: '—',
+        status: 'Current',
+    },
+    {
+        name: 'Weekly coordination — Mar 10.docx',
+        type: 'doc',
+        size: '88 KB',
+        by: 'PM',
+        date: 'Mar 10',
+        folder: 'Correspondence',
+        version: '—',
+        status: 'Current',
+    },
+    {
+        name: 'Concrete test reports — Mar.zip',
+        type: 'other',
+        size: '12 MB',
+        by: 'QC',
+        date: 'Mar 16',
+        folder: 'Reports',
+        version: 'Bundle 2026-03',
+        status: 'Current',
+    },
+    {
+        name: 'Facade mock-up photos.zip',
+        type: 'other',
+        size: '24 MB',
+        by: 'Site',
+        date: 'Mar 8',
+        folder: 'Reports',
+        version: '—',
+        status: 'Current',
+    },
+    {
+        name: 'Insurance — CAR policy.pdf',
+        type: 'pdf',
+        size: '900 KB',
+        by: 'Admin',
+        date: 'Dec 1',
+        folder: 'Contracts',
+        version: '2025 Policy',
+        status: 'Superseded',
+    },
 ];
 
 export const DUMMY_MEETINGS = [

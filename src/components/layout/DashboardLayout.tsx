@@ -1,10 +1,13 @@
-import { Outlet, useLocation } from 'react-router-dom';
-import { Sidebar } from './sidebar';
-import { Header } from './header';
-import { EmailVerificationBanner } from '@/components/auth/EmailVerificationBanner';
-import { ProjectUiProvider } from '@/features/project-ui/ProjectUiContext';
-import { SidebarLayoutProvider, useSidebarLayout } from './SidebarLayoutContext';
-import { GlobalSearchProvider } from '@/components/layout/GlobalSearchContext';
+import { Outlet, useLocation } from "react-router-dom";
+import { Sidebar } from "./sidebar";
+import { Header } from "./header";
+import { EmailVerificationBanner } from "@/components/auth/EmailVerificationBanner";
+import { ProjectUiProvider } from "@/features/project-ui/ProjectUiContext";
+import {
+  SidebarLayoutProvider,
+  useSidebarLayout,
+} from "./SidebarLayoutContext";
+import { GlobalSearchProvider } from "@/components/layout/GlobalSearchContext";
 
 function DashboardShell() {
   const { collapsed } = useSidebarLayout();
@@ -14,7 +17,7 @@ function DashboardShell() {
       <Sidebar />
       <div
         className={`flex h-full min-h-0 min-w-0 flex-col overflow-x-hidden transition-[padding] duration-200 ease-out ${
-          collapsed ? 'ps-14' : 'ps-60'
+          collapsed ? "ps-14" : "ps-60"
         }`}
       >
         <EmailVerificationBanner />
