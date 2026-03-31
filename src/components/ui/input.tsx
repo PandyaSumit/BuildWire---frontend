@@ -1,34 +1,53 @@
-import { InputHTMLAttributes, forwardRef } from 'react';
+import { InputHTMLAttributes, forwardRef, type ReactNode } from 'react';
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   helperText?: string;
   fullWidth?: boolean;
+  /** Icon/element rendered on the left inside the input */
+  startAdornment?: ReactNode;
+  /** Icon/element rendered on the right inside the input */
+  endAdornment?: ReactNode;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, helperText, fullWidth = true, className = '', ...props }, ref) => {
-    const widthClass = fullWidth ? 'w-full' : '';
-    const errorClass = error ? 'border-danger focus:ring-danger' : 'border-border focus:ring-brand';
+  (
+    { label, error, helperText, fullWidth = true, startAdornment, endAdornment, className = '', ...props },
+    ref
+  ) => {
+    const hasError = Boolean(error);
+    const borderCls = hasError
+      ? 'border-danger focus-within:ring-danger/40 focus-within:border-danger'
+      : 'border-border/70 focus-within:ring-brand/40 focus-within:border-brand';
 
     return (
-      <div className={widthClass}>
+      <div className={fullWidth ? 'w-full' : ''}>
         {label && (
-          <label className="block text-sm font-medium mb-2 text-primary">
+          <label className="mb-1.5 block text-[12.5px] font-medium text-primary">
             {label}
           </label>
         )}
-        <input
-          ref={ref}
-          className={`w-full px-4 py-2.5 bg-bg border rounded-lg text-primary text-sm placeholder:text-muted focus:outline-none focus:ring-2 focus:border-transparent transition-all disabled:opacity-50 disabled:cursor-not-allowed ${errorClass} ${className}`}
-          {...props}
-        />
-        {error && (
-          <p className="mt-1 text-sm text-danger">{error}</p>
-        )}
-        {helperText && !error && (
-          <p className="mt-1 text-sm text-muted">{helperText}</p>
+
+        <div
+          className={`flex items-center gap-2 rounded-lg border bg-bg px-3 py-0 text-sm ring-0 transition-all duration-150 focus-within:ring-2 focus-within:ring-offset-0 disabled:opacity-50 ${borderCls} ${fullWidth ? 'w-full' : ''}`}
+        >
+          {startAdornment && (
+            <span className="shrink-0 text-muted [&>svg]:h-4 [&>svg]:w-4">{startAdornment}</span>
+          )}
+          <input
+            ref={ref}
+            className={`min-w-0 flex-1 bg-transparent py-2.5 text-primary placeholder:text-muted focus:outline-none disabled:cursor-not-allowed ${className}`}
+            {...props}
+          />
+          {endAdornment && (
+            <span className="shrink-0 text-muted [&>svg]:h-4 [&>svg]:w-4">{endAdornment}</span>
+          )}
+        </div>
+
+        {hasError && <p className="mt-1 text-[12px] text-danger">{error}</p>}
+        {helperText && !hasError && (
+          <p className="mt-1 text-[12px] text-muted">{helperText}</p>
         )}
       </div>
     );

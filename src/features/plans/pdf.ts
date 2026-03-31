@@ -50,17 +50,36 @@ export function isImage(url: string | null | undefined, fileName?: string | null
   return false;
 }
 
+/** Cached PDF document instances keyed by URL to avoid re-downloading. */
+const pdfDocCache = new Map<string, pdfjsLib.PDFDocumentProxy>();
+
+async function getPdfDoc(url: string): Promise<pdfjsLib.PDFDocumentProxy> {
+  const cached = pdfDocCache.get(url);
+  if (cached) return cached;
+  const task = pdfjsLib.getDocument({ url, withCredentials: false });
+  const doc = await task.promise;
+  pdfDocCache.set(url, doc);
+  return doc;
+}
+
+/** Returns the total page count for a PDF. */
+export async function getPdfPageCount(url: string): Promise<number> {
+  const doc = await getPdfDoc(url);
+  return doc.numPages;
+}
+
 /**
- * Render PDF page 1 to an existing canvas. Returns pixel dimensions of the rendered page.
+ * Render a specific PDF page to an existing canvas.
+ * @param pageNumber 1-based page index (default: 1)
  */
 export async function renderPdfPageToCanvas(
   url: string,
   canvas: HTMLCanvasElement,
   scale = 2,
+  pageNumber = 1,
 ): Promise<{ width: number; height: number }> {
-  const task = pdfjsLib.getDocument({ url, withCredentials: false });
-  const pdf = await task.promise;
-  const page = await pdf.getPage(1);
+  const doc = await getPdfDoc(url);
+  const page = await doc.getPage(Math.max(1, Math.min(pageNumber, doc.numPages)));
   const viewport = page.getViewport({ scale });
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas unsupported");
@@ -72,17 +91,32 @@ export async function renderPdfPageToCanvas(
 }
 
 /**
- * Rasterize first PDF page to a PNG data URL for use as `<img src>` (matches legacy plan viewer flow).
+ * Rasterize a PDF page to a PNG data URL.
+ * @param pageNumber 1-based page index (default: 1)
  */
-export async function rasterizePdfFirstPageToDataUrl(
+export async function rasterizePdfPageToDataUrl(
   url: string,
   scale = 2,
-): Promise<{ dataUrl: string; width: number; height: number }> {
+  pageNumber = 1,
+): Promise<{ dataUrl: string; width: number; height: number; totalPages: number }> {
+  const doc = await getPdfDoc(url);
+  const totalPages = doc.numPages;
+  const safePageNumber = Math.max(1, Math.min(pageNumber, totalPages));
   const canvas = document.createElement("canvas");
-  const { width, height } = await renderPdfPageToCanvas(url, canvas, scale);
+  const { width, height } = await renderPdfPageToCanvas(url, canvas, scale, safePageNumber);
   return {
     dataUrl: canvas.toDataURL("image/png"),
     width,
     height,
+    totalPages,
   };
+}
+
+/** @deprecated Use rasterizePdfPageToDataUrl instead */
+export async function rasterizePdfFirstPageToDataUrl(
+  url: string,
+  scale = 2,
+): Promise<{ dataUrl: string; width: number; height: number }> {
+  const { dataUrl, width, height } = await rasterizePdfPageToDataUrl(url, scale, 1);
+  return { dataUrl, width, height };
 }

@@ -214,7 +214,7 @@ export function Select({
           disabled={disabled}
           onClick={() => !disabled && setOpen((o) => !o)}
           onKeyDown={onTriggerKeyDown}
-          className={`flex items-center justify-between gap-2 rounded-lg border bg-bg text-left text-primary shadow-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 focus-visible:ring-offset-bg disabled:cursor-not-allowed disabled:opacity-50 ${sizeTrigger} ${borderClass} ${fullWidth ? 'w-full' : 'w-auto min-w-0'} ${triggerClassName}`}
+          className={`flex items-center justify-between gap-2 rounded-lg border bg-bg text-left text-primary shadow-token-xs transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-0 focus-visible:ring-offset-bg disabled:cursor-not-allowed disabled:opacity-50 ${sizeTrigger} ${borderClass} ${fullWidth ? 'w-full' : 'w-auto min-w-0'} ${triggerClassName}`}
         >
           <span className={`min-w-0 flex-1 truncate ${!selected && !value ? 'text-muted' : ''}`}>
             {displayLabel}
@@ -227,7 +227,7 @@ export function Select({
             id={listboxId}
             role="listbox"
             aria-labelledby={label ? triggerId : undefined}
-            className="absolute left-0 right-0 z-[100] mt-1 max-h-60 overflow-auto rounded-lg border border-border bg-elevated py-1 shadow-lg ring-1 ring-black/5 dark:ring-white/10"
+            className="animate-slide-down absolute left-0 right-0 z-[100] mt-1 max-h-60 overflow-auto rounded-xl border border-border/70 bg-elevated py-1 shadow-token-lg"
           >
             {options.map((opt, i) => {
               const isSelected = opt.value === value;

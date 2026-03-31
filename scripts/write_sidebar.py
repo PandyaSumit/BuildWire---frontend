@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+content = r'''import { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "@/store/hooks";
@@ -244,3 +244,8 @@ export function Sidebar() {
     </>
   );
 }
+'''
+
+with open('C:/SUMIT/Ideas/BuildWire-frontend/src/components/layout/sidebar.tsx', 'w', newline='\n') as f:
+    f.write(content)
+print('Sidebar written successfully')

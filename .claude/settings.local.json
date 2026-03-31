@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(python3 \"C:/SUMIT/Ideas/BuildWire-frontend/scripts/write_sidebar.py\")",
+      "Bash(node:*)",
+      "Bash(find /c/SUMIT/Ideas/BuildWire-frontend -type f \\\\\\(-name *canvas* -o -name *pdf* -o -name *annotation* -o -name *markup* \\\\\\) -iname *)",
+      "Bash(xargs grep:*)",
+      "Bash(wc:*)"
     ]
   }
 }

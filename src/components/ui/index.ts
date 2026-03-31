@@ -1,6 +1,6 @@
 export { Button, type ButtonProps } from './button';
 export { Spinner } from './spinner';
-export { Badge, type BadgeProps } from './badge';
+export { Badge, type BadgeProps, type BadgeVariant, type BadgeSize, type BadgeShape } from './badge';
 export { Avatar, type AvatarProps } from './avatar';
 export { Input, type InputProps } from './input';
 export { Textarea, type TextareaProps } from './textarea';

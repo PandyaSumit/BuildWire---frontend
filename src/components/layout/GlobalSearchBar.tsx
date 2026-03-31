@@ -63,7 +63,7 @@ export function GlobalSearchBar({ className }: GlobalSearchBarProps) {
         autoComplete="off"
         autoCorrect="off"
         spellCheck={false}
-        className="h-9 w-full rounded-lg border border-border/80 bg-bg py-2 ps-9 pe-16 text-[13px] text-primary placeholder:text-muted shadow-sm focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand dark:border-white/[0.08]"
+        className="h-9 w-full rounded-lg border border-border/70 bg-bg py-2 ps-9 pe-16 text-[13px] text-primary placeholder:text-muted shadow-token-xs transition-all duration-150 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/40 dark:border-white/[0.07]"
       />
       <span
         className="pointer-events-none absolute end-2 top-1/2 hidden -translate-y-1/2 select-none items-center gap-0.5 sm:flex"

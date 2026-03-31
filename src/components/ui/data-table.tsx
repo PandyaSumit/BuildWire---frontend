@@ -19,7 +19,6 @@ export type DataTableColumn<T> = {
 };
 
 export type DataTableVariant = "card" | "flush";
-
 export type DataTableDensity = "compact" | "comfortable";
 
 export type DataTableProps<T> = {
@@ -27,43 +26,29 @@ export type DataTableProps<T> = {
   data: T[];
   rowKey: (row: T, index: number) => string;
   /**
-   * `flush` — square corners, no side border; full-bleed in the main column (pair with `-mx-*` on parent).
+   * `flush` — square corners, no side border; full-bleed in the main column.
    * `card` — rounded shell + border (embedded panels).
    */
   variant?: DataTableVariant;
-  /** `comfortable` adds vertical padding to header and body cells (wide monitors / touch). */
+  /** `comfortable` adds extra vertical padding (touch-friendly). */
   density?: DataTableDensity;
-  /**
-   * Max height of the scroll container (horizontal + vertical overflow).
-   * `card` variant uses global thin scrollbars unless `hideScrollbar` is set.
-   */
   maxHeightClassName?: string;
   /** Applied to the inner `<table>` (e.g. `min-w-[72rem]` for wide grids). */
   tableMinWidthClassName?: string;
-  /**
-   * When `tableMinWidthClassName` is set, which table layout to use.
-   * Default `auto` (content-sized columns + horizontal scroll on narrow viewports).
-   * Use `fixed` when the table should stretch to the container width on large screens (e.g. RFIs).
-   */
   minWidthTableLayout?: "auto" | "fixed";
   tableLayout?: "auto" | "fixed";
   className?: string;
   /** Shown as a single full-width row when `data` is empty. */
   emptyFallback?: ReactNode;
-  /**
-   * Hide scrollbars while keeping overflow scroll (wheel / trackpad / touch).
-   * Defaults to true for `flush`, false for `card`.
-   */
   hideScrollbar?: boolean;
   /**
-   * Whole-row activation (e.g. open detail drawer). Ignores clicks that originate
-   * from interactive descendants (buttons, links, inputs, menu items).
+   * Whole-row activation. Ignores clicks that originate from interactive descendants
+   * (buttons, links, inputs, menu items).
    */
   onRowClick?: (row: T, rowIndex: number) => void;
   /** Controlled sort; omit to manage sorting inside the table */
   sort?: DataTableSortState | null;
   onSortChange?: (next: DataTableSortState | null) => void;
-  /** Skeleton placeholder rows (keeps column layout stable) */
   loading?: boolean;
   loadingRows?: number;
   rowClassName?: (row: T, rowIndex: number) => string | undefined;
@@ -75,13 +60,9 @@ function alignClass(align: "left" | "right" | "center" = "left") {
   return "text-left";
 }
 
-/**
- * App-wide data table: sticky dense header, row dividers, hover rows, scroll shell.
- * Define columns with `cell` renderers for each screen (tasks, RFIs, team, etc.).
- */
 const shellByVariant: Record<DataTableVariant, string> = {
-  card: "rounded-md border border-border bg-bg",
-  flush: "rounded-none border-x-0 border-b-0 border-t border-border bg-bg",
+  card:  "rounded-xl border border-border/70 bg-surface overflow-hidden",
+  flush: "rounded-none border-x-0 border-b-0 border-t border-border/50 bg-bg",
 };
 
 function compareSortValues(
@@ -99,13 +80,36 @@ function compareSortValues(
   );
 }
 
+/** Sort direction chevron icons */
+function SortIcon({ state }: { state: "asc" | "desc" | "none" }) {
+  if (state === "asc") {
+    return (
+      <svg className="h-3 w-3 shrink-0 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 15l7-7 7 7" />
+      </svg>
+    );
+  }
+  if (state === "desc") {
+    return (
+      <svg className="h-3 w-3 shrink-0 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+      </svg>
+    );
+  }
+  return (
+    <svg className="h-3 w-3 shrink-0 text-muted/50" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4M16 15l-4 4-4-4" />
+    </svg>
+  );
+}
+
 export function DataTable<T>({
   columns,
   data,
   rowKey,
   variant = "flush",
   density = "compact",
-  maxHeightClassName = "max-h-[min(32rem,calc(100vh-14rem))]",
+  maxHeightClassName = "max-h-[min(36rem,calc(100vh-14rem))]",
   tableMinWidthClassName,
   minWidthTableLayout = "auto",
   tableLayout = "fixed",
@@ -119,11 +123,8 @@ export function DataTable<T>({
   loadingRows = 5,
   rowClassName,
 }: DataTableProps<T>) {
-  const [sortInternal, setSortInternal] = useState<DataTableSortState | null>(
-    null,
-  );
-  const sortState =
-    sortControlled !== undefined ? sortControlled : sortInternal;
+  const [sortInternal, setSortInternal] = useState<DataTableSortState | null>(null);
+  const sortState = sortControlled !== undefined ? sortControlled : sortInternal;
   const setSortState = onSortChange ?? setSortInternal;
 
   const sortedData = useMemo(() => {
@@ -131,28 +132,17 @@ export function DataTable<T>({
     const col = columns.find((c) => c.id === sortState.columnId);
     if (!col?.sortValue) return data;
     return [...data].sort((a, b) =>
-      compareSortValues(
-        col.sortValue!(a),
-        col.sortValue!(b),
-        sortState.direction,
-      ),
+      compareSortValues(col.sortValue!(a), col.sortValue!(b), sortState.direction),
     );
   }, [columns, data, sortState]);
 
-  const displayData = sortedData;
-
   const minW = tableMinWidthClassName ?? "";
-  const thPad = density === "comfortable" ? "py-3" : "py-2.5";
-  const tdPad = density === "comfortable" ? "py-3.5" : "py-2.5";
+  const thPad = density === "comfortable" ? "py-3 px-3" : "py-2.5 px-3";
+  const tdPad = density === "comfortable" ? "py-3.5 px-3" : "py-2.5 px-3";
   const layoutResolved = minW
-    ? minWidthTableLayout === "fixed"
-      ? "table-fixed"
-      : "table-auto"
-    : tableLayout === "fixed"
-      ? "table-fixed"
-      : "table-auto";
+    ? minWidthTableLayout === "fixed" ? "table-fixed" : "table-auto"
+    : tableLayout === "fixed" ? "table-fixed" : "table-auto";
   const hideBar = hideScrollbar ?? variant === "flush";
-  /** `min-w-*` + `w-full`: fill the scroll container when it is wider than the floor; still scrolls when narrower. */
   const tableWidthClass = minW ? `${minW} w-full` : "w-full";
 
   function toggleSort(columnId: string) {
@@ -171,64 +161,49 @@ export function DataTable<T>({
     const el = target as HTMLElement | null;
     if (!el || typeof el.closest !== "function") return false;
     return Boolean(
-      el.closest(
-        'button, a, input, textarea, select, option, [role="menuitem"], [role="combobox"]',
-      ),
+      el.closest('button, a, input, textarea, select, option, [role="menuitem"], [role="combobox"]'),
     );
   }
 
-  function handleRowClick(
-    row: T,
-    rowIndex: number,
-    e: MouseEvent<HTMLTableRowElement>,
-  ) {
+  function handleRowClick(row: T, rowIndex: number, e: MouseEvent<HTMLTableRowElement>) {
     if (!onRowClick || isInteractiveTarget(e.target)) return;
     onRowClick(row, rowIndex);
   }
 
+  const scrollShell = `min-h-0 min-w-0 overflow-auto ${shellByVariant[variant]} ${maxHeightClassName} ${hideBar ? "scrollbar-none" : ""} ${className}`.trim();
+
   return (
-    <div
-      className={`min-h-0 min-w-0 overflow-auto ${shellByVariant[variant]} ${maxHeightClassName} ${hideBar ? "scrollbar-none" : ""} ${className}`.trim()}
-    >
+    <div className={scrollShell}>
       <table
         className={`border-separate border-spacing-0 text-sm ${layoutResolved} ${tableWidthClass} [&_tbody>tr:last-child>td]:border-b-0`.trim()}
       >
-        <thead className="sticky top-0 z-10 border-b border-border/80 bg-elevated/95 shadow-sm backdrop-blur-md supports-[backdrop-filter]:bg-elevated/80">
-          <tr>
+        {/* ── Header ── */}
+        <thead className="sticky top-0 z-10">
+          <tr className="border-b border-border/60 bg-bg/95 backdrop-blur-sm supports-[backdrop-filter]:bg-bg/80">
             {columns.map((col) => {
               const sortable = Boolean(col.sortValue);
               const active = sortState?.columnId === col.id;
+              const sortDir = !active ? "none" : sortState!.direction;
               const ariaSort = !sortable
                 ? undefined
-                : !active
-                  ? "none"
-                  : sortState!.direction === "asc"
-                    ? "ascending"
-                    : "descending";
+                : !active ? "none"
+                : sortState!.direction === "asc" ? "ascending" : "descending";
+
               return (
                 <th
                   key={col.id}
                   scope="col"
                   aria-sort={ariaSort}
-                  className={`whitespace-nowrap ${thPad} align-middle text-[11px] font-semibold leading-none text-secondary ${alignClass(col.align)} ${col.headerClassName ?? ""}`.trim()}
+                  className={`whitespace-nowrap ${thPad} align-middle text-[11px] font-semibold uppercase tracking-[0.07em] text-muted/80 ${alignClass(col.align)} ${col.headerClassName ?? ""}`.trim()}
                 >
                   {sortable ? (
                     <button
                       type="button"
                       onClick={() => toggleSort(col.id)}
-                      className={`inline-flex max-w-full items-center gap-1 rounded-md px-0.5 text-left text-inherit hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 ${alignClass(col.align)}`}
+                      className={`inline-flex max-w-full items-center gap-1 rounded px-0.5 text-left text-inherit transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 ${active ? "text-primary" : ""} ${alignClass(col.align)}`}
                     >
                       <span className="min-w-0 truncate">{col.header}</span>
-                      <span
-                        className="shrink-0 font-normal text-muted tabular-nums"
-                        aria-hidden
-                      >
-                        {active
-                          ? sortState!.direction === "asc"
-                            ? "↑"
-                            : "↓"
-                          : "↕"}
-                      </span>
+                      <SortIcon state={sortDir} />
                     </button>
                   ) : (
                     col.header
@@ -238,48 +213,46 @@ export function DataTable<T>({
             })}
           </tr>
         </thead>
+
+        {/* ── Body ── */}
         <tbody>
           {loading ? (
             Array.from({ length: loadingRows }).map((_, rowIndex) => (
-              <tr key={`sk-${rowIndex}`} className="even:bg-muted/[0.025]">
+              <tr key={`sk-${rowIndex}`}>
                 {columns.map((col) => (
                   <td
                     key={col.id}
-                    className={`border-b border-border/45 ${tdPad} align-middle ${alignClass(col.align)} ${col.cellClassName ?? ""}`.trim()}
+                    className={`border-b border-border/40 ${tdPad} align-middle ${alignClass(col.align)} ${col.cellClassName ?? ""}`.trim()}
                   >
                     <Skeleton className="h-4 w-full max-w-[8rem]" />
                   </td>
                 ))}
               </tr>
             ))
-          ) : displayData.length === 0 && emptyFallback != null ? (
+          ) : sortedData.length === 0 && emptyFallback != null ? (
             <tr>
               <td
                 colSpan={columns.length}
-                className="border-b-0 py-12 text-center text-sm text-muted"
+                className="border-b-0 py-14 text-center text-sm text-muted"
               >
                 {emptyFallback}
               </td>
             </tr>
           ) : (
-            displayData.map((row, rowIndex) => (
+            sortedData.map((row, rowIndex) => (
               <tr
                 key={rowKey(row, rowIndex)}
-                className={`transition-colors odd:bg-transparent even:bg-muted/[0.025] ${
+                className={`transition-colors duration-100 ${
                   onRowClick
-                    ? "cursor-pointer hover:bg-muted/[0.08] active:bg-muted/[0.12]"
-                    : "hover:bg-muted/[0.04]"
+                    ? "cursor-pointer hover:bg-brand/[0.04] active:bg-brand/[0.07]"
+                    : "hover:bg-primary/[0.025]"
                 } ${rowClassName?.(row, rowIndex) ?? ""}`.trim()}
-                onClick={
-                  onRowClick
-                    ? (e) => handleRowClick(row, rowIndex, e)
-                    : undefined
-                }
+                onClick={onRowClick ? (e) => handleRowClick(row, rowIndex, e) : undefined}
               >
                 {columns.map((col) => (
                   <td
                     key={col.id}
-                    className={`border-b border-border/45 ${tdPad} align-middle text-[13px] leading-5 ${alignClass(col.align)} ${col.cellClassName ?? ""}`.trim()}
+                    className={`border-b border-border/40 ${tdPad} align-middle text-[13px] leading-5 ${alignClass(col.align)} ${col.cellClassName ?? ""}`.trim()}
                   >
                     {col.cell(row, rowIndex)}
                   </td>

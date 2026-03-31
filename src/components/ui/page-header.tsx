@@ -18,13 +18,13 @@ type PageHeaderProps = {
 export function PageHeader({ title, description, actions, toolbar, className = '' }: PageHeaderProps) {
   return (
     <div className={`space-y-3 ${className}`}>
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <h1 className="font-[family-name:var(--font-dm-sans)] text-xl font-bold tracking-tight text-primary">
+          <h1 className="font-[family-name:var(--font-dm-sans)] text-[19px] font-bold tracking-tight text-primary leading-tight">
             {title}
           </h1>
           {description && (
-            <p className="mt-0.5 text-sm leading-relaxed text-secondary">{description}</p>
+            <p className="mt-0.5 text-[13px] leading-relaxed text-secondary">{description}</p>
           )}
         </div>
         {actions && (
