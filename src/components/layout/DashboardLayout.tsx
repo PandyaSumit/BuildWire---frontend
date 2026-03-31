@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { Sidebar } from "./sidebar";
 import { Header } from "./header";
@@ -10,7 +11,37 @@ import {
 import { GlobalSearchProvider } from "@/components/layout/GlobalSearchContext";
 
 function DashboardShell() {
-  const { collapsed, mobileOpen, setMobileOpen } = useSidebarLayout();
+  const {
+    collapsed,
+    mobileOpen,
+    setMobileOpen,
+    mobileDragOffset,
+    setMobileDragOffset,
+  } = useSidebarLayout();
+  const dragStartRef = useRef<number | null>(null);
+
+  const mobileOverlayVisible = mobileOpen || mobileDragOffset > 0;
+  const mobileOverlayOpacity = mobileOpen
+    ? 1
+    : Math.min(mobileDragOffset / 180, 0.9);
+
+  const handleThumbStart = (clientX: number) => {
+    dragStartRef.current = clientX;
+    setMobileDragOffset(0);
+  };
+
+  const handleThumbMove = (clientX: number) => {
+    if (dragStartRef.current == null) return;
+    setMobileDragOffset(Math.max(0, Math.min(clientX - dragStartRef.current, 320)));
+  };
+
+  const handleThumbEnd = () => {
+    if (dragStartRef.current == null) return;
+    const shouldOpen = mobileDragOffset > 72;
+    dragStartRef.current = null;
+    setMobileOpen(shouldOpen);
+    setMobileDragOffset(0);
+  };
 
   return (
     <>
@@ -19,11 +50,33 @@ function DashboardShell() {
         className={[
           "fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] lg:hidden",
           "transition-opacity duration-200",
-          mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
+          mobileOverlayVisible ? "pointer-events-auto" : "pointer-events-none",
         ].join(" ")}
+        style={{ opacity: mobileOverlayOpacity }}
         onClick={() => setMobileOpen(false)}
         aria-hidden
       />
+
+      {/* Mobile edge thumb — swipe/tap to reveal the drawer */}
+      {!mobileOpen && (
+        <div
+          className="fixed left-0 top-1/2 z-40 -translate-y-1/2 lg:hidden"
+          aria-hidden
+          onTouchStart={(e) => handleThumbStart(e.touches[0]?.clientX ?? 0)}
+          onTouchMove={(e) => handleThumbMove(e.touches[0]?.clientX ?? 0)}
+          onTouchEnd={handleThumbEnd}
+          onTouchCancel={handleThumbEnd}
+        >
+          <button
+            type="button"
+            onClick={() => setMobileOpen(true)}
+            className="group flex h-16 w-5 items-center justify-center rounded-r-full border border-l-0 border-border/60 bg-sidebar/95 shadow-token-md backdrop-blur-sm transition-colors"
+            aria-label="Open sidebar"
+          >
+            <span className="h-8 w-1 rounded-full bg-border/80 transition-colors group-hover:bg-brand/50" />
+          </button>
+        </div>
+      )}
 
       <Sidebar />
 

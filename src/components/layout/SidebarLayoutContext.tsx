@@ -17,6 +17,8 @@ type SidebarLayoutContextValue = {
   /** Mobile drawer open state (below lg breakpoint) */
   mobileOpen: boolean;
   setMobileOpen: (value: boolean) => void;
+  mobileDragOffset: number;
+  setMobileDragOffset: (value: number) => void;
 };
 
 const SidebarLayoutContext = createContext<SidebarLayoutContextValue | null>(null);
@@ -24,6 +26,7 @@ const SidebarLayoutContext = createContext<SidebarLayoutContextValue | null>(nul
 export function SidebarLayoutProvider({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsedState] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileDragOffset, setMobileDragOffset] = useState(0);
 
   useEffect(() => {
     try {
@@ -57,8 +60,16 @@ export function SidebarLayoutProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ collapsed, setCollapsed, toggle, mobileOpen, setMobileOpen }),
-    [collapsed, setCollapsed, toggle, mobileOpen],
+    () => ({
+      collapsed,
+      setCollapsed,
+      toggle,
+      mobileOpen,
+      setMobileOpen,
+      mobileDragOffset,
+      setMobileDragOffset,
+    }),
+    [collapsed, setCollapsed, toggle, mobileOpen, mobileDragOffset],
   );
 
   return <SidebarLayoutContext.Provider value={value}>{children}</SidebarLayoutContext.Provider>;

@@ -68,18 +68,14 @@ export function Sidebar() {
     <>
       <aside
         className={[
-          // Base layout
           "fixed start-0 top-0 z-50 flex h-dvh max-h-dvh flex-col bg-sidebar",
           "border-e border-border/50 dark:border-white/[0.05]",
-          // Mobile: slide-in/out as overlay drawer (always w-60)
           "w-60 transition-transform duration-200 ease-out",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
-          // Desktop (lg+): always visible, width controls collapsed state
           "lg:translate-x-0 lg:z-30 lg:transition-[width] lg:duration-200 lg:ease-out",
           collapsed ? "lg:w-14" : "lg:w-60",
         ].join(" ")}
       >
-        {/* Logo / Brand */}
         <div
           className={`shrink-0 border-b border-border/40 dark:border-white/[0.05] ${
             effectiveCollapsed
@@ -108,7 +104,6 @@ export function Sidebar() {
                   {t("brand.name")}
                 </span>
               </div>
-              {/* On mobile, show close button; on desktop show collapse toggle */}
               <button
                 type="button"
                 onClick={mobileOpen ? () => setMobileOpen(false) : toggle}
@@ -129,7 +124,6 @@ export function Sidebar() {
           )}
         </div>
 
-        {/* Navigation */}
         <nav
           className={`scrollbar-none flex-1 overflow-y-auto overflow-x-hidden ${
             effectiveCollapsed ? "px-1.5 py-2" : "px-2 py-3"
@@ -203,7 +197,6 @@ export function Sidebar() {
           ))}
         </nav>
 
-        {/* Account footer */}
         <div
           ref={accountMenuRef}
           className={`relative shrink-0 border-t border-border/40 dark:border-white/[0.05] ${

@@ -5,6 +5,7 @@ import { useSidebarMode } from '@/hooks/useSidebarMode';
 import { useSidebarLayout } from '@/components/layout/SidebarLayoutContext';
 import { LanguageMenu } from '@/components/layout/LanguageMenu';
 import { GlobalSearchBar } from '@/components/layout/GlobalSearchBar';
+import { useOptionalProjectUi } from '@/features/project-ui/ProjectUiContext';
 
 interface HeaderProps {
   title?: string;
@@ -19,13 +20,13 @@ export function Header({ title, subtitle, actions }: HeaderProps) {
   const { t } = useTranslation();
   const sidebarMode = useSidebarMode();
   const showProjectBack = sidebarMode.mode === 'project';
+  const projectUi = useOptionalProjectUi();
   const { mobileOpen, setMobileOpen } = useSidebarLayout();
 
   return (
-    <header className="sticky top-0 z-40 flex h-[52px] items-center gap-2 border-b border-border/50 bg-header px-3 sm:gap-3 sm:px-5 dark:border-white/[0.05]">
-      {/* Left: hamburger (mobile) + back link + page title */}
+    <header className="sticky top-0 z-40 flex h-[52px] items-center gap-2 border-b border-border/50 bg-header/95 px-2.5 backdrop-blur-sm sm:px-4 dark:border-white/[0.05]">
+      {/* Left: hamburger (mobile) + breadcrumb context */}
       <div className="flex min-w-0 flex-1 items-center gap-2">
-        {/* Hamburger — only visible on mobile/tablet (below lg) */}
         <button
           type="button"
           onClick={() => setMobileOpen(!mobileOpen)}
@@ -45,43 +46,46 @@ export function Header({ title, subtitle, actions }: HeaderProps) {
         </button>
 
         {showProjectBack && (
-          <Link
-            to="/projects"
-            className="inline-flex shrink-0 items-center gap-1 rounded-md px-2 py-1.5 text-[12.5px] font-medium text-secondary transition-colors hover:bg-primary/6 hover:text-primary"
-          >
-            <svg
-              className="h-3.5 w-3.5 rtl:rotate-180"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden
+          <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-1 text-[11.5px]">
+            <Link
+              to="/projects"
+              className="shrink-0 rounded-md px-1.5 py-1 text-muted transition-colors hover:bg-primary/6 hover:text-primary"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-            </svg>
-            <span className="hidden sm:inline">{t('header.allProjects')}</span>
-          </Link>
+              {t('header.allProjects')}
+            </Link>
+            <span className="text-muted/40">/</span>
+            <span className="truncate font-medium text-primary">
+              {projectUi?.project.name ?? t('nav.projects')}
+            </span>
+          </nav>
         )}
 
-        {(title || subtitle) && (
+        {!showProjectBack && (title || subtitle) && (
           <div className="min-w-0">
             {title && (
-              <h1 className="truncate text-[14px] font-semibold tracking-tight text-primary leading-tight">
+              <h1 className="truncate text-[13px] font-semibold tracking-tight text-primary leading-tight">
                 {title}
               </h1>
             )}
             {subtitle && (
-              <p className="truncate text-[11.5px] leading-tight text-muted">{subtitle}</p>
+              <p className="truncate text-[11px] leading-tight text-muted">{subtitle}</p>
             )}
+          </div>
+        )}
+
+        {!showProjectBack && !title && (
+          <div className="min-w-0 text-[12px]">
+            <span className="font-semibold text-primary">BuildWire</span>
+            <span className="mx-1 text-muted/40">/</span>
+            <span className="text-muted">{t('nav.projects')}</span>
           </div>
         )}
       </div>
 
-      {/* Center: global search */}
-      <div className="hidden w-full max-w-sm flex-1 sm:flex">
+      <div className="hidden w-full max-w-[15rem] flex-1 sm:flex lg:max-w-[18rem]">
         <GlobalSearchBar className="max-w-full" />
       </div>
 
-      {/* Right: actions + icons */}
       <div className="flex shrink-0 items-center gap-1">
         {actions}
 
@@ -91,7 +95,9 @@ export function Header({ title, subtitle, actions }: HeaderProps) {
           </svg>
         </button>
 
-        <LanguageMenu />
+        <div className="hidden md:block">
+          <LanguageMenu />
+        </div>
 
         <button type="button" className={iconBtn} aria-label={t('header.notifications')}>
           <svg className="h-[17px] w-[17px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
