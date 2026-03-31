@@ -579,16 +579,15 @@ function buildColumns(): DataTableColumn<DummyRfiRow>[] {
     {
       id: "num",
       header: "RFI #",
-      headerClassName: "pl-4 pr-3 w-[88px]",
-      cellClassName: "pl-4 pr-3",
+      headerClassName: "w-[88px]",
       sortValue: (r) => r.num,
       cell: (r) => <span className="font-mono text-xs font-semibold text-brand">{r.num}</span>,
     },
     {
       id: "title",
       header: "Title",
-      headerClassName: "px-3 min-w-[11rem] w-[28%]",
-      cellClassName: "px-3 min-w-0",
+      headerClassName: "min-w-[11rem] w-[28%]",
+      cellClassName: "min-w-0",
       sortValue: (r) => r.title,
       cell: (r) => (
         <span className="block min-w-0 truncate text-[13px] font-medium text-primary" title={r.title}>
@@ -599,8 +598,8 @@ function buildColumns(): DataTableColumn<DummyRfiRow>[] {
     {
       id: "location",
       header: "Location",
-      headerClassName: "px-3 hidden lg:table-cell max-w-[9rem]",
-      cellClassName: "px-3 hidden lg:table-cell max-w-[9rem]",
+      headerClassName: "hidden lg:table-cell max-w-[9rem]",
+      cellClassName: "hidden lg:table-cell max-w-[9rem]",
       sortValue: (r) => r.location,
       cell: (r) => (
         <span className="block min-w-0 truncate text-[12px] text-secondary" title={r.location}>
@@ -611,8 +610,8 @@ function buildColumns(): DataTableColumn<DummyRfiRow>[] {
     {
       id: "specSection",
       header: "Spec",
-      headerClassName: "px-3 hidden xl:table-cell w-[8rem]",
-      cellClassName: "px-3 hidden xl:table-cell",
+      headerClassName: "hidden xl:table-cell w-[8rem]",
+      cellClassName: "hidden xl:table-cell",
       sortValue: (r) => r.specSection,
       cell: (r) => (
         <span className="block min-w-0 truncate font-mono text-[11px] text-secondary" title={r.specSection}>
@@ -623,16 +622,12 @@ function buildColumns(): DataTableColumn<DummyRfiRow>[] {
     {
       id: "trade",
       header: "Trade",
-      headerClassName: "px-3",
-      cellClassName: "px-3",
       sortValue: (r) => r.trade,
       cell: (r) => <SemanticPill label={r.trade} palette={RFI_TRADE_PILL_CLASSES} />,
     },
     {
       id: "priority",
       header: "Priority",
-      headerClassName: "px-3",
-      cellClassName: "px-3",
       sortValue: (r) => r.priority,
       cell: (r) => (
         <Badge variant={RFI_PRIORITY_BADGE_VARIANT[r.priority]} size="sm">{r.priority}</Badge>
@@ -641,8 +636,6 @@ function buildColumns(): DataTableColumn<DummyRfiRow>[] {
     {
       id: "status",
       header: "Status",
-      headerClassName: "px-3",
-      cellClassName: "px-3",
       sortValue: (r) => r.status,
       cell: (r) => (
         <Badge variant={RFI_STATUS_BADGE_VARIANT[r.status] ?? "default"} size="sm">
@@ -653,40 +646,31 @@ function buildColumns(): DataTableColumn<DummyRfiRow>[] {
     {
       id: "ballInCourt",
       header: "BIC",
-      headerClassName: "px-3",
-      cellClassName: "px-3",
       sortValue: (r) => r.ballInCourt,
       cell: (r) => <span className="text-[13px] text-secondary">{r.ballInCourt || "—"}</span>,
     },
     {
       id: "submittedBy",
       header: "Submitted by",
-      headerClassName: "px-3",
-      cellClassName: "px-3",
       sortValue: (r) => r.submittedBy,
       cell: (r) => <span className="text-[13px] text-secondary">{r.submittedBy}</span>,
     },
     {
       id: "assignedTo",
       header: "Assigned to",
-      headerClassName: "px-3",
-      cellClassName: "px-3",
       sortValue: (r) => r.assignedTo,
       cell: (r) => <span className="text-[13px] text-secondary">{r.assignedTo || "—"}</span>,
     },
     {
       id: "due",
       header: "Due",
-      headerClassName: "px-3",
-      cellClassName: "px-3 whitespace-nowrap",
+      cellClassName: "whitespace-nowrap",
       sortValue: (r) => r.due,
       cell: (r) => <span className="text-[13px] text-secondary">{r.due || "—"}</span>,
     },
     {
       id: "daysOpen",
       header: "Days open",
-      headerClassName: "px-3",
-      cellClassName: "px-3",
       align: "right",
       sortValue: (r) => r.daysOpen,
       cell: (r) => (
@@ -698,8 +682,6 @@ function buildColumns(): DataTableColumn<DummyRfiRow>[] {
     {
       id: "costImpact",
       header: "Cost",
-      headerClassName: "px-3",
-      cellClassName: "px-3",
       align: "center",
       sortValue: (r) => (r.costImpact ? 1 : 0),
       cell: (r) =>
@@ -712,16 +694,13 @@ function buildColumns(): DataTableColumn<DummyRfiRow>[] {
     {
       id: "scheduleImpact",
       header: "Schedule",
-      headerClassName: "px-3",
-      cellClassName: "px-3 min-w-[5.5rem]",
+      cellClassName: "min-w-[5.5rem]",
       sortValue: (r) => scheduleSortRank(r),
       cell: (r) => <ScheduleCell rfi={r} />,
     },
     {
       id: "attachments",
       header: "Files",
-      headerClassName: "px-3 pr-4 text-center",
-      cellClassName: "px-3 pr-4",
       align: "center",
       sortValue: (r) => r.attachmentCount,
       cell: (r) =>
@@ -1066,41 +1045,38 @@ export default function ProjectRfisPage() {
       ) : null}
 
       {/* ── Table card ────────────────────────────────────────────────────── */}
-      <div className="min-h-0 min-w-0 overflow-hidden rounded-xl border border-border/40 bg-bg">
-        <DataTable<DummyRfiRow>
-            variant="flush"
-            density="comfortable"
-            columns={columns}
-            data={filteredRows}
-            rowKey={(r) => r.num}
-            tableMinWidthClassName="min-w-[1040px]"
-            minWidthTableLayout="fixed"
-            maxHeightClassName="max-h-none"
-            className="rounded-none border-0"
-            onRowClick={(r) => setSelectedRfi(r)}
-            rowClassName={(r) =>
-              r.isOverdue ? "border-s-2 border-s-danger/55" : undefined
-            }
-            emptyFallback={
-              rfiRows.length === 0 ? (
-                <EmptyState
-                  title={t("rfiPage.emptyTitle")}
-                  description={t("rfiPage.emptyDescription")}
-                  action={{ label: t("rfiPage.newRfi"), onClick: openCreate }}
-                />
-              ) : (
-                <EmptyState
-                  title={t("rfiPage.emptyFilteredTitle")}
-                  description={t("rfiPage.emptyFilteredDescription")}
-                  action={{
-                    label: t("rfiPage.resetFilters"),
-                    onClick: resetFilters,
-                  }}
-                />
-              )
-            }
-          />
-      </div>
+      <DataTable<DummyRfiRow>
+        variant="card"
+        density="comfortable"
+        columns={columns}
+        data={filteredRows}
+        rowKey={(r) => r.num}
+        tableMinWidthClassName="min-w-[1040px]"
+        minWidthTableLayout="fixed"
+        maxHeightClassName="max-h-none"
+        onRowClick={(r) => setSelectedRfi(r)}
+        rowClassName={(r) =>
+          r.isOverdue ? "border-s-2 border-s-danger/55" : undefined
+        }
+        emptyFallback={
+          rfiRows.length === 0 ? (
+            <EmptyState
+              title={t("rfiPage.emptyTitle")}
+              description={t("rfiPage.emptyDescription")}
+              action={{ label: t("rfiPage.newRfi"), onClick: openCreate }}
+            />
+          ) : (
+            <EmptyState
+              title={t("rfiPage.emptyFilteredTitle")}
+              description={t("rfiPage.emptyFilteredDescription")}
+              action={{
+                label: t("rfiPage.resetFilters"),
+                onClick: resetFilters,
+              }}
+            />
+          )
+        }
+      />
 
       <SheetDrawer
         open={selectedRfi !== null}

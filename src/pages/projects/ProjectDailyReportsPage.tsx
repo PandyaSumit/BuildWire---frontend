@@ -168,8 +168,8 @@ export default function ProjectDailyReportsPage() {
       {
         id: "date",
         header: t("dailyReportsPage.colDate"),
-        headerClassName: "pl-4 pr-3",
-        cellClassName: "pl-4 pr-3 whitespace-nowrap",
+        headerClassName: "",
+        cellClassName: "whitespace-nowrap",
         sortValue: (r) => r.date,
         cell: (r) => (
           <span className="font-mono text-[13px] text-primary">{r.date}</span>
@@ -178,8 +178,8 @@ export default function ProjectDailyReportsPage() {
       {
         id: "submittedBy",
         header: t("dailyReportsPage.colSubmittedBy"),
-        headerClassName: "px-3",
-        cellClassName: "px-3",
+        headerClassName: "",
+        cellClassName: "",
         sortValue: (r) => r.submittedBy,
         cell: (r) => (
           <span className="text-[13px] font-medium text-primary">{r.submittedBy}</span>
@@ -188,8 +188,8 @@ export default function ProjectDailyReportsPage() {
       {
         id: "crew",
         header: t("dailyReportsPage.colCrew"),
-        headerClassName: "px-3",
-        cellClassName: "px-3",
+        headerClassName: "",
+        cellClassName: "",
         align: "right",
         sortValue: (r) => totalDailyReportCrew(r),
         cell: (r) => (
@@ -199,8 +199,8 @@ export default function ProjectDailyReportsPage() {
       {
         id: "weather",
         header: t("dailyReportsPage.colWeather"),
-        headerClassName: "px-3",
-        cellClassName: "px-3",
+        headerClassName: "",
+        cellClassName: "",
         sortValue: (r) => r.weather,
         cell: (r) => (
           <span className="text-[13px] text-secondary">{r.weather}</span>
@@ -209,8 +209,8 @@ export default function ProjectDailyReportsPage() {
       {
         id: "status",
         header: t("dailyReportsPage.colStatus"),
-        headerClassName: "px-3 pr-4",
-        cellClassName: "px-3 pr-4",
+        headerClassName: "pr-4",
+        cellClassName: "pr-4",
         sortValue: (r) => r.status,
         cell: (r) => (
           <Badge variant={DAILY_REPORT_STATUS_BADGE[r.status]} size="sm">

@@ -303,8 +303,8 @@ export default function ProjectMeetingsPage() {
     {
       id: "name",
       header: "Meeting",
-      headerClassName: "pl-4 pr-3",
-      cellClassName: "pl-4 pr-3",
+      headerClassName: "",
+      cellClassName: "",
       sortValue: (r) => r.name,
       cell: (r) => (
         <span className="text-[13px] font-medium text-primary">{r.name}</span>
@@ -313,8 +313,8 @@ export default function ProjectMeetingsPage() {
     {
       id: "type",
       header: "Type",
-      headerClassName: "px-3",
-      cellClassName: "px-3",
+      headerClassName: "",
+      cellClassName: "",
       sortValue: (r) => r.type,
       cell: (r) => (
         <SemanticPill label={r.type} palette={MEETING_TYPE_PILL_CLASSES} />
@@ -323,8 +323,8 @@ export default function ProjectMeetingsPage() {
     {
       id: "date",
       header: "Date & time",
-      headerClassName: "px-3",
-      cellClassName: "px-3 whitespace-nowrap",
+      headerClassName: "",
+      cellClassName: "whitespace-nowrap",
       sortValue: (r) => r.date,
       cell: (r) => (
         <span className="font-mono text-[13px] text-secondary">{r.date}</span>
@@ -333,8 +333,8 @@ export default function ProjectMeetingsPage() {
     {
       id: "attendees",
       header: "Attendees",
-      headerClassName: "px-3",
-      cellClassName: "px-3",
+      headerClassName: "",
+      cellClassName: "",
       align: "right",
       sortValue: (r) => r.attendees,
       cell: (r) => (
@@ -346,8 +346,8 @@ export default function ProjectMeetingsPage() {
     {
       id: "actions",
       header: "Action items",
-      headerClassName: "px-3",
-      cellClassName: "px-3",
+      headerClassName: "",
+      cellClassName: "",
       align: "right",
       sortValue: (r) => r.actions,
       cell: (r) => (
@@ -361,8 +361,8 @@ export default function ProjectMeetingsPage() {
     {
       id: "status",
       header: "Status",
-      headerClassName: "px-3 pr-4",
-      cellClassName: "px-3 pr-4",
+      headerClassName: "pr-4",
+      cellClassName: "pr-4",
       sortValue: (r) => r.status,
       cell: (r) => (
         <Badge variant={MEETING_STATUS_BADGE[r.status] ?? "secondary"} size="sm">

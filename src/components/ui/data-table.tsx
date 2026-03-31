@@ -26,8 +26,8 @@ export type DataTableProps<T> = {
   data: T[];
   rowKey: (row: T, index: number) => string;
   /**
-   * `flush` — square corners, no side border; full-bleed in the main column.
-   * `card` — rounded shell + border (embedded panels).
+   * `flush` — no outer border/radius; full-bleed in the main column.
+   * `card`  — rounded-md shell + border (embedded panels).
    */
   variant?: DataTableVariant;
   /** `comfortable` adds extra vertical padding (touch-friendly). */
@@ -61,8 +61,8 @@ function alignClass(align: "left" | "right" | "center" = "left") {
 }
 
 const shellByVariant: Record<DataTableVariant, string> = {
-  card:  "rounded-xl border border-border/70 bg-surface overflow-hidden",
-  flush: "rounded-none border-x-0 border-b-0 border-t border-border/50 bg-bg",
+  card:  "rounded-md border border-border/60 bg-surface overflow-hidden",
+  flush: "bg-transparent overflow-hidden",
 };
 
 function compareSortValues(
@@ -75,29 +75,27 @@ function compareSortValues(
   if (a == null) return 1 * mult;
   if (b == null) return -1 * mult;
   if (typeof a === "number" && typeof b === "number") return (a - b) * mult;
-  return (
-    String(a).localeCompare(String(b), undefined, { numeric: true }) * mult
-  );
+  return String(a).localeCompare(String(b), undefined, { numeric: true }) * mult;
 }
 
 /** Sort direction chevron icons */
 function SortIcon({ state }: { state: "asc" | "desc" | "none" }) {
   if (state === "asc") {
     return (
-      <svg className="h-3 w-3 shrink-0 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <svg className="h-[11px] w-[11px] shrink-0 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 15l7-7 7 7" />
       </svg>
     );
   }
   if (state === "desc") {
     return (
-      <svg className="h-3 w-3 shrink-0 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <svg className="h-[11px] w-[11px] shrink-0 text-brand" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
       </svg>
     );
   }
   return (
-    <svg className="h-3 w-3 shrink-0 text-muted/50" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+    <svg className="h-[11px] w-[11px] shrink-0 text-muted/30" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l4-4 4 4M16 15l-4 4-4-4" />
     </svg>
   );
@@ -137,8 +135,8 @@ export function DataTable<T>({
   }, [columns, data, sortState]);
 
   const minW = tableMinWidthClassName ?? "";
-  const thPad = density === "comfortable" ? "py-3 px-3" : "py-2.5 px-3";
-  const tdPad = density === "comfortable" ? "py-3.5 px-3" : "py-2.5 px-3";
+  const thPad = density === "comfortable" ? "py-3 px-4" : "py-2.5 px-4";
+  const tdPad = density === "comfortable" ? "py-3.5 px-4" : "py-2.5 px-4";
   const layoutResolved = minW
     ? minWidthTableLayout === "fixed" ? "table-fixed" : "table-auto"
     : tableLayout === "fixed" ? "table-fixed" : "table-auto";
@@ -170,16 +168,22 @@ export function DataTable<T>({
     onRowClick(row, rowIndex);
   }
 
-  const scrollShell = `min-h-0 min-w-0 overflow-auto ${shellByVariant[variant]} ${maxHeightClassName} ${hideBar ? "scrollbar-none" : ""} ${className}`.trim();
+  const scrollShell = [
+    "min-h-0 min-w-0 overflow-auto",
+    shellByVariant[variant],
+    maxHeightClassName,
+    hideBar ? "scrollbar-none" : "",
+    className,
+  ].filter(Boolean).join(" ");
 
   return (
     <div className={scrollShell}>
       <table
-        className={`border-separate border-spacing-0 text-sm ${layoutResolved} ${tableWidthClass} [&_tbody>tr:last-child>td]:border-b-0`.trim()}
+        className={`border-separate border-spacing-0 text-sm ${layoutResolved} ${tableWidthClass} [&_tbody>tr:last-child>td]:border-b-0`}
       >
         {/* ── Header ── */}
         <thead className="sticky top-0 z-10">
-          <tr className="border-b border-border/60 bg-bg/95 backdrop-blur-sm supports-[backdrop-filter]:bg-bg/80">
+          <tr>
             {columns.map((col) => {
               const sortable = Boolean(col.sortValue);
               const active = sortState?.columnId === col.id;
@@ -194,13 +198,26 @@ export function DataTable<T>({
                   key={col.id}
                   scope="col"
                   aria-sort={ariaSort}
-                  className={`whitespace-nowrap ${thPad} align-middle text-[11px] font-semibold uppercase tracking-[0.07em] text-muted/80 ${alignClass(col.align)} ${col.headerClassName ?? ""}`.trim()}
+                  className={[
+                    thPad,
+                    "border-b border-border/50 bg-surface",
+                    "whitespace-nowrap align-middle",
+                    "text-[11px] font-medium uppercase tracking-[0.055em] text-muted/70",
+                    alignClass(col.align),
+                    col.headerClassName ?? "",
+                  ].filter(Boolean).join(" ")}
                 >
                   {sortable ? (
                     <button
                       type="button"
                       onClick={() => toggleSort(col.id)}
-                      className={`inline-flex max-w-full items-center gap-1 rounded px-0.5 text-left text-inherit transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 ${active ? "text-primary" : ""} ${alignClass(col.align)}`}
+                      className={[
+                        "inline-flex max-w-full items-center gap-1 text-left text-inherit",
+                        "transition-colors duration-100 hover:text-primary",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 rounded",
+                        active ? "text-primary" : "",
+                        alignClass(col.align),
+                      ].filter(Boolean).join(" ")}
                     >
                       <span className="min-w-0 truncate">{col.header}</span>
                       <SortIcon state={sortDir} />
@@ -218,13 +235,19 @@ export function DataTable<T>({
         <tbody>
           {loading ? (
             Array.from({ length: loadingRows }).map((_, rowIndex) => (
-              <tr key={`sk-${rowIndex}`}>
+              <tr key={`sk-${rowIndex}`} className="bg-surface">
                 {columns.map((col) => (
                   <td
                     key={col.id}
-                    className={`border-b border-border/40 ${tdPad} align-middle ${alignClass(col.align)} ${col.cellClassName ?? ""}`.trim()}
+                    className={[
+                      "border-b border-border/30",
+                      tdPad,
+                      "align-middle",
+                      alignClass(col.align),
+                      col.cellClassName ?? "",
+                    ].filter(Boolean).join(" ")}
                   >
-                    <Skeleton className="h-4 w-full max-w-[8rem]" />
+                    <Skeleton className="h-3.5 w-full max-w-[9rem]" />
                   </td>
                 ))}
               </tr>
@@ -233,7 +256,7 @@ export function DataTable<T>({
             <tr>
               <td
                 colSpan={columns.length}
-                className="border-b-0 py-14 text-center text-sm text-muted"
+                className="border-b-0 py-16 text-center text-sm text-muted"
               >
                 {emptyFallback}
               </td>
@@ -242,17 +265,25 @@ export function DataTable<T>({
             sortedData.map((row, rowIndex) => (
               <tr
                 key={rowKey(row, rowIndex)}
-                className={`transition-colors duration-100 ${
-                  onRowClick
-                    ? "cursor-pointer hover:bg-brand/[0.04] active:bg-brand/[0.07]"
-                    : "hover:bg-primary/[0.025]"
-                } ${rowClassName?.(row, rowIndex) ?? ""}`.trim()}
                 onClick={onRowClick ? (e) => handleRowClick(row, rowIndex, e) : undefined}
+                className={[
+                  "bg-surface transition-colors duration-100",
+                  onRowClick
+                    ? "cursor-pointer hover:bg-primary/[0.03] active:bg-primary/[0.055]"
+                    : "hover:bg-primary/[0.02]",
+                  rowClassName?.(row, rowIndex) ?? "",
+                ].filter(Boolean).join(" ")}
               >
                 {columns.map((col) => (
                   <td
                     key={col.id}
-                    className={`border-b border-border/40 ${tdPad} align-middle text-[13px] leading-5 ${alignClass(col.align)} ${col.cellClassName ?? ""}`.trim()}
+                    className={[
+                      "border-b border-border/30",
+                      tdPad,
+                      "align-middle text-[13px] leading-5 text-secondary",
+                      alignClass(col.align),
+                      col.cellClassName ?? "",
+                    ].filter(Boolean).join(" ")}
                   >
                     {col.cell(row, rowIndex)}
                   </td>

@@ -127,8 +127,8 @@ export default function ProjectInspectionsPage() {
       {
         id: "title",
         header: t("inspectionPage.colInspection"),
-        headerClassName: "pl-4 pr-3 max-w-[14rem]",
-        cellClassName: "pl-4 pr-3 max-w-[14rem]",
+        headerClassName: "max-w-[14rem]",
+        cellClassName: "max-w-[14rem]",
         sortValue: (r) => r.title,
         cell: (r) => (
           <span className="block min-w-0 truncate text-[13px] font-medium text-primary" title={r.title}>
@@ -139,16 +139,16 @@ export default function ProjectInspectionsPage() {
       {
         id: "type",
         header: t("inspectionPage.colType"),
-        headerClassName: "px-3",
-        cellClassName: "px-3",
+        headerClassName: "",
+        cellClassName: "",
         sortValue: (r) => r.type,
         cell: (r) => <SemanticPill label={r.type} palette={INSPECTION_TYPE_PILL_CLASSES} />,
       },
       {
         id: "location",
         header: t("inspectionPage.colLocation"),
-        headerClassName: "px-3",
-        cellClassName: "px-3",
+        headerClassName: "",
+        cellClassName: "",
         sortValue: (r) => r.location,
         cell: (r) => (
           <span className="text-[13px] text-secondary">{r.location}</span>
@@ -157,8 +157,8 @@ export default function ProjectInspectionsPage() {
       {
         id: "by",
         header: t("inspectionPage.colBy"),
-        headerClassName: "px-3",
-        cellClassName: "px-3",
+        headerClassName: "",
+        cellClassName: "",
         sortValue: (r) => r.by,
         cell: (r) => (
           <span className="text-[13px] text-secondary">{r.by}</span>
@@ -167,8 +167,8 @@ export default function ProjectInspectionsPage() {
       {
         id: "date",
         header: t("inspectionPage.colDate"),
-        headerClassName: "px-3",
-        cellClassName: "px-3 whitespace-nowrap",
+        headerClassName: "",
+        cellClassName: "whitespace-nowrap",
         sortValue: (r) => r.date,
         cell: (r) => (
           <span className="font-mono text-[13px] text-secondary">{r.date}</span>
@@ -177,8 +177,8 @@ export default function ProjectInspectionsPage() {
       {
         id: "result",
         header: t("inspectionPage.colResult"),
-        headerClassName: "px-3",
-        cellClassName: "px-3",
+        headerClassName: "",
+        cellClassName: "",
         sortValue: (r) => r.result,
         cell: (r) => (
           <Badge variant={INSPECTION_RESULT_BADGE[r.result]} size="sm">
@@ -189,8 +189,8 @@ export default function ProjectInspectionsPage() {
       {
         id: "status",
         header: t("inspectionPage.colStatus"),
-        headerClassName: "px-3 pr-4",
-        cellClassName: "px-3 pr-4",
+        headerClassName: "pr-4",
+        cellClassName: "pr-4",
         sortValue: (r) => r.status,
         cell: (r) => (
           <span className="text-[13px] text-secondary">{r.status}</span>

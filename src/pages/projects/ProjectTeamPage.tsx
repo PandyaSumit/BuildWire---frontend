@@ -271,8 +271,8 @@ const MEMBER_COLUMNS: DataTableColumn<DummyTeamMember>[] = [
   {
     id: "name",
     header: "Member",
-    headerClassName: "pl-4 pr-3",
-    cellClassName: "pl-4 pr-3",
+    headerClassName: "",
+    cellClassName: "",
     sortValue: (r) => r.name,
     cell: (r) => (
       <div className="flex items-center gap-2.5">
@@ -287,8 +287,8 @@ const MEMBER_COLUMNS: DataTableColumn<DummyTeamMember>[] = [
   {
     id: "role",
     header: "Role",
-    headerClassName: "px-3",
-    cellClassName: "px-3",
+    headerClassName: "",
+    cellClassName: "",
     sortValue: (r) => r.role,
     cell: (r) => (
       <Badge variant={TEAM_ROLE_BADGE_VARIANT[r.role] ?? "default"} size="sm">
@@ -299,24 +299,24 @@ const MEMBER_COLUMNS: DataTableColumn<DummyTeamMember>[] = [
   {
     id: "joined",
     header: "Joined",
-    headerClassName: "px-3",
-    cellClassName: "px-3",
+    headerClassName: "",
+    cellClassName: "",
     sortValue: (r) => r.joined,
     cell: (r) => <span className="text-[13px] text-secondary">{r.joined}</span>,
   },
   {
     id: "lastActive",
     header: "Last active",
-    headerClassName: "px-3",
-    cellClassName: "px-3",
+    headerClassName: "",
+    cellClassName: "",
     sortValue: (r) => r.lastActive,
     cell: (r) => <span className="text-[13px] text-secondary">{r.lastActive}</span>,
   },
   {
     id: "tasks",
     header: "Tasks",
-    headerClassName: "px-3",
-    cellClassName: "px-3",
+    headerClassName: "",
+    cellClassName: "",
     align: "right",
     sortValue: (r) => r.tasks,
     cell: (r) => (
@@ -326,8 +326,8 @@ const MEMBER_COLUMNS: DataTableColumn<DummyTeamMember>[] = [
   {
     id: "onSite",
     header: "On site",
-    headerClassName: "px-3 pr-4",
-    cellClassName: "px-3 pr-4",
+    headerClassName: "pr-4",
+    cellClassName: "pr-4",
     align: "center",
     cell: (r) =>
       r.onSite ? (
@@ -345,31 +345,31 @@ const SUB_COLUMNS: DataTableColumn<DummySub>[] = [
   {
     id: "name",
     header: "Company",
-    headerClassName: "pl-4 pr-3",
-    cellClassName: "pl-4 pr-3",
+    headerClassName: "",
+    cellClassName: "",
     sortValue: (r) => r.name,
     cell: (r) => <span className="text-[13px] font-medium text-primary">{r.name}</span>,
   },
   {
     id: "trade",
     header: "Trade",
-    headerClassName: "px-3",
-    cellClassName: "px-3",
+    headerClassName: "",
+    cellClassName: "",
     sortValue: (r) => r.trade,
     cell: (r) => <span className="text-[13px] text-secondary">{r.trade}</span>,
   },
   {
     id: "contact",
     header: "Contact",
-    headerClassName: "px-3",
-    cellClassName: "px-3",
+    headerClassName: "",
+    cellClassName: "",
     cell: (r) => <span className="text-[13px] text-secondary">{r.contact}</span>,
   },
   {
     id: "workers",
     header: "Active workers",
-    headerClassName: "px-3",
-    cellClassName: "px-3",
+    headerClassName: "",
+    cellClassName: "",
     align: "right",
     sortValue: (r) => r.workers,
     cell: (r) => (
@@ -379,8 +379,8 @@ const SUB_COLUMNS: DataTableColumn<DummySub>[] = [
   {
     id: "tasks",
     header: "Tasks",
-    headerClassName: "px-3 pr-4",
-    cellClassName: "px-3 pr-4",
+    headerClassName: "pr-4",
+    cellClassName: "pr-4",
     align: "right",
     sortValue: (r) => r.tasks,
     cell: (r) => (
