@@ -17,10 +17,10 @@ export function ModuleSplitLayout({
 }: ModuleSplitLayoutProps) {
   return (
     <div className="flex min-h-full min-w-0 flex-col md:flex-row">
-      <aside className="shrink-0 border-b border-border bg-surface md:w-56 md:border-b-0 md:border-e">
-        <div className="p-4">
+      <aside className="shrink-0 border-b border-border bg-surface md:w-60 md:border-b-0 md:border-e">
+        <div className="overflow-y-auto p-3">
           {sidebarLabel ? (
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-muted">
+            <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-wider text-muted">
               {sidebarLabel}
             </p>
           ) : null}

@@ -20,6 +20,7 @@ import {
 import {
   SemanticPill,
   ModulePageShell,
+  FilterPopover,
 } from "@/features/project-ui/components";
 import {
   computeRfiStats,
@@ -747,7 +748,6 @@ export default function ProjectRfisPage() {
   const [rfiRows, setRfiRows] = useState<DummyRfiRow[]>(() => [...DUMMY_RFIS]);
   const [selectedRfi, setSelectedRfi] = useState<DummyRfiRow | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
-  const [filtersOpen, setFiltersOpen] = useState(false);
   const [quickScope, setQuickScope] = useState<null | "open" | "overdue">(null);
   const [statusFilter, setStatusFilter] = useState("");
   const [tradeFilter, setTradeFilter] = useState("");
@@ -815,7 +815,7 @@ export default function ProjectRfisPage() {
     setPriorityFilter("");
     setImpactFilter("all");
     setQuery("");
-    setFiltersOpen(false);
+    // filter panel closed via popover
   }, [setQuery]);
 
   const openCreate = useCallback(() => {
@@ -844,6 +844,16 @@ export default function ProjectRfisPage() {
       return true;
     });
   }, [orderedSource, qNorm, quickScope, statusFilter, tradeFilter, priorityFilter, impactFilter]);
+
+  const activeFilterCount = useMemo(() => {
+    let n = 0;
+    if (statusFilter) n++;
+    if (tradeFilter) n++;
+    if (priorityFilter) n++;
+    if (impactFilter !== "all") n++;
+    if (quickScope) n++;
+    return n;
+  }, [statusFilter, tradeFilter, priorityFilter, impactFilter, quickScope]);
 
   const chipClass =
     "inline-flex max-w-full items-center gap-1 rounded-full border border-border/60 bg-muted/10 px-2.5 py-1 text-[11px] font-medium text-secondary hover:bg-muted/20";
@@ -885,8 +895,7 @@ export default function ProjectRfisPage() {
               setQuery("");
               setQuickScope("open");
               setImpactFilter("all");
-              setFiltersOpen(true);
-            },
+                    },
             title: t("rfiPage.statOpenHint"),
           },
           {
@@ -900,8 +909,7 @@ export default function ProjectRfisPage() {
               setQuery("");
               setQuickScope("overdue");
               setImpactFilter("all");
-              setFiltersOpen(true);
-            },
+                    },
             title: t("rfiPage.statOverdueHint"),
           },
           {
@@ -915,8 +923,7 @@ export default function ProjectRfisPage() {
               setQuery("");
               setQuickScope(null);
               setImpactFilter("schedule");
-              setFiltersOpen(true);
-            },
+                    },
             title: t("rfiPage.statScheduleRiskHint"),
           },
           {
@@ -930,163 +937,137 @@ export default function ProjectRfisPage() {
         <p className="text-xs text-muted">{t("rfiPage.globalSearchHint", { count: filteredRows.length })}</p>
       ) : null}
 
-      <div className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-md border border-border/40 bg-bg">
-        <div className="flex min-h-11 shrink-0 items-center justify-end gap-2 border-b border-border/35 px-1 py-2.5 sm:px-0">
-          <div className="flex min-w-0 flex-wrap items-center justify-end gap-x-2 gap-y-1 text-[12px] text-secondary">
-            <button
-              type="button"
-              onClick={() => setFiltersOpen((v) => !v)}
-              aria-expanded={filtersOpen}
-              aria-controls="rfis-filter-panel"
-              className={`h-8 shrink-0 rounded-lg px-2.5 hover:bg-muted/10 hover:text-primary ${
-                filtersOpen ? "bg-primary/8 text-primary dark:bg-white/10" : ""
-              }`}
-            >
-              {t("rfiPage.filterToggle")}
-            </button>
-            {hasActiveFilters ? (
-              <button
-                type="button"
-                onClick={resetFilters}
-                className="h-8 shrink-0 rounded-lg px-2.5 hover:bg-muted/10 hover:text-primary"
-              >
-                {t("rfiPage.clearFiltersShort")}
-              </button>
-            ) : null}
-          </div>
+      {/* ── Toolbar row ──────────────────────────────────────────────────── */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        {/* Quick scope chips */}
+        <div className="flex flex-wrap items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => {
+              setStatusFilter(""); setTradeFilter(""); setPriorityFilter(""); setQuery(""); setImpactFilter("all");
+              setQuickScope((v) => v === "open" ? null : "open");
+            }}
+            className={`h-7 rounded-full border px-3 text-[11px] font-medium transition-colors ${
+              quickScope === "open"
+                ? "border-brand bg-brand-light text-primary"
+                : "border-border/60 bg-surface text-secondary hover:border-border hover:text-primary"
+            }`}
+          >
+            {t("rfiPage.statOpen")} · {rfiStats.open}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setStatusFilter(""); setTradeFilter(""); setPriorityFilter(""); setQuery(""); setImpactFilter("all");
+              setQuickScope((v) => v === "overdue" ? null : "overdue");
+            }}
+            className={`h-7 rounded-full border px-3 text-[11px] font-medium transition-colors ${
+              quickScope === "overdue"
+                ? "border-danger/50 bg-danger/10 text-danger"
+                : "border-border/60 bg-surface text-secondary hover:border-border hover:text-primary"
+            }`}
+          >
+            {t("rfiPage.statOverdue")} · {rfiStats.overdue}
+          </button>
         </div>
 
-        {filtersOpen ? (
-          <div
-            id="rfis-filter-panel"
-            className="border-b border-border/30 bg-surface/30 px-3 py-3 sm:px-4"
-          >
-            <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-4">
-              <Select
-                label={t("rfiPage.filterStatus")}
-                options={statusOptions}
-                value={statusFilter}
-                onValueChange={(v) => {
-                  clearQuick();
-                  setStatusFilter(v);
-                }}
-                size="sm"
-                fullWidth
-                triggerClassName="h-9"
-              />
-              <Select
-                label={t("rfiPage.filterTrade")}
-                options={tradeOptions}
-                value={tradeFilter}
-                onValueChange={(v) => {
-                  clearQuick();
-                  setTradeFilter(v);
-                }}
-                size="sm"
-                fullWidth
-                triggerClassName="h-9"
-              />
-              <Select
-                label={t("rfiPage.filterPriority")}
-                options={priorityOptions}
-                value={priorityFilter}
-                onValueChange={(v) => {
-                  clearQuick();
-                  setPriorityFilter(v as "" | "Normal" | "Urgent");
-                }}
-                size="sm"
-                fullWidth
-                triggerClassName="h-9"
-              />
-              <Select
-                label={t("rfiPage.filterImpact")}
-                options={impactOptions}
-                value={impactFilter}
-                onValueChange={(v) => {
-                  clearQuick();
-                  setImpactFilter(v as ImpactFilter);
-                }}
-                size="sm"
-                fullWidth
-                triggerClassName="h-9"
-              />
-            </div>
-          </div>
-        ) : null}
-
-        {hasActiveFilters ? (
-          <div className="flex flex-wrap items-center gap-2 border-b border-border/25 px-3 py-2 sm:px-4">
-            <span className="text-[11px] font-medium uppercase tracking-wide text-muted">
-              {t("rfiPage.activeFilters")}
-            </span>
-            {quickScope === "open" ? (
-              <button type="button" className={chipClass} onClick={() => setQuickScope(null)}>
-                {t("rfiPage.chipOpenPipeline")} ×
-              </button>
-            ) : null}
-            {quickScope === "overdue" ? (
-              <button type="button" className={chipClass} onClick={() => setQuickScope(null)}>
-                {t("rfiPage.chipOverdue")} ×
-              </button>
-            ) : null}
-            {impactFilter === "schedule" && !quickScope ? (
-              <button
-                type="button"
-                className={chipClass}
-                onClick={() => setImpactFilter("all")}
-              >
-                {t("rfiPage.chipSchedule")} ×
-              </button>
-            ) : null}
-            {impactFilter === "cost" ? (
-              <button
-                type="button"
-                className={chipClass}
-                onClick={() => setImpactFilter("all")}
-              >
-                {t("rfiPage.filterImpactCost")} ×
-              </button>
-            ) : null}
-            {impactFilter === "both" ? (
-              <button
-                type="button"
-                className={chipClass}
-                onClick={() => setImpactFilter("all")}
-              >
-                {t("rfiPage.filterImpactBoth")} ×
-              </button>
-            ) : null}
-            {statusFilter ? (
-              <button type="button" className={chipClass} onClick={() => setStatusFilter("")}>
-                {statusFilter} ×
-              </button>
-            ) : null}
-            {tradeFilter ? (
-              <button type="button" className={chipClass} onClick={() => setTradeFilter("")}>
-                {tradeFilter} ×
-              </button>
-            ) : null}
-            {priorityFilter ? (
-              <button
-                type="button"
-                className={chipClass}
-                onClick={() => setPriorityFilter("")}
-              >
-                {priorityFilter} ×
-              </button>
-            ) : null}
+        {/* Right controls */}
+        <div className="flex items-center gap-2">
+          {hasActiveFilters && (
             <button
               type="button"
               onClick={resetFilters}
               className="text-[11px] font-semibold text-brand hover:underline"
             >
-              {t("rfiPage.clearAllChips")}
+              {t("rfiPage.clearFiltersShort")}
             </button>
-          </div>
-        ) : null}
+          )}
+          <FilterPopover
+            activeCount={activeFilterCount}
+            label={t("rfiPage.filterToggle")}
+            onClear={resetFilters}
+          >
+            <Select
+              label={t("rfiPage.filterStatus")}
+              options={statusOptions}
+              value={statusFilter}
+              onValueChange={(v) => { clearQuick(); setStatusFilter(v); }}
+              size="sm"
+              fullWidth
+              triggerClassName="h-9"
+            />
+            <Select
+              label={t("rfiPage.filterTrade")}
+              options={tradeOptions}
+              value={tradeFilter}
+              onValueChange={(v) => { clearQuick(); setTradeFilter(v); }}
+              size="sm"
+              fullWidth
+              triggerClassName="h-9"
+            />
+            <Select
+              label={t("rfiPage.filterPriority")}
+              options={priorityOptions}
+              value={priorityFilter}
+              onValueChange={(v) => { clearQuick(); setPriorityFilter(v as "" | "Normal" | "Urgent"); }}
+              size="sm"
+              fullWidth
+              triggerClassName="h-9"
+            />
+            <Select
+              label={t("rfiPage.filterImpact")}
+              options={impactOptions}
+              value={impactFilter}
+              onValueChange={(v) => { clearQuick(); setImpactFilter(v as ImpactFilter); }}
+              size="sm"
+              fullWidth
+              triggerClassName="h-9"
+            />
+          </FilterPopover>
+        </div>
+      </div>
 
-        <div className="min-h-0 min-w-0 flex-1 p-0 pt-0">
-          <DataTable<DummyRfiRow>
+      {/* Active filter chips */}
+      {hasActiveFilters ? (
+        <div className="flex flex-wrap items-center gap-1.5">
+          {quickScope === "open" ? (
+            <button type="button" className={chipClass} onClick={() => setQuickScope(null)}>
+              {t("rfiPage.chipOpenPipeline")} ×
+            </button>
+          ) : null}
+          {quickScope === "overdue" ? (
+            <button type="button" className={chipClass} onClick={() => setQuickScope(null)}>
+              {t("rfiPage.chipOverdue")} ×
+            </button>
+          ) : null}
+          {impactFilter !== "all" ? (
+            <button type="button" className={chipClass} onClick={() => setImpactFilter("all")}>
+              {impactFilter === "schedule" ? t("rfiPage.chipSchedule")
+                : impactFilter === "cost" ? t("rfiPage.filterImpactCost")
+                : t("rfiPage.filterImpactBoth")} ×
+            </button>
+          ) : null}
+          {statusFilter ? (
+            <button type="button" className={chipClass} onClick={() => setStatusFilter("")}>
+              {statusFilter} ×
+            </button>
+          ) : null}
+          {tradeFilter ? (
+            <button type="button" className={chipClass} onClick={() => setTradeFilter("")}>
+              {tradeFilter} ×
+            </button>
+          ) : null}
+          {priorityFilter ? (
+            <button type="button" className={chipClass} onClick={() => setPriorityFilter("")}>
+              {priorityFilter} ×
+            </button>
+          ) : null}
+        </div>
+      ) : null}
+
+      {/* ── Table card ────────────────────────────────────────────────────── */}
+      <div className="min-h-0 min-w-0 overflow-hidden rounded-xl border border-border/40 bg-bg">
+        <DataTable<DummyRfiRow>
             variant="flush"
             density="comfortable"
             columns={columns}
@@ -1119,7 +1100,6 @@ export default function ProjectRfisPage() {
               )
             }
           />
-        </div>
       </div>
 
       <SheetDrawer

@@ -5,7 +5,6 @@ import { PageHeader } from "@/components/ui/page-header";
 import { Badge } from "@/components/ui/badge";
 import {
   REPORT_CATEGORIES,
-  REPORT_CATEGORY_ICONS,
   type ReportCategoryId,
 } from "@/config/pm/reports";
 import {
@@ -36,6 +35,47 @@ const SCHEDULED_REPORTS = [
   { title: "Executive one-pager", schedule: "Every Friday 6 PM", recipients: "Stakeholders", nextRun: "Mar 22", format: "PDF" },
   { title: "Expense Report", schedule: "1st of month", recipients: "Finance team", nextRun: "Apr 1", format: "Excel" },
 ];
+
+// Category descriptions for sidebar
+const CATEGORY_DESCRIPTIONS: Record<ReportCategoryId, string> = {
+  Overview: "Status & dashboards",
+  Field: "Daily reports & tasks",
+  Financial: "Budget & cash flow",
+  Quality: "Inspections & defects",
+  Custom: "Saved & shared views",
+};
+
+// SVG icons for categories
+function CategoryIcon({ cat }: { cat: ReportCategoryId }) {
+  const icons: Record<ReportCategoryId, JSX.Element> = {
+    Overview: (
+      <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24" aria-hidden>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h7" />
+      </svg>
+    ),
+    Field: (
+      <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24" aria-hidden>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
+    ),
+    Financial: (
+      <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24" aria-hidden>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    Quality: (
+      <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24" aria-hidden>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
+    Custom: (
+      <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24" aria-hidden>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 3h14a2 2 0 012 2v3a2 2 0 01-.586 1.414L15 15v6l-6-3v-3L3.586 9.414A2 2 0 013 8V5a2 2 0 012-2z" />
+      </svg>
+    ),
+  };
+  return icons[cat];
+}
 
 type Tab = "reports" | "scheduled";
 
@@ -132,47 +172,116 @@ export default function ProjectReportsPage() {
       return next;
     });
 
+  // ── Sidebar ──────────────────────────────────────────────────────────────
   const sidebar = (
-    <nav className="flex flex-row gap-1 overflow-x-auto md:flex-col md:gap-0.5 md:overflow-visible">
-      {REPORT_CATEGORIES.map((c) => (
-        <button
-          key={c}
-          type="button"
-          onClick={() => { setCat(c); setTab("reports"); }}
-          className={`flex shrink-0 items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors md:w-full ${
-            cat === c && tab === "reports"
-              ? "bg-brand-light font-medium text-primary"
-              : "text-secondary hover:bg-muted/10 hover:text-primary"
-          }`}
-        >
-          <span className="shrink-0 text-base leading-none text-muted">
-            {REPORT_CATEGORY_ICONS[c]}
-          </span>
-          <span className="whitespace-nowrap">{c}</span>
-        </button>
-      ))}
-      <div className="my-1 border-t border-border/50 md:my-2" />
+    <nav className="flex flex-row gap-1 overflow-x-auto md:flex-col md:gap-0.5 md:overflow-visible" aria-label="Report categories">
+      {/* Categories section */}
+      <p className="mb-1.5 hidden px-2 text-[10px] font-semibold uppercase tracking-wider text-muted md:block">
+        Categories
+      </p>
+      {REPORT_CATEGORIES.map((c) => {
+        const count = (DUMMY_REPORTS_BY_CATEGORY[c] ?? []).length;
+        const isActive = cat === c && tab === "reports";
+        return (
+          <button
+            key={c}
+            type="button"
+            onClick={() => { setCat(c); setTab("reports"); setSearch(""); }}
+            className={`group flex shrink-0 items-center gap-3 rounded-lg px-2.5 py-2 text-left transition-colors md:w-full ${
+              isActive
+                ? "bg-brand-light text-primary"
+                : "text-secondary hover:bg-muted/10 hover:text-primary"
+            }`}
+          >
+            {/* Icon container */}
+            <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md border transition-colors ${
+              isActive
+                ? "border-brand/30 bg-brand/10 text-brand"
+                : "border-border/60 bg-surface text-muted group-hover:border-brand/20 group-hover:text-brand"
+            }`}>
+              <CategoryIcon cat={c} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className={`block whitespace-nowrap text-[13px] font-medium leading-snug ${isActive ? "text-primary" : ""}`}>
+                {c}
+              </span>
+              <span className="hidden truncate text-[11px] text-muted leading-none mt-0.5 md:block">
+                {CATEGORY_DESCRIPTIONS[c]}
+              </span>
+            </span>
+            <span className={`hidden shrink-0 text-[11px] tabular-nums font-medium md:block ${isActive ? "text-secondary" : "text-muted"}`}>
+              {count}
+            </span>
+          </button>
+        );
+      })}
+
+      {/* Divider */}
+      <div className="my-2 hidden border-t border-border/50 md:block" />
+
+      {/* Scheduled section */}
+      <p className="mb-1.5 hidden px-2 text-[10px] font-semibold uppercase tracking-wider text-muted md:block">
+        Automation
+      </p>
       <button
         type="button"
         onClick={() => setTab("scheduled")}
-        className={`flex shrink-0 items-center gap-2.5 rounded-lg px-3 py-2 text-left text-sm transition-colors md:w-full ${
+        className={`flex shrink-0 items-center gap-3 rounded-lg px-2.5 py-2 text-left transition-colors md:w-full ${
           tab === "scheduled"
-            ? "bg-brand-light font-medium text-primary"
+            ? "bg-brand-light text-primary"
             : "text-secondary hover:bg-muted/10 hover:text-primary"
         }`}
       >
-        <span className="shrink-0 text-base leading-none text-muted">🕐</span>
-        <span className="whitespace-nowrap">Scheduled</span>
-        <Badge variant="secondary" size="sm" className="ml-auto">
-          {SCHEDULED_REPORTS.length}
-        </Badge>
+        <span className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-md border transition-colors ${
+          tab === "scheduled"
+            ? "border-brand/30 bg-brand/10 text-brand"
+            : "border-border/60 bg-surface text-muted"
+        }`}>
+          <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24" aria-hidden>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block whitespace-nowrap text-[13px] font-medium leading-snug">Scheduled</span>
+          <span className="hidden text-[11px] text-muted leading-none mt-0.5 md:block">Auto-delivered reports</span>
+        </span>
+        <Badge variant="secondary" size="sm" className="hidden md:flex">{SCHEDULED_REPORTS.length}</Badge>
       </button>
+
+      {/* Starred shortcut — desktop only */}
+      {starred.size > 0 && (
+        <>
+          <div className="my-2 hidden border-t border-border/50 md:block" />
+          <p className="mb-1.5 hidden px-2 text-[10px] font-semibold uppercase tracking-wider text-muted md:block">
+            Starred
+          </p>
+          <div className="hidden space-y-0.5 md:block">
+            {[...starred].slice(0, 4).map((title) => (
+              <button
+                key={title}
+                type="button"
+                onClick={() => {
+                  // Find which category this report belongs to
+                  for (const c of REPORT_CATEGORIES) {
+                    const found = (DUMMY_REPORTS_BY_CATEGORY[c] ?? []).find((r) => r.title === title);
+                    if (found) { setCat(c); setTab("reports"); setSearch(""); break; }
+                  }
+                }}
+                className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[12px] text-secondary transition-colors hover:bg-muted/10 hover:text-primary"
+              >
+                <span className="text-warning text-[10px]">★</span>
+                <span className="min-w-0 truncate">{title}</span>
+              </button>
+            ))}
+          </div>
+        </>
+      )}
     </nav>
   );
 
   return (
     <>
-      <ModuleSplitLayout sidebar={sidebar} sidebarLabel="Categories">
+      <ModuleSplitLayout sidebar={sidebar} sidebarLabel="">
         <ModulePageShell>
           <PageHeader
             title="Reports"
@@ -204,18 +313,21 @@ export default function ProjectReportsPage() {
               {SCHEDULED_REPORTS.map((r) => (
                 <div
                   key={r.title}
-                  className="rounded-xl border border-border/60 bg-surface px-4 py-3"
+                  className="group rounded-xl border border-border/60 bg-surface px-4 py-3.5 transition-colors hover:border-border/80"
                 >
                   <div className="flex flex-wrap items-start justify-between gap-2">
-                    <div>
-                      <p className="text-[13px] font-semibold text-primary">{r.title}</p>
-                      <p className="mt-0.5 text-xs text-secondary">{r.schedule} · To: {r.recipients}</p>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-success/15 text-[9px] text-success">●</span>
+                        <p className="text-[13px] font-semibold text-primary">{r.title}</p>
+                      </div>
+                      <p className="mt-1 text-xs text-secondary">{r.schedule} · To: {r.recipients}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant="secondary" size="sm">{r.format}</Badge>
                       <button
                         type="button"
-                        className="rounded-lg border border-border/60 px-3 py-1 text-xs text-secondary hover:border-danger/40 hover:text-danger"
+                        className="rounded-lg border border-border/60 px-3 py-1 text-xs text-secondary hover:border-warning/40 hover:text-warning"
                       >
                         Pause
                       </button>
@@ -227,36 +339,41 @@ export default function ProjectReportsPage() {
                       </button>
                     </div>
                   </div>
-                  <p className="mt-1.5 text-[11px] text-muted">Next run: {r.nextRun}</p>
+                  <p className="mt-2 text-[11px] text-muted">Next run: <span className="font-medium text-secondary">{r.nextRun}</span></p>
                 </div>
               ))}
               <button
                 type="button"
-                className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border/60 py-3 text-sm text-secondary hover:border-brand/40 hover:text-primary"
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border/60 py-3.5 text-sm text-secondary hover:border-brand/40 hover:bg-brand-light/30 hover:text-primary"
               >
-                + Schedule a new report
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                Schedule a new report
               </button>
             </div>
           ) : (
             <>
               {/* Search */}
               <div className="relative">
-                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted">
-                  🔍
+                <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2">
+                  <svg className="h-4 w-4 text-muted" fill="none" stroke="currentColor" strokeWidth={1.75} viewBox="0 0 24 24" aria-hidden>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
                 </span>
                 <input
                   type="search"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search reports…"
-                  className="w-full rounded-xl border border-border/60 bg-bg py-2 pl-9 pr-4 text-sm text-primary placeholder:text-muted focus:border-brand/50 focus:outline-none"
+                  className="w-full rounded-xl border border-border/60 bg-bg py-2.5 pl-10 pr-4 text-sm text-primary placeholder:text-muted focus:border-brand/50 focus:outline-none focus:ring-2 focus:ring-brand/20"
                 />
               </div>
 
               {/* Report list */}
               <ul className="space-y-2">
                 {items.length === 0 ? (
-                  <li className="py-8 text-center text-sm text-muted">
+                  <li className="rounded-xl border border-dashed border-border/50 py-10 text-center text-sm text-muted">
                     No reports match your search.
                   </li>
                 ) : (
@@ -266,22 +383,22 @@ export default function ProjectReportsPage() {
                     return (
                       <li
                         key={r.title}
-                        className="group rounded-xl border border-border/50 bg-surface/80 px-4 py-3 transition-colors hover:border-brand/25 hover:bg-muted/[0.04]"
+                        className="group rounded-xl border border-border/50 bg-surface/80 px-4 py-3.5 transition-all hover:border-border hover:shadow-sm"
                       >
-                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
                               <button
                                 type="button"
                                 onClick={() => toggleStar(r.title)}
-                                className="shrink-0 text-base leading-none transition-transform hover:scale-110"
+                                className="shrink-0 text-sm leading-none transition-transform hover:scale-110"
                                 aria-label={isStarred ? "Unstar" : "Star"}
                               >
-                                {isStarred ? "⭐" : "☆"}
+                                <span className={isStarred ? "text-warning" : "text-muted/50 hover:text-muted"}>
+                                  {isStarred ? "★" : "☆"}
+                                </span>
                               </button>
-                              <p className="text-[13px] font-semibold text-primary">
-                                {r.title}
-                              </p>
+                              <p className="text-[13px] font-semibold text-primary">{r.title}</p>
                               {meta?.scheduled && (
                                 <Badge variant="secondary" size="sm">Scheduled</Badge>
                               )}
@@ -289,15 +406,19 @@ export default function ProjectReportsPage() {
                             <p className="mt-0.5 pl-6 text-xs text-secondary">{r.subtitle}</p>
                             {meta && (
                               <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 pl-6 text-[11px] text-muted">
-                                {meta.lastRun && <span>Last run: {meta.lastRun}</span>}
-                                <span>{meta.format.join(" · ")}</span>
+                                {meta.lastRun && <span>Last run: <span className="text-secondary">{meta.lastRun}</span></span>}
+                                <span className="flex items-center gap-1">
+                                  {meta.format.map((f) => (
+                                    <span key={f} className="rounded-md border border-border/50 px-1.5 py-0.5 font-mono text-[10px] text-muted">{f}</span>
+                                  ))}
+                                </span>
                               </div>
                             )}
                           </div>
                           <button
                             type="button"
                             onClick={() => setRunningReport(r.title)}
-                            className="shrink-0 rounded-lg border border-border/60 px-3 py-1.5 text-xs font-medium text-secondary transition-colors hover:border-brand/40 hover:bg-brand-light hover:text-primary"
+                            className="shrink-0 rounded-lg border border-border/60 px-4 py-1.5 text-xs font-semibold text-secondary transition-colors hover:border-brand/40 hover:bg-brand-light hover:text-primary"
                           >
                             Run →
                           </button>

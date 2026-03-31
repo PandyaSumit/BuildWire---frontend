@@ -18,7 +18,7 @@ import {
   nextInspectionId,
   ScheduleInspectionDrawer,
 } from "@/features/project-ui/InspectionDrawers";
-import { ModulePageShell, SemanticPill } from "@/features/project-ui/components";
+import { ModulePageShell, SemanticPill, FilterPopover } from "@/features/project-ui/components";
 import {
   computeInspectionStats,
   DUMMY_INSPECTIONS,
@@ -60,7 +60,6 @@ export default function ProjectInspectionsPage() {
   const [rows, setRows] = useState<DummyInspection[]>(() => [...DUMMY_INSPECTIONS]);
   const [selected, setSelected] = useState<DummyInspection | null>(null);
   const [scheduleOpen, setScheduleOpen] = useState(false);
-  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const [typeFilter, setTypeFilter] = useState("");
   const [resultFilter, setResultFilter] = useState<"" | InspectionResult>("");
@@ -79,7 +78,6 @@ export default function ProjectInspectionsPage() {
     setStatusFilter("");
     setTradeFilter("");
     setQuery("");
-    setFiltersOpen(false);
   }, [setQuery]);
 
   const hasActiveFilters = Boolean(typeFilter || resultFilter || statusFilter || tradeFilter || qNorm);
@@ -206,6 +204,15 @@ export default function ProjectInspectionsPage() {
     setRows((prev) => [{ ...draft, id: nextInspectionId(prev) }, ...prev]);
   }, []);
 
+  const activeFilterCount = useMemo(() => {
+    let n = 0;
+    if (typeFilter) n++;
+    if (resultFilter) n++;
+    if (statusFilter) n++;
+    if (tradeFilter) n++;
+    return n;
+  }, [typeFilter, resultFilter, statusFilter, tradeFilter]);
+
   const chipClass =
     "inline-flex max-w-full items-center gap-1 rounded-full border border-border/60 bg-muted/10 px-2.5 py-1 text-[11px] font-medium text-secondary hover:bg-muted/20";
 
@@ -245,7 +252,6 @@ export default function ProjectInspectionsPage() {
             onClick: () => {
               resetFilters();
               setStatusFilter("Scheduled");
-              setFiltersOpen(true);
             },
             title: t("inspectionPage.statScheduledHint"),
           },
@@ -258,107 +264,79 @@ export default function ProjectInspectionsPage() {
         </p>
       ) : null}
 
-      <div className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-md border border-border/40 bg-bg">
-        <div className="flex min-h-11 shrink-0 items-center justify-end gap-2 border-b border-border/35 px-1 py-2.5 sm:px-0">
-          <div className="flex min-w-0 flex-wrap items-center justify-end gap-x-2 gap-y-1 text-[12px] text-secondary">
-            <button
-              type="button"
-              onClick={() => setFiltersOpen((v) => !v)}
-              aria-expanded={filtersOpen}
-              aria-controls="inspections-filter-panel"
-              className={`h-8 shrink-0 rounded-lg px-2.5 hover:bg-muted/10 hover:text-primary ${
-                filtersOpen ? "bg-primary/8 text-primary dark:bg-white/10" : ""
-              }`}
-            >
-              {t("inspectionPage.filterToggle")}
-            </button>
-            {hasActiveFilters ? (
-              <button
-                type="button"
-                onClick={resetFilters}
-                className="h-8 shrink-0 rounded-lg px-2.5 hover:bg-muted/10 hover:text-primary"
-              >
-                {t("inspectionPage.clearFiltersShort")}
-              </button>
-            ) : null}
-          </div>
-        </div>
-
-        {filtersOpen ? (
-          <div
-            id="inspections-filter-panel"
-            className="border-b border-border/35 px-3 py-3 sm:px-4"
+      {/* ── Toolbar row ──────────────────────────────────────────────────── */}
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        {hasActiveFilters && (
+          <button
+            type="button"
+            onClick={resetFilters}
+            className="text-[11px] font-semibold text-brand hover:underline"
           >
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              <Select
-                label={t("inspectionPage.filterType")}
-                options={typeOptions}
-                value={typeFilter}
-                onValueChange={setTypeFilter}
-                size="sm"
-                fullWidth
-                triggerClassName="h-9"
-              />
-              <Select
-                label={t("inspectionPage.filterResult")}
-                options={resultOptions}
-                value={resultFilter}
-                onValueChange={(v) => setResultFilter(v as "" | InspectionResult)}
-                size="sm"
-                fullWidth
-                triggerClassName="h-9"
-              />
-              <Select
-                label={t("inspectionPage.filterStatus")}
-                options={statusOptions}
-                value={statusFilter}
-                onValueChange={setStatusFilter}
-                size="sm"
-                fullWidth
-                triggerClassName="h-9"
-              />
-              <label className="flex flex-col text-sm font-medium text-primary">
-                {t("inspectionPage.filterTrade")}
-                <input
-                  type="text"
-                  value={tradeFilter}
-                  onChange={(e) => setTradeFilter(e.target.value)}
-                  placeholder={t("inspectionPage.filterTradePh")}
-                  className="mt-1.5 h-9 w-full rounded-lg border border-border bg-bg px-3 text-sm font-normal text-primary placeholder:text-muted focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
-                />
-              </label>
-            </div>
-          </div>
-        ) : null}
-
-        {hasActiveFilters ? (
-          <div className="flex flex-wrap items-center gap-2 border-b border-border/25 px-3 py-2 sm:px-4">
-            <span className="text-[11px] font-medium uppercase tracking-wide text-muted">
-              {t("inspectionPage.activeFilters")}
-            </span>
-            {typeFilter ? (
-              <button type="button" className={chipClass} onClick={() => setTypeFilter("")}>
-                {typeFilter} ×
-              </button>
-            ) : null}
-            {resultFilter ? (
-              <button type="button" className={chipClass} onClick={() => setResultFilter("")}>
-                {resultFilter} ×
-              </button>
-            ) : null}
-            {statusFilter ? (
-              <button type="button" className={chipClass} onClick={() => setStatusFilter("")}>
-                {statusFilter} ×
-              </button>
-            ) : null}
-            {tradeFilter ? (
-              <button type="button" className={chipClass} onClick={() => setTradeFilter("")}>
-                {tradeFilter} ×
-              </button>
-            ) : null}
-          </div>
-        ) : null}
+            {t("inspectionPage.clearFiltersShort")}
+          </button>
+        )}
+        <FilterPopover
+          activeCount={activeFilterCount}
+          label={t("inspectionPage.filterToggle")}
+          onClear={resetFilters}
+        >
+          <Select
+            label={t("inspectionPage.filterType")}
+            options={typeOptions}
+            value={typeFilter}
+            onValueChange={setTypeFilter}
+            size="sm"
+            fullWidth
+            triggerClassName="h-9"
+          />
+          <Select
+            label={t("inspectionPage.filterResult")}
+            options={resultOptions}
+            value={resultFilter}
+            onValueChange={(v) => setResultFilter(v as "" | InspectionResult)}
+            size="sm"
+            fullWidth
+            triggerClassName="h-9"
+          />
+          <Select
+            label={t("inspectionPage.filterStatus")}
+            options={statusOptions}
+            value={statusFilter}
+            onValueChange={setStatusFilter}
+            size="sm"
+            fullWidth
+            triggerClassName="h-9"
+          />
+          <label className="flex flex-col text-[12px] font-medium text-secondary">
+            {t("inspectionPage.filterTrade")}
+            <input
+              type="text"
+              value={tradeFilter}
+              onChange={(e) => setTradeFilter(e.target.value)}
+              placeholder={t("inspectionPage.filterTradePh")}
+              className="mt-1.5 h-9 w-full rounded-lg border border-border bg-bg px-3 text-sm font-normal text-primary placeholder:text-muted focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+            />
+          </label>
+        </FilterPopover>
       </div>
+
+      {/* Active filter chips */}
+      {hasActiveFilters ? (
+        <div className="flex flex-wrap items-center gap-1.5">
+          {typeFilter ? (
+            <button type="button" className={chipClass} onClick={() => setTypeFilter("")}>{typeFilter} ×</button>
+          ) : null}
+          {resultFilter ? (
+            <button type="button" className={chipClass} onClick={() => setResultFilter("")}>{resultFilter} ×</button>
+          ) : null}
+          {statusFilter ? (
+            <button type="button" className={chipClass} onClick={() => setStatusFilter("")}>{statusFilter} ×</button>
+          ) : null}
+          {tradeFilter ? (
+            <button type="button" className={chipClass} onClick={() => setTradeFilter("")}>{tradeFilter} ×</button>
+          ) : null}
+        </div>
+      ) : null}
 
       <DataTable<DummyInspection>
         variant="card"

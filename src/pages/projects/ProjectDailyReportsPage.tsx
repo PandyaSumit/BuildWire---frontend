@@ -23,7 +23,7 @@ import {
   type DailyReportRow,
 } from "@/features/project-ui/projectDummyData";
 
-const calCellH = "h-9 w-full min-w-0 sm:h-10";
+const calCellH = "h-10 w-full min-w-0 sm:h-12";
 
 function shiftCalendarMonth(year: number, monthIndex: number, delta: number): { year: number; monthIndex: number } {
   const d = new Date(year, monthIndex + delta, 1);
@@ -263,13 +263,17 @@ export default function ProjectDailyReportsPage() {
       />
 
       {showMissingBanner ? (
-        <div className="flex w-full min-w-0 flex-col gap-3 rounded-md border border-warning/25 bg-warning/[0.06] px-4 py-3 text-sm sm:flex-row sm:items-center">
-          <span className="font-medium text-warning">{t("dailyReportsPage.bannerMissingTitle")}</span>
-          <span className="text-secondary">{t("dailyReportsPage.bannerMissingBody")}</span>
+        <div className="flex w-full min-w-0 items-start gap-3 rounded-xl border border-warning/25 bg-warning/[0.06] px-4 py-3.5">
+          {/* Accent dot */}
+          <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-warning/20 text-[9px] text-warning">!</span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-warning">{t("dailyReportsPage.bannerMissingTitle")}</p>
+            <p className="mt-0.5 text-xs text-secondary">{t("dailyReportsPage.bannerMissingBody")}</p>
+          </div>
           <button
             type="button"
             onClick={() => openNew(realTodayIso)}
-            className="rounded-lg border border-warning/35 bg-warning/10 px-3 py-1.5 text-xs font-medium text-warning hover:bg-warning/15 sm:ms-auto"
+            className="shrink-0 rounded-lg border border-warning/40 bg-warning/10 px-3 py-1.5 text-xs font-semibold text-warning hover:bg-warning/20"
           >
             {t("dailyReportsPage.bannerSubmitNow")}
           </button>
@@ -283,22 +287,49 @@ export default function ProjectDailyReportsPage() {
       ) : null}
 
       {mode === "calendar" ? (
-        <div className="w-full min-w-0 rounded-md border border-border/60 bg-surface p-3 sm:p-5">
-          <div className="mb-3 flex flex-col gap-2 sm:mb-4 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
-            <p className="text-sm font-semibold text-primary sm:text-base">
-              {monthLabel(viewYear, viewMonthIndex, i18n.language)}
-            </p>
+        <div className="w-full min-w-0 rounded-xl border border-border/60 bg-surface p-4 sm:p-6">
+          {/* Calendar header */}
+          <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              {/* Prev/Next month buttons */}
+              <div className="flex gap-1">
+                <button
+                  type="button"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-border/60 text-muted hover:bg-muted/10 hover:text-primary"
+                  aria-label={t("dailyReportsPage.prevMonth")}
+                  onClick={() => {
+                    const n = shiftCalendarMonth(viewYear, viewMonthIndex, -1);
+                    setViewYear(n.year);
+                    setViewMonthIndex(n.monthIndex);
+                  }}
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <button
+                  type="button"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-border/60 text-muted hover:bg-muted/10 hover:text-primary"
+                  aria-label={t("dailyReportsPage.nextMonth")}
+                  onClick={() => {
+                    const n = shiftCalendarMonth(viewYear, viewMonthIndex, 1);
+                    setViewYear(n.year);
+                    setViewMonthIndex(n.monthIndex);
+                  }}
+                >
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24" aria-hidden>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+              <p className="text-base font-bold text-primary">
+                {monthLabel(viewYear, viewMonthIndex, i18n.language)}
+              </p>
+            </div>
+
             <div className="flex flex-wrap items-center gap-3">
-              <label className="flex items-center gap-2 text-xs text-secondary">
-                <span className="sr-only">{t("dailyReportsPage.jumpMonth")}</span>
-                <input
-                  type="month"
-                  value={monthPickerValue}
-                  onChange={(e) => onMonthPick(e.target.value)}
-                  className="rounded-lg border border-border/60 bg-bg px-2 py-1.5 text-xs text-primary"
-                />
-              </label>
-              <div className="hidden flex-wrap items-center gap-3 text-xs text-muted sm:flex">
+              {/* Legend */}
+              <div className="flex flex-wrap items-center gap-3 text-[11px] text-muted">
                 {(Object.entries(DAILY_REPORT_CALENDAR_LEGEND) as [
                   CalendarDot,
                   { className: string; label: string },
@@ -309,70 +340,46 @@ export default function ProjectDailyReportsPage() {
                   </span>
                 ))}
               </div>
-              <div className="flex gap-1">
-                <button
-                  type="button"
-                  className="rounded-lg border border-border/60 px-2.5 py-1 text-xs text-secondary hover:bg-muted/10 hover:text-primary"
-                  aria-label={t("dailyReportsPage.prevMonth")}
-                  onClick={() => {
-                    const n = shiftCalendarMonth(viewYear, viewMonthIndex, -1);
-                    setViewYear(n.year);
-                    setViewMonthIndex(n.monthIndex);
-                  }}
-                >
-                  ‹
-                </button>
-                <button
-                  type="button"
-                  className="rounded-lg border border-border/60 px-2.5 py-1 text-xs text-secondary hover:bg-muted/10 hover:text-primary"
-                  aria-label={t("dailyReportsPage.nextMonth")}
-                  onClick={() => {
-                    const n = shiftCalendarMonth(viewYear, viewMonthIndex, 1);
-                    setViewYear(n.year);
-                    setViewMonthIndex(n.monthIndex);
-                  }}
-                >
-                  ›
-                </button>
-              </div>
+              {/* Month picker */}
+              <label className="flex items-center gap-2 text-xs text-secondary">
+                <span className="sr-only">{t("dailyReportsPage.jumpMonth")}</span>
+                <input
+                  type="month"
+                  value={monthPickerValue}
+                  onChange={(e) => onMonthPick(e.target.value)}
+                  className="h-8 rounded-lg border border-border/60 bg-bg px-2 text-xs text-primary focus:border-brand/50 focus:outline-none"
+                />
+              </label>
             </div>
           </div>
 
-          <div className="mb-3 flex flex-wrap gap-3 text-xs text-muted sm:hidden">
-            {(Object.entries(DAILY_REPORT_CALENDAR_LEGEND) as [
-              CalendarDot,
-              { className: string; label: string },
-            ][]).map(([key, v]) => (
-              <span key={key} className="inline-flex items-center gap-1.5">
-                <span className={`h-2 w-2 shrink-0 rounded-full ${v.className}`} />
-                {v.label}
-              </span>
-            ))}
-          </div>
-
-          <div className="mb-0.5 grid w-full min-w-0 grid-cols-7 gap-px sm:mb-1 sm:gap-1">
+          {/* Weekday labels */}
+          <div className="mb-1 grid w-full min-w-0 grid-cols-7 gap-1">
             {WEEKDAY_LABELS.map((d) => (
               <div
                 key={d}
-                className="px-0.5 py-1 text-center text-[9px] font-semibold uppercase leading-tight tracking-wide text-muted sm:py-1.5 sm:text-[11px]"
+                className="py-1.5 text-center text-[10px] font-semibold uppercase tracking-wider text-muted"
               >
                 {d}
               </div>
             ))}
           </div>
 
-          <div className="grid w-full min-w-0 grid-cols-7 gap-px sm:gap-1">
+          {/* Calendar grid */}
+          <div className="grid w-full min-w-0 grid-cols-7 gap-1">
             {calendarCells.map((cell, idx) => {
               if (cell.kind === "pad") {
                 return (
                   <div
                     key={`pad-${idx}`}
-                    className={`${calCellH} rounded-md bg-muted/[0.04]`}
+                    className={`${calCellH} rounded-lg bg-muted/[0.03]`}
                     aria-hidden
                   />
                 );
               }
               const { className: dotCls } = DAILY_REPORT_CALENDAR_LEGEND[cell.dot];
+              const todayIso = dailyReportDateIso(viewYear, viewMonthIndex, cell.day);
+              const isToday = todayIso === realTodayIso;
               return (
                 <button
                   key={cell.day}
@@ -380,17 +387,18 @@ export default function ProjectDailyReportsPage() {
                   disabled={cell.weekend}
                   onClick={() => {
                     if (cell.weekend) return;
-                    const iso = dailyReportDateIso(viewYear, viewMonthIndex, cell.day);
-                    if (rowsByDate.has(iso)) openEdit(iso);
-                    else openNew(iso);
+                    if (rowsByDate.has(todayIso)) openEdit(todayIso);
+                    else openNew(todayIso);
                   }}
-                  className={`flex ${calCellH} touch-manipulation flex-row items-center justify-center gap-0.5 rounded-md px-0.5 text-[11px] transition-colors sm:gap-1 sm:text-xs ${
+                  className={`flex ${calCellH} touch-manipulation flex-col items-center justify-center gap-1 rounded-lg text-[11px] transition-colors sm:text-xs ${
                     cell.weekend
-                      ? "cursor-default opacity-50"
+                      ? "cursor-default opacity-40"
+                      : isToday
+                      ? "border border-brand/40 bg-brand-light text-primary hover:bg-brand/10"
                       : "hover:bg-muted/10 hover:text-primary active:bg-muted/15"
                   } text-primary`}
                 >
-                  <span className="shrink-0 tabular-nums font-medium leading-none">
+                  <span className={`tabular-nums font-semibold leading-none ${isToday ? "text-brand" : ""}`}>
                     {cell.day}
                   </span>
                   <span

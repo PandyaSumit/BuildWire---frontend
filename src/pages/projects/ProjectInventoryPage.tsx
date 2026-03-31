@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { KpiStatCard } from "@/components/ui/kpi-stat-card";
 import { PageHeader } from "@/components/ui/page-header";
 import { ProgressBar } from "@/components/ui/progress-bar";
+import { Select, type SelectOption } from "@/components/ui/select";
 import { SheetDrawer } from "@/components/ui/sheet-drawer";
 import { StatsBar } from "@/components/ui/stats-bar";
 import { INVENTORY_UNIT_STATUS_STYLE } from "@/config/pm/inventory";
@@ -252,6 +253,20 @@ export default function ProjectInventoryPage() {
     [floorUnits],
   );
 
+  const unitTypeOptions: SelectOption[] = useMemo(
+    () => unitTypes.map((t) => ({ value: t, label: t === "all" ? "All types" : t })),
+    [unitTypes],
+  );
+
+  const unitStatusOptions: SelectOption[] = [
+    { value: "all", label: "All statuses" },
+    { value: "available", label: "Available" },
+    { value: "reserved", label: "Reserved" },
+    { value: "booked", label: "Booked" },
+    { value: "sold", label: "Sold" },
+    { value: "handed", label: "Handed over" },
+  ];
+
   const filteredUnits = useMemo(() => {
     return floorUnits.filter((u) => {
       const matchStatus = statusFilter === "all" || u.status === statusFilter;
@@ -325,9 +340,10 @@ export default function ProjectInventoryPage() {
         {/* Stacking plan */}
         <div className="rounded-2xl border border-border/60 bg-surface p-4">
           <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">
-              Stacking plan — {selectedFloor}
-            </p>
+            <div>
+              <p className="text-sm font-semibold text-primary">Stacking Plan</p>
+              <p className="text-[11px] text-muted">Floor {selectedFloor} · click any unit to view details</p>
+            </div>
             {/* Filters */}
             <div className="flex flex-wrap items-center gap-2">
               <input
@@ -335,29 +351,22 @@ export default function ProjectInventoryPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search unit…"
-                className="w-32 rounded-lg border border-border/60 bg-bg px-2.5 py-1 text-xs text-primary placeholder:text-muted focus:border-brand/50 focus:outline-none"
+                className="h-8 w-32 rounded-lg border border-border/60 bg-bg px-2.5 text-xs text-primary placeholder:text-muted focus:border-brand/50 focus:outline-none"
               />
-              <select
+              <Select
+                options={unitTypeOptions}
                 value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value)}
-                className="rounded-lg border border-border/60 bg-bg px-2.5 py-1 text-xs text-primary focus:border-brand/50 focus:outline-none"
-              >
-                {unitTypes.map((t) => (
-                  <option key={t} value={t}>{t === "all" ? "All types" : t}</option>
-                ))}
-              </select>
-              <select
+                onValueChange={setTypeFilter}
+                size="sm"
+                triggerClassName="h-8 text-xs"
+              />
+              <Select
+                options={unitStatusOptions}
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as UnitStatus | "all")}
-                className="rounded-lg border border-border/60 bg-bg px-2.5 py-1 text-xs text-primary focus:border-brand/50 focus:outline-none"
-              >
-                <option value="all">All statuses</option>
-                <option value="available">Available</option>
-                <option value="reserved">Reserved</option>
-                <option value="booked">Booked</option>
-                <option value="sold">Sold</option>
-                <option value="handed">Handed over</option>
-              </select>
+                onValueChange={(v) => setStatusFilter(v as UnitStatus | "all")}
+                size="sm"
+                triggerClassName="h-8 text-xs"
+              />
             </div>
           </div>
 
@@ -412,13 +421,20 @@ export default function ProjectInventoryPage() {
           </div>
 
           {/* Legend */}
-          <div className="mt-4 flex flex-wrap gap-3 text-[10px] text-muted sm:text-xs">
-            <span>⬜ Available</span>
-            <span className="text-blue-600 dark:text-blue-300">🔵 Reserved</span>
-            <span className="text-amber-700 dark:text-amber-200">🟡 Booked</span>
-            <span className="text-green-700 dark:text-green-200">🟢 Sold</span>
-            <span className="text-purple-700 dark:text-purple-200">🟣 Handed over</span>
-            <span className="ml-auto italic">Click any unit for details</span>
+          <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1.5 border-t border-border/40 pt-3">
+            {([
+              { label: "Available", cls: "bg-muted/20 border-border/60" },
+              { label: "Reserved", cls: "bg-blue-400/25 border-blue-400/40 dark:bg-blue-500/20" },
+              { label: "Booked", cls: "bg-amber-400/25 border-amber-400/40 dark:bg-amber-500/20" },
+              { label: "Sold", cls: "bg-success/25 border-success/40" },
+              { label: "Handed over", cls: "bg-purple-400/25 border-purple-400/40 dark:bg-purple-500/20" },
+            ] as const).map(({ label, cls }) => (
+              <span key={label} className="flex items-center gap-1.5 text-[11px] text-muted">
+                <span className={`h-3 w-4 shrink-0 rounded border ${cls}`} aria-hidden />
+                {label}
+              </span>
+            ))}
+            <span className="ml-auto text-[11px] italic text-muted">Click any unit for details</span>
           </div>
         </div>
 
