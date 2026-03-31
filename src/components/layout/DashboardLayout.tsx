@@ -10,14 +10,27 @@ import {
 import { GlobalSearchProvider } from "@/components/layout/GlobalSearchContext";
 
 function DashboardShell() {
-  const { collapsed } = useSidebarLayout();
+  const { collapsed, mobileOpen, setMobileOpen } = useSidebarLayout();
 
   return (
     <>
+      {/* Mobile backdrop — closes drawer when tapping outside */}
+      <div
+        className={[
+          "fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] lg:hidden",
+          "transition-opacity duration-200",
+          mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none",
+        ].join(" ")}
+        onClick={() => setMobileOpen(false)}
+        aria-hidden
+      />
+
       <Sidebar />
+
+      {/* Main content: no left padding on mobile (sidebar is overlay); push only on lg+ */}
       <div
         className={`flex h-full min-h-0 min-w-0 flex-col overflow-x-hidden transition-[padding] duration-200 ease-out ${
-          collapsed ? "ps-14" : "ps-60"
+          collapsed ? "lg:ps-14" : "lg:ps-60"
         }`}
       >
         <EmailVerificationBanner />

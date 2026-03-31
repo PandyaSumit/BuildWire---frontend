@@ -12,19 +12,18 @@ type PageHeaderProps = {
 
 /**
  * Consistent page-level header: title + description on the left,
- * action buttons on the right. Drop-in replacement for the inline
- * flex heading pattern used across every project module.
+ * action buttons on the right.
  */
 export function PageHeader({ title, description, actions, toolbar, className = '' }: PageHeaderProps) {
   return (
     <div className={`space-y-3 ${className}`}>
-      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
-          <h1 className="font-[family-name:var(--font-dm-sans)] text-[19px] font-bold tracking-tight text-primary leading-tight">
+          <h1 className="font-[family-name:var(--font-dm-sans)] text-[20px] font-bold tracking-tight text-primary leading-tight sm:text-[22px]">
             {title}
           </h1>
           {description && (
-            <p className="mt-0.5 text-[13px] leading-relaxed text-secondary">{description}</p>
+            <p className="mt-1 text-[13px] leading-relaxed text-secondary max-w-prose">{description}</p>
           )}
         </div>
         {actions && (

@@ -7,8 +7,8 @@ type ModuleSplitLayoutProps = {
 };
 
 /**
- * Two-pane module layout: sidebar stacks on narrow screens; place
- * `flex flex-row overflow-x-auto md:flex-col` on inner nav when needed.
+ * Two-pane module layout: sidebar stacks on narrow screens; sidebar scrolls
+ * independently from the main content pane.
  */
 export function ModuleSplitLayout({
   sidebar,
@@ -17,10 +17,10 @@ export function ModuleSplitLayout({
 }: ModuleSplitLayoutProps) {
   return (
     <div className="flex min-h-full min-w-0 flex-col md:flex-row">
-      <aside className="shrink-0 border-b border-border bg-surface md:w-60 md:border-b-0 md:border-e">
-        <div className="overflow-y-auto p-3">
+      <aside className="shrink-0 border-b border-border/60 bg-surface md:w-64 md:border-b-0 md:border-e">
+        <div className="overflow-y-auto p-3 md:p-4">
           {sidebarLabel ? (
-            <p className="mb-2 px-2 text-[10px] font-semibold uppercase tracking-wider text-muted">
+            <p className="mb-2.5 px-2 text-[10.5px] font-semibold uppercase tracking-wider text-muted">
               {sidebarLabel}
             </p>
           ) : null}

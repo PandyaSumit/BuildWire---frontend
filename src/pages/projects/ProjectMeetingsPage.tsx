@@ -382,7 +382,7 @@ export default function ProjectMeetingsPage() {
         />
 
         {/* KPIs */}
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <KpiStatCard label="Total meetings" value={String(DUMMY_MEETINGS.length)} sublabel="This month" />
           <KpiStatCard label="Upcoming" value={String(scheduled)} sublabel="Scheduled" accent="default" />
           <KpiStatCard label="Open action items" value={String(totalActions)} sublabel="Across all meetings" accent="warning" />

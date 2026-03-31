@@ -299,7 +299,7 @@ export default function ProjectReportsPage() {
 
           {/* Overview KPIs */}
           {cat === "Overview" && tab === "reports" && (
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <KpiStatCard label="Reports run this month" value="24" sublabel="↑ 6 vs last month" />
               <KpiStatCard label="Scheduled active" value="3" sublabel="Auto-delivered" accent="success" />
               <KpiStatCard label="Last export" value="Mar 20" sublabel="Project Status PDF" />

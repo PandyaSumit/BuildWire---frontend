@@ -492,7 +492,7 @@ export default function ProjectFinancialsPage() {
       {tab === "budget" && (
         <>
           {/* KPI row */}
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <KpiStatCard label="Total budget" value="₹12.4 Cr" sublabel="Incl. approved COs" />
             <KpiStatCard label="Spent to date" value="₹7.7 Cr" sublabel="62% utilised" />
             <KpiStatCard
@@ -661,7 +661,7 @@ export default function ProjectFinancialsPage() {
       {/* ── Invoices tab ── */}
       {tab === "invoices" && (
         <>
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-3">
             <KpiStatCard label="Submitted this month" value="₹71L" sublabel="2 invoices" />
             <KpiStatCard label="Pending approval" value="1" sublabel="₹48.2L" accent="warning" />
             <KpiStatCard label="Paid this month" value="₹37.3L" sublabel="2 approved invoices" accent="success" />

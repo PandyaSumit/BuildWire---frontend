@@ -14,10 +14,10 @@ export type KpiStatCardProps = {
 
 const accentBorderTop: Record<NonNullable<KpiStatCardProps['accent']>, string> = {
   default: 'border-t-border',
-  success: 'border-t-success/50',
-  warning: 'border-t-warning/50',
-  danger:  'border-t-danger/50',
-  info:    'border-t-info/50',
+  success: 'border-t-success/60',
+  warning: 'border-t-warning/60',
+  danger:  'border-t-danger/60',
+  info:    'border-t-info/60',
 };
 
 const accentBarLeft: Record<NonNullable<KpiStatCardProps['accent']>, string> = {
@@ -47,7 +47,7 @@ export function KpiStatCard({
 }: KpiStatCardProps) {
   return (
     <div
-      className={`relative overflow-hidden rounded-xl border border-border/70 bg-surface shadow-token-sm ${
+      className={`relative overflow-hidden rounded-xl border border-border/70 bg-surface shadow-token-sm transition-shadow duration-150 hover:shadow-token-md ${
         !accentBar ? `border-t-2 ${accentBorderTop[accent]}` : 'border-t-0'
       }`}
     >
@@ -59,9 +59,9 @@ export function KpiStatCard({
         />
       )}
 
-      <div className={`p-4 ${accentBar ? 'ps-5' : ''}`}>
-        <div className="flex items-start justify-between gap-2">
-          <p className="font-[family-name:var(--font-ibm-plex)] text-[11px] font-semibold uppercase tracking-[0.07em] text-muted">
+      <div className={`p-4 sm:p-5 ${accentBar ? 'ps-5 sm:ps-6' : ''}`}>
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-[11.5px] font-semibold uppercase tracking-[0.07em] text-muted leading-tight">
             {label}
           </p>
           {icon && (
@@ -71,15 +71,15 @@ export function KpiStatCard({
           )}
         </div>
 
-        <div className="mt-2 flex items-end justify-between gap-2">
-          <p className="font-[family-name:var(--font-kpi-mono)] text-2xl font-semibold tabular-nums leading-none text-primary">
+        <div className="mt-2.5 flex items-end justify-between gap-2">
+          <p className="font-[family-name:var(--font-kpi-mono)] text-[26px] font-semibold tabular-nums leading-none tracking-tight text-primary">
             {value}
           </p>
           {trend && <div className="text-xs text-secondary">{trend}</div>}
         </div>
 
         {sublabel && (
-          <p className="mt-1.5 text-[11.5px] leading-snug text-secondary">{sublabel}</p>
+          <p className="mt-1.5 text-[12px] leading-snug text-muted">{sublabel}</p>
         )}
       </div>
     </div>

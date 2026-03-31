@@ -26,7 +26,10 @@ export function Sidebar() {
   const user = useAppSelector((s) => s.auth.user);
   const orgRole = parseOrgRole(user?.org?.role);
   const sidebarMode = useSidebarMode();
-  const { collapsed, toggle } = useSidebarLayout();
+  const { collapsed, toggle, mobileOpen, setMobileOpen } = useSidebarLayout();
+
+  // On mobile, the drawer always shows expanded layout regardless of collapsed state
+  const effectiveCollapsed = collapsed && !mobileOpen;
 
   const navigation =
     sidebarMode.mode === "project"
@@ -35,6 +38,11 @@ export function Sidebar() {
 
   const [accountOpen, setAccountOpen] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement>(null);
+
+  // Auto-close mobile drawer on route change
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname, setMobileOpen]);
 
   useEffect(() => {
     if (!accountOpen) return;
@@ -59,19 +67,27 @@ export function Sidebar() {
   return (
     <>
       <aside
-        className={`fixed start-0 top-0 z-30 flex h-dvh max-h-dvh flex-col bg-sidebar transition-[width] duration-200 ease-out border-e border-border/50 dark:border-white/[0.05] ${
-          collapsed ? "w-14" : "w-60"
-        }`}
+        className={[
+          // Base layout
+          "fixed start-0 top-0 z-50 flex h-dvh max-h-dvh flex-col bg-sidebar",
+          "border-e border-border/50 dark:border-white/[0.05]",
+          // Mobile: slide-in/out as overlay drawer (always w-60)
+          "w-60 transition-transform duration-200 ease-out",
+          mobileOpen ? "translate-x-0" : "-translate-x-full",
+          // Desktop (lg+): always visible, width controls collapsed state
+          "lg:translate-x-0 lg:z-30 lg:transition-[width] lg:duration-200 lg:ease-out",
+          collapsed ? "lg:w-14" : "lg:w-60",
+        ].join(" ")}
       >
         {/* Logo / Brand */}
         <div
           className={`shrink-0 border-b border-border/40 dark:border-white/[0.05] ${
-            collapsed
+            effectiveCollapsed
               ? "flex h-[52px] items-center justify-center px-2"
               : "flex h-[52px] items-center px-3"
           }`}
         >
-          {collapsed ? (
+          {effectiveCollapsed ? (
             <button
               type="button"
               onClick={toggle}
@@ -92,15 +108,22 @@ export function Sidebar() {
                   {t("brand.name")}
                 </span>
               </div>
+              {/* On mobile, show close button; on desktop show collapse toggle */}
               <button
                 type="button"
-                onClick={toggle}
+                onClick={mobileOpen ? () => setMobileOpen(false) : toggle}
                 className={iconBtn}
-                aria-expanded
-                aria-label={t("sidebar.collapse")}
-                title={t("sidebar.collapse")}
+                aria-expanded={!effectiveCollapsed}
+                aria-label={mobileOpen ? t("sidebar.close", { defaultValue: "Close menu" }) : t("sidebar.collapse")}
+                title={mobileOpen ? t("sidebar.close", { defaultValue: "Close menu" }) : t("sidebar.collapse")}
               >
-                <BuildWireMark size={20} strokeWidth={1.75} decorative />
+                {mobileOpen ? (
+                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <BuildWireMark size={20} strokeWidth={1.75} decorative />
+                )}
               </button>
             </div>
           )}
@@ -109,14 +132,14 @@ export function Sidebar() {
         {/* Navigation */}
         <nav
           className={`scrollbar-none flex-1 overflow-y-auto overflow-x-hidden ${
-            collapsed ? "px-1.5 py-2" : "px-2 py-3"
+            effectiveCollapsed ? "px-1.5 py-2" : "px-2 py-3"
           }`}
         >
           {navigation.map((group, groupIndex) => (
-            <div key={group.groupKey + groupIndex} className={collapsed ? "mb-3" : "mb-4"}>
+            <div key={group.groupKey + groupIndex} className={effectiveCollapsed ? "mb-3" : "mb-4"}>
               <h3
                 className={`mb-1 text-[10.5px] font-semibold uppercase tracking-[0.09em] text-muted/70 ${
-                  collapsed ? "sr-only" : "px-2.5"
+                  effectiveCollapsed ? "sr-only" : "px-2.5"
                 }`}
               >
                 {t(`navGroup.${group.groupKey}`)}
@@ -129,9 +152,9 @@ export function Sidebar() {
                     <Link
                       key={item.id}
                       to={item.to}
-                      title={collapsed ? itemLabel : undefined}
+                      title={effectiveCollapsed ? itemLabel : undefined}
                       className={`relative flex items-center rounded-md text-[13px] font-medium leading-5 transition-colors duration-150 ${
-                        collapsed
+                        effectiveCollapsed
                           ? "justify-center px-2 py-2"
                           : "gap-2.5 px-2.5 py-[7px]"
                       } ${
@@ -140,7 +163,7 @@ export function Sidebar() {
                           : "text-secondary hover:bg-primary/6 hover:text-primary"
                       }`}
                     >
-                      {!collapsed && active && (
+                      {!effectiveCollapsed && active && (
                         <span
                           className="absolute start-0 top-1/2 h-[18px] w-[3px] -translate-y-1/2 rounded-full bg-brand"
                           aria-hidden
@@ -153,20 +176,20 @@ export function Sidebar() {
                       >
                         {item.icon}
                       </span>
-                      {!collapsed && (
+                      {!effectiveCollapsed && (
                         <span className="min-w-0 flex-1 truncate">{itemLabel}</span>
                       )}
-                      {!collapsed && item.showAiBadge && (
+                      {!effectiveCollapsed && item.showAiBadge && (
                         <span className="shrink-0 rounded-md border border-border px-1.5 py-px text-[10px] font-semibold uppercase tracking-wide text-muted dark:text-secondary">
                           {t("nav.aiBadge")}
                         </span>
                       )}
-                      {!collapsed && item.badge && (
+                      {!effectiveCollapsed && item.badge && (
                         <span className="shrink-0 rounded-full bg-danger/90 px-1.5 py-px text-[10px] font-bold leading-tight text-white">
                           {item.badge}
                         </span>
                       )}
-                      {collapsed && item.badge && (
+                      {effectiveCollapsed && item.badge && (
                         <span
                           className="absolute end-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-danger ring-2 ring-sidebar"
                           aria-hidden
@@ -184,18 +207,18 @@ export function Sidebar() {
         <div
           ref={accountMenuRef}
           className={`relative shrink-0 border-t border-border/40 dark:border-white/[0.05] ${
-            collapsed ? "p-1.5" : "p-2"
+            effectiveCollapsed ? "p-1.5" : "p-2"
           }`}
         >
           <button
             type="button"
             onClick={() => setAccountOpen((o) => !o)}
             className={`flex w-full items-center rounded-lg text-start transition-colors duration-150 hover:bg-primary/6 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 ${
-              collapsed ? "justify-center p-2" : "gap-2.5 px-2 py-2"
+              effectiveCollapsed ? "justify-center p-2" : "gap-2.5 px-2 py-2"
             }`}
             aria-expanded={accountOpen}
             aria-haspopup="menu"
-            title={collapsed ? displayName : undefined}
+            title={effectiveCollapsed ? displayName : undefined}
           >
             {user?.avatar ? (
               <img
@@ -208,7 +231,7 @@ export function Sidebar() {
                 {initials}
               </div>
             )}
-            {!collapsed && (
+            {!effectiveCollapsed && (
               <>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-[12.5px] font-semibold leading-tight text-primary">
@@ -237,7 +260,7 @@ export function Sidebar() {
           <AccountDropdown
             open={accountOpen}
             onClose={() => setAccountOpen(false)}
-            collapsed={collapsed}
+            collapsed={effectiveCollapsed}
           />
         </div>
       </aside>

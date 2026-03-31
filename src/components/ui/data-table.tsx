@@ -1,5 +1,5 @@
-import type { MouseEvent, ReactNode } from "react";
-import { useMemo, useState } from "react";
+import type { CSSProperties, MouseEvent, ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Skeleton } from "./skeleton";
 
 export type DataTableSortState = {
@@ -16,6 +16,12 @@ export type DataTableColumn<T> = {
   cell: (row: T, rowIndex: number) => ReactNode;
   /** Enables header sort control; return string or number for stable ordering */
   sortValue?: (row: T) => string | number | null | undefined;
+  /**
+   * Minimum column width in pixels. Applied via style so it works
+   * regardless of table-layout mode.
+   * e.g. `minWidth: 120` keeps the column at least 120px wide at all times.
+   */
+  minWidth?: number;
 };
 
 export type DataTableVariant = "card" | "flush";
@@ -27,20 +33,40 @@ export type DataTableProps<T> = {
   rowKey: (row: T, index: number) => string;
   /**
    * `flush` — no outer border/radius; full-bleed in the main column.
-   * `card`  — rounded-md shell + border (embedded panels).
+   * `card`  — rounded-lg shell + border (embedded panels).
    */
   variant?: DataTableVariant;
   /** `comfortable` adds extra vertical padding (touch-friendly). */
   density?: DataTableDensity;
   maxHeightClassName?: string;
-  /** Applied to the inner `<table>` (e.g. `min-w-[72rem]` for wide grids). */
+  /**
+   * Applied to the inner `<table>` to enforce a minimum total width.
+   * When the table would be narrower than this, horizontal scrolling kicks in.
+   * e.g. `"min-w-[600px]"` ensures the table never collapses below 600px.
+   */
   tableMinWidthClassName?: string;
   minWidthTableLayout?: "auto" | "fixed";
+  /**
+   * Controls CSS `table-layout`.
+   * - `"auto"` (default): column widths size to content — the table
+   *   grows to fit and scrolls horizontally if needed. Best for most cases.
+   * - `"fixed"`: equal column distribution based on first row/declared widths.
+   */
   tableLayout?: "auto" | "fixed";
   className?: string;
   /** Shown as a single full-width row when `data` is empty. */
   emptyFallback?: ReactNode;
+  /**
+   * Hide the scrollbar track.
+   * Defaults to `false` — a visible scrollbar lets users know the table is scrollable.
+   * Set to `true` only when the scroll affordance is provided another way (e.g. touch).
+   */
   hideScrollbar?: boolean;
+  /**
+   * Show left/right gradient shadow indicators when content is scrollable.
+   * Defaults to `true`.
+   */
+  scrollShadows?: boolean;
   /**
    * Whole-row activation. Ignores clicks that originate from interactive descendants
    * (buttons, links, inputs, menu items).
@@ -61,8 +87,8 @@ function alignClass(align: "left" | "right" | "center" = "left") {
 }
 
 const shellByVariant: Record<DataTableVariant, string> = {
-  card:  "rounded-md border border-border/60 bg-surface overflow-hidden",
-  flush: "bg-transparent overflow-hidden",
+  card:  "rounded-lg border border-border/60 bg-surface overflow-hidden shadow-token-xs",
+  flush: "bg-transparent",
 };
 
 function compareSortValues(
@@ -110,10 +136,11 @@ export function DataTable<T>({
   maxHeightClassName = "max-h-[min(36rem,calc(100vh-14rem))]",
   tableMinWidthClassName,
   minWidthTableLayout = "auto",
-  tableLayout = "fixed",
+  tableLayout = "auto",
   className = "",
   emptyFallback,
-  hideScrollbar,
+  hideScrollbar = false,
+  scrollShadows = true,
   onRowClick,
   sort: sortControlled,
   onSortChange,
@@ -125,6 +152,33 @@ export function DataTable<T>({
   const sortState = sortControlled !== undefined ? sortControlled : sortInternal;
   const setSortState = onSortChange ?? setSortInternal;
 
+  // ── Scroll shadow tracking ────────────────────────────────────────────────
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  useEffect(() => {
+    if (!scrollShadows) return;
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const update = () => {
+      const { scrollLeft, scrollWidth, clientWidth } = el;
+      setCanScrollLeft(scrollLeft > 2);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 2);
+    };
+
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener("scroll", update);
+      ro.disconnect();
+    };
+  }, [scrollShadows, columns.length, data.length]);
+
+  // ── Sort ─────────────────────────────────────────────────────────────────
   const sortedData = useMemo(() => {
     if (!sortState) return data;
     const col = columns.find((c) => c.id === sortState.columnId);
@@ -134,13 +188,13 @@ export function DataTable<T>({
     );
   }, [columns, data, sortState]);
 
+  // ── Layout resolution ────────────────────────────────────────────────────
   const minW = tableMinWidthClassName ?? "";
-  const thPad = density === "comfortable" ? "py-3 px-4" : "py-2.5 px-4";
-  const tdPad = density === "comfortable" ? "py-3.5 px-4" : "py-2.5 px-4";
+  const thPad = density === "comfortable" ? "py-3 px-4" : "py-2.5 px-3.5";
+  const tdPad = density === "comfortable" ? "py-3.5 px-4" : "py-2.5 px-3.5";
   const layoutResolved = minW
-    ? minWidthTableLayout === "fixed" ? "table-fixed" : "table-auto"
-    : tableLayout === "fixed" ? "table-fixed" : "table-auto";
-  const hideBar = hideScrollbar ?? variant === "flush";
+    ? (minWidthTableLayout === "fixed" ? "table-fixed" : "table-auto")
+    : (tableLayout === "fixed" ? "table-fixed" : "table-auto");
   const tableWidthClass = minW ? `${minW} w-full` : "w-full";
 
   function toggleSort(columnId: string) {
@@ -168,131 +222,175 @@ export function DataTable<T>({
     onRowClick(row, rowIndex);
   }
 
-  const scrollShell = [
-    "min-h-0 min-w-0 overflow-auto",
-    shellByVariant[variant],
+  // ── Scroll container ─────────────────────────────────────────────────────
+  const scrollClasses = [
+    "min-h-0 min-w-0 overflow-auto bw-table-scroll",
     maxHeightClassName,
-    hideBar ? "scrollbar-none" : "",
+    hideScrollbar ? "scrollbar-none" : "",
     className,
   ].filter(Boolean).join(" ");
 
   return (
-    <div className={scrollShell}>
-      <table
-        className={`border-separate border-spacing-0 text-sm ${layoutResolved} ${tableWidthClass} [&_tbody>tr:last-child>td]:border-b-0`}
-      >
-        {/* ── Header ── */}
-        <thead className="sticky top-0 z-10">
-          <tr>
-            {columns.map((col) => {
-              const sortable = Boolean(col.sortValue);
-              const active = sortState?.columnId === col.id;
-              const sortDir = !active ? "none" : sortState!.direction;
-              const ariaSort = !sortable
-                ? undefined
-                : !active ? "none"
-                : sortState!.direction === "asc" ? "ascending" : "descending";
+    /**
+     * Outer wrapper: `relative overflow-hidden` so shadow overlays clip to
+     * the table bounds without leaking into the page layout.
+     */
+    <div className={`relative overflow-hidden ${shellByVariant[variant]}`}>
 
-              return (
-                <th
-                  key={col.id}
-                  scope="col"
-                  aria-sort={ariaSort}
-                  className={[
-                    thPad,
-                    "border-b border-border/50 bg-surface",
-                    "whitespace-nowrap align-middle",
-                    "text-[11px] font-medium uppercase tracking-[0.055em] text-muted/70",
-                    alignClass(col.align),
-                    col.headerClassName ?? "",
-                  ].filter(Boolean).join(" ")}
-                >
-                  {sortable ? (
-                    <button
-                      type="button"
-                      onClick={() => toggleSort(col.id)}
+      {/* ── Left scroll shadow ── */}
+      {scrollShadows && (
+        <div
+          aria-hidden
+          className={[
+            "pointer-events-none absolute inset-y-0 start-0 z-20 w-10",
+            "bg-gradient-to-r from-surface via-surface/60 to-transparent",
+            "transition-opacity duration-150",
+            canScrollLeft ? "opacity-100" : "opacity-0",
+          ].join(" ")}
+        />
+      )}
+
+      {/* ── Right scroll shadow ── */}
+      {scrollShadows && (
+        <div
+          aria-hidden
+          className={[
+            "pointer-events-none absolute inset-y-0 end-0 z-20 w-10",
+            "bg-gradient-to-l from-surface via-surface/60 to-transparent",
+            "transition-opacity duration-150",
+            canScrollRight ? "opacity-100 bw-scroll-hint" : "opacity-0",
+          ].join(" ")}
+        />
+      )}
+
+      {/* ── Scrollable area ── */}
+      <div ref={scrollRef} className={scrollClasses}>
+        <table
+          className={`border-separate border-spacing-0 text-sm ${layoutResolved} ${tableWidthClass} [&_tbody>tr:last-child>td]:border-b-0`}
+        >
+          {/* ── Header ── */}
+          <thead className="sticky top-0 z-10">
+            <tr>
+              {columns.map((col) => {
+                const sortable = Boolean(col.sortValue);
+                const active = sortState?.columnId === col.id;
+                const sortDir = !active ? "none" : sortState!.direction;
+                const ariaSort = !sortable
+                  ? undefined
+                  : !active ? "none"
+                  : sortState!.direction === "asc" ? "ascending" : "descending";
+
+                const colStyle: CSSProperties | undefined =
+                  col.minWidth ? { minWidth: col.minWidth } : undefined;
+
+                return (
+                  <th
+                    key={col.id}
+                    scope="col"
+                    aria-sort={ariaSort}
+                    style={colStyle}
+                    className={[
+                      thPad,
+                      "border-b border-border/60 bg-surface/95 backdrop-blur-sm",
+                      "whitespace-nowrap align-middle",
+                      "text-[11px] font-semibold uppercase tracking-[0.06em] text-muted",
+                      alignClass(col.align),
+                      col.headerClassName ?? "",
+                    ].filter(Boolean).join(" ")}
+                  >
+                    {sortable ? (
+                      <button
+                        type="button"
+                        onClick={() => toggleSort(col.id)}
+                        className={[
+                          "inline-flex max-w-full items-center gap-1 text-left text-inherit",
+                          "transition-colors duration-100 hover:text-primary",
+                          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 rounded",
+                          active ? "text-primary" : "",
+                          alignClass(col.align),
+                        ].filter(Boolean).join(" ")}
+                      >
+                        <span className="min-w-0 truncate">{col.header}</span>
+                        <SortIcon state={sortDir} />
+                      </button>
+                    ) : (
+                      col.header
+                    )}
+                  </th>
+                );
+              })}
+            </tr>
+          </thead>
+
+          {/* ── Body ── */}
+          <tbody>
+            {loading ? (
+              Array.from({ length: loadingRows }).map((_, rowIndex) => (
+                <tr key={`sk-${rowIndex}`} className="bg-surface">
+                  {columns.map((col) => (
+                    <td
+                      key={col.id}
                       className={[
-                        "inline-flex max-w-full items-center gap-1 text-left text-inherit",
-                        "transition-colors duration-100 hover:text-primary",
-                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 rounded",
-                        active ? "text-primary" : "",
+                        "border-b border-border/30",
+                        tdPad,
+                        "align-middle",
                         alignClass(col.align),
+                        col.cellClassName ?? "",
                       ].filter(Boolean).join(" ")}
                     >
-                      <span className="min-w-0 truncate">{col.header}</span>
-                      <SortIcon state={sortDir} />
-                    </button>
-                  ) : (
-                    col.header
-                  )}
-                </th>
-              );
-            })}
-          </tr>
-        </thead>
+                      <Skeleton className="h-3.5 w-full max-w-[9rem]" />
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : sortedData.length === 0 && emptyFallback != null ? (
+              <tr>
+                <td
+                  colSpan={columns.length}
+                  className="border-b-0 py-16 text-center text-sm text-muted"
+                >
+                  {emptyFallback}
+                </td>
+              </tr>
+            ) : (
+              sortedData.map((row, rowIndex) => (
+                <tr
+                  key={rowKey(row, rowIndex)}
+                  onClick={onRowClick ? (e) => handleRowClick(row, rowIndex, e) : undefined}
+                  className={[
+                    "bg-surface transition-colors duration-100",
+                    onRowClick
+                      ? "cursor-pointer hover:bg-primary/[0.05] active:bg-primary/[0.08]"
+                      : "hover:bg-primary/[0.03]",
+                    rowClassName?.(row, rowIndex) ?? "",
+                  ].filter(Boolean).join(" ")}
+                >
+                  {columns.map((col) => {
+                    const colStyle: CSSProperties | undefined =
+                      col.minWidth ? { minWidth: col.minWidth } : undefined;
 
-        {/* ── Body ── */}
-        <tbody>
-          {loading ? (
-            Array.from({ length: loadingRows }).map((_, rowIndex) => (
-              <tr key={`sk-${rowIndex}`} className="bg-surface">
-                {columns.map((col) => (
-                  <td
-                    key={col.id}
-                    className={[
-                      "border-b border-border/30",
-                      tdPad,
-                      "align-middle",
-                      alignClass(col.align),
-                      col.cellClassName ?? "",
-                    ].filter(Boolean).join(" ")}
-                  >
-                    <Skeleton className="h-3.5 w-full max-w-[9rem]" />
-                  </td>
-                ))}
-              </tr>
-            ))
-          ) : sortedData.length === 0 && emptyFallback != null ? (
-            <tr>
-              <td
-                colSpan={columns.length}
-                className="border-b-0 py-16 text-center text-sm text-muted"
-              >
-                {emptyFallback}
-              </td>
-            </tr>
-          ) : (
-            sortedData.map((row, rowIndex) => (
-              <tr
-                key={rowKey(row, rowIndex)}
-                onClick={onRowClick ? (e) => handleRowClick(row, rowIndex, e) : undefined}
-                className={[
-                  "bg-surface transition-colors duration-100",
-                  onRowClick
-                    ? "cursor-pointer hover:bg-primary/[0.03] active:bg-primary/[0.055]"
-                    : "hover:bg-primary/[0.02]",
-                  rowClassName?.(row, rowIndex) ?? "",
-                ].filter(Boolean).join(" ")}
-              >
-                {columns.map((col) => (
-                  <td
-                    key={col.id}
-                    className={[
-                      "border-b border-border/30",
-                      tdPad,
-                      "align-middle text-[13px] leading-5 text-secondary",
-                      alignClass(col.align),
-                      col.cellClassName ?? "",
-                    ].filter(Boolean).join(" ")}
-                  >
-                    {col.cell(row, rowIndex)}
-                  </td>
-                ))}
-              </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+                    return (
+                      <td
+                        key={col.id}
+                        style={colStyle}
+                        className={[
+                          "border-b border-border/30",
+                          tdPad,
+                          "align-middle text-[13px] leading-5 text-secondary",
+                          alignClass(col.align),
+                          col.cellClassName ?? "",
+                        ].filter(Boolean).join(" ")}
+                      >
+                        {col.cell(row, rowIndex)}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

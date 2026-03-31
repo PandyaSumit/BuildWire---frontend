@@ -433,7 +433,7 @@ export default function ProjectTeamPage() {
         />
 
         {/* KPI cards */}
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <KpiStatCard label="Total members" value={String(s.total)} sublabel={`${s.companies} companies`} />
           <KpiStatCard label="On site now" value={String(onSiteCount)} sublabel="Active this session" accent="success" />
           <KpiStatCard label="Avg attendance" value={`${avgAttendance}%`} sublabel="This month" accent={avgAttendance >= 90 ? "success" : "warning"} />
