@@ -1,7 +1,7 @@
 import type { BuildWireTask, TaskPriorityKey, TaskStatus, TaskTradeKey, TaskTypeKey } from '@/types/task';
-import type { NewTaskFormValues } from '@/features/tasks/taskFactory';
-import { FLOOR_OPTIONS } from '@/features/tasks/taskConstants';
-import { DEMO_USERS } from '@/features/tasks/demoUsers';
+import type { NewTaskFormValues } from '@/utils/task/taskFactory';
+import { FLOOR_OPTIONS } from '@/utils/task/taskConstants';
+import { DEMO_USERS } from '@/utils/task/demoUsers';
 
 /** Shared form state for create + edit task drawer */
 export type TaskEditorDraft = {

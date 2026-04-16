@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { DEMO_PLAN_PDF_URL, renderPdfPageToCanvas } from "@/features/plans/pdf";
+import { DEMO_PLAN_PDF_URL, renderPdfPageToCanvas } from "@/utils/project/planPdf";
 
 type PdfPlanViewerProps = {
   /** Optional override; defaults to a public sample PDF. */

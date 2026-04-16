@@ -6,7 +6,7 @@ import {
   deleteOrganizationRole,
   listOrganizationRoles,
   updateOrganizationRole,
-} from '@/api/organizations';
+} from '@/services/organization/organizationService';
 import type { OrganizationRoleTemplate } from '@/types/organization';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';

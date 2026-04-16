@@ -3,7 +3,7 @@ import {
   TASK_COLUMNS,
   type TaskColumn,
   type UiTask,
-} from "@/features/tasks/fixtures";
+} from '@/utils/task/fixtures';
 
 export type OverviewTaskStats = {
   total: number;

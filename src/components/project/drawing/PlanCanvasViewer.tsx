@@ -10,17 +10,17 @@ import type {
   AnnotationStyle,
   DrawingViewerToolId,
   LayerVisibility,
-} from "@/features/plans/DrawingViewerToolbar";
+} from "./DrawingViewerToolbar";
 import {
   BUILDWIRE_TASK_DRAG_TYPE,
   parseTaskDragPayload,
-} from "@/features/plans/taskDrag";
+} from "@/utils/project/taskDrag";
 import {
   isImage,
   isPdf,
   rasterizePdfPageToDataUrl,
   resolvePlanFileUrl,
-} from "@/features/plans/pdf";
+} from "@/utils/project/planPdf";
 
 /* ─────────────────────────────────────────────────── Constants ── */
 const MIN_ZOOM = 0.05;

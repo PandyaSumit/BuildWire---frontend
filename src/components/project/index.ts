@@ -15,6 +15,10 @@ export { DeleteProjectDialog } from './DeleteProjectDialog';
 export { ProjectMembersSection } from './ProjectMembersSection';
 export { ProjectTaskStatsGrid } from './ProjectTaskStats';
 export { DailyReportDrawer } from './drawers/DailyReportDrawer';
-export { InspectionDrawers } from './drawers/InspectionDrawers';
+export {
+  InspectionDetailDrawer,
+  ScheduleInspectionDrawer,
+  nextInspectionId,
+} from './drawers/InspectionDrawers';
 export { OverviewRollups } from './overview/OverviewRollups';
 export { OverviewExecutionSnapshot } from './overview/OverviewExecutionSnapshot';

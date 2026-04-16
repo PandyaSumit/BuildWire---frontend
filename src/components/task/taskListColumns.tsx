@@ -3,12 +3,12 @@ import type { TFunction } from 'i18next';
 import type { DataTableColumn } from '@/components/ui/data-table';
 import { Avatar } from '@/components/ui';
 import type { BuildWireTask } from '@/types/task';
-import { taskPriorityTKey, taskWorkflowTKey } from '@/features/tasks/fixtures';
-import { taskTableTypePillClassKey } from '@/features/tasks/taskPresentation';
-import { taskTypeKeyTKey, taskTradeKeyTKey } from '@/features/tasks/taskI18nKeys';
+import { taskPriorityTKey, taskWorkflowTKey } from '@/utils/task/fixtures';
+import { taskTableTypePillClassKey } from '@/utils/task/taskPresentation';
+import { taskTypeKeyTKey, taskTradeKeyTKey } from '@/utils/task/taskI18nKeys';
 import type { DateFormatPref } from '@/lib/userPreferences';
 import { formatTaskCreatedDate } from '@/lib/userPreferences';
-import { demoPrimaryAssigneeName } from '@/features/tasks/demoUsers';
+import { demoPrimaryAssigneeName } from '@/utils/task/demoUsers';
 
 function TaskProgressRing({ value }: { value: number }) {
   const v = Math.min(100, Math.max(0, value));

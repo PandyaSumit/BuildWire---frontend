@@ -15,33 +15,33 @@ import {
   TASK_COLUMNS,
   taskPriorityTKey,
   taskWorkflowTKey,
-} from "@/features/tasks/fixtures";
-import { typeBadgeClassKey } from "@/features/tasks/taskPresentation";
+} from "@/utils/task/fixtures";
+import { typeBadgeClassKey } from "@/utils/task/taskPresentation";
 import {
   taskTypeKeyTKey,
   taskTradeKeyTKey,
-} from "@/features/tasks/taskI18nKeys";
+} from "@/utils/task/taskI18nKeys";
 import {
   demoAssigneesDisplayList,
   demoPrimaryAssigneeName,
   demoPrimaryInitials,
   DEMO_USERS,
-} from "@/features/tasks/demoUsers";
+} from "@/utils/task/demoUsers";
 import {
   draftToNewTaskValues,
   draftToPatch,
   emptyTaskDraft,
   taskToDraft,
   type TaskEditorDraft,
-} from "@/features/tasks/taskEditorState";
-import { TaskFormSections } from "@/features/tasks/TaskFormSections";
-import { useTaskProject } from "@/features/tasks/TaskProjectContext";
+} from "@/utils/task/taskEditorState";
+import { TaskFormSections } from "./TaskFormSections";
+import { useTaskProject } from "@/hooks/task/TaskProjectContext";
 import {
   BUILTIN_TASK_TEMPLATES,
   orderedTemplatesForPicker,
   recordTemplateUse,
-} from "@/features/tasks/taskTemplates";
-import { createBuildWireTask } from "@/features/tasks/taskFactory";
+} from "@/utils/task/taskTemplates";
+import { createBuildWireTask } from "@/utils/task/taskFactory";
 
 function toggleAssigneeId(ids: string[], id: string): string[] {
   return ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id];

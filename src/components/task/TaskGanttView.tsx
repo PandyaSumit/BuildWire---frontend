@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { BuildWireTask } from '@/types/task';
-import { useTaskProject } from '@/features/tasks/TaskProjectContext';
-import { ganttBarClassForStatus } from '@/features/tasks/taskPresentation';
-import { demoPrimaryAssigneeName } from '@/features/tasks/demoUsers';
-import { taskWorkflowTKey } from '@/features/tasks/fixtures';
+import { useTaskProject } from '@/hooks/task/TaskProjectContext';
+import { ganttBarClassForStatus } from '@/utils/task/taskPresentation';
+import { demoPrimaryAssigneeName } from '@/utils/task/demoUsers';
+import { taskWorkflowTKey } from '@/utils/task/fixtures';
 import { EmptyState, SegmentedControl } from '@/components/ui';
 
 type Zoom = 'week' | 'month' | 'quarter';

@@ -15,10 +15,10 @@ import type {
   TaskStatus,
 } from '@/types/task';
 import { EMPTY_TASK_FILTERS } from '@/types/task';
-import { seedBuildWireTasks } from '@/features/tasks/migrateLegacyMock';
-import { applyConstructionFilters } from '@/features/tasks/taskFilterUtils';
-import { patchProjectTask } from '@/api/tasks';
-import { emitTaskNotification } from '@/features/notifications/taskNotifications';
+import { seedBuildWireTasks } from '@/utils/task/migrateLegacyMock';
+import { applyConstructionFilters } from '@/utils/task/taskFilterUtils';
+import { patchProjectTask } from '@/services/task/taskService';
+import { emitTaskNotification } from '@/utils/notification/taskNotifications';
 import {
   cloneDefaultKanbanSections,
   readKanbanSections,

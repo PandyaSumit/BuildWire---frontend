@@ -1,4 +1,4 @@
-import type { UiTask } from "@/features/tasks/fixtures";
+import type { UiTask } from '@/utils/task/fixtures';
 
 /** MIME type for HTML5 drag data (task → plan pin). */
 export const BUILDWIRE_TASK_DRAG_TYPE = "application/buildwire-task+json";

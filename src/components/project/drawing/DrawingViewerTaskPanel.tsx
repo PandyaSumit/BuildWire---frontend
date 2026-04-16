@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { UiTask } from "@/features/tasks/fixtures";
-import { priorityBorderClass, typeBadgeClass } from "@/features/tasks/fixtures";
-import { BUILDWIRE_TASK_DRAG_TYPE, buildTaskDragPayload } from "@/features/plans/taskDrag";
+import type { UiTask } from "@/utils/task/fixtures";
+import { priorityBorderClass, typeBadgeClass } from "@/utils/task/fixtures";
+import { BUILDWIRE_TASK_DRAG_TYPE, buildTaskDragPayload } from "@/utils/project/taskDrag";
 
 const STORAGE_W = "buildwire.drawings.taskPanelWidth";
 const STORAGE_OPEN = "buildwire.drawings.taskPanelOpen";

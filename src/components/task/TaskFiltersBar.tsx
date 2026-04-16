@@ -2,12 +2,12 @@ import { useId, useMemo, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TaskListFilters, TaskPriorityKey, TaskTradeKey, TaskTypeKey } from '@/types/task';
 import { EMPTY_TASK_FILTERS } from '@/types/task';
-import { ALL_TASK_TYPE_KEYS, ALL_TRADE_KEYS } from '@/features/tasks/taskConstants';
-import { DEMO_USERS } from '@/features/tasks/demoUsers';
-import { FLOOR_OPTIONS } from '@/features/tasks/taskConstants';
-import { useTaskProject } from '@/features/tasks/TaskProjectContext';
-import { taskTypeKeyTKey, taskTradeKeyTKey } from '@/features/tasks/taskI18nKeys';
-import { taskPriorityTKey } from '@/features/tasks/fixtures';
+import { ALL_TASK_TYPE_KEYS, ALL_TRADE_KEYS } from '@/utils/task/taskConstants';
+import { DEMO_USERS } from '@/utils/task/demoUsers';
+import { FLOOR_OPTIONS } from '@/utils/task/taskConstants';
+import { useTaskProject } from '@/hooks/task/TaskProjectContext';
+import { taskTypeKeyTKey, taskTradeKeyTKey } from '@/utils/task/taskI18nKeys';
+import { taskPriorityTKey } from '@/utils/task/fixtures';
 import { Select } from '@/components/ui/select';
 
 const PRIOS: TaskPriorityKey[] = ['critical', 'high', 'medium', 'low'];

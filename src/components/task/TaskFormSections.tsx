@@ -11,19 +11,19 @@ import {
   ALL_TASK_TYPE_KEYS,
   ALL_TRADE_KEYS,
   FLOOR_OPTIONS,
-} from "@/features/tasks/taskConstants";
+} from "@/utils/task/taskConstants";
 import {
   taskTypeKeyTKey,
   taskTradeKeyTKey,
-} from "@/features/tasks/taskI18nKeys";
+} from "@/utils/task/taskI18nKeys";
 import {
   TASK_COLUMNS,
   taskPriorityTKey,
   taskWorkflowTKey,
-} from "@/features/tasks/fixtures";
+} from "@/utils/task/fixtures";
 import { Select } from "@/components/ui/select";
-import { DEMO_USERS } from "@/features/tasks/demoUsers";
-import type { TaskEditorDraft } from "@/features/tasks/taskEditorState";
+import { DEMO_USERS } from "@/utils/task/demoUsers";
+import type { TaskEditorDraft } from "@/utils/task/taskEditorState";
 
 function toggleId(arr: string[], id: string): string[] {
   return arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id];

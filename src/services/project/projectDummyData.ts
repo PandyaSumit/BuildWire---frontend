@@ -3,8 +3,8 @@
  * Import from screens to keep copy consistent across Overview, lists, and stats.
  */
 
-import type { TaskColumn } from "@/features/tasks/fixtures";
-import { DEMO_PLAN_PDF_URL } from "@/features/plans/pdf";
+import type { TaskColumn } from "@/utils/task/fixtures";
+import { DEMO_PLAN_PDF_URL } from "@/utils/project/planPdf";
 
 export type RfiScheduleImpact = 'none' | 'potential' | 'confirmed';
 

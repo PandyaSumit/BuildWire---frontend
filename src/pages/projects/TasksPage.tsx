@@ -2,23 +2,23 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Avatar, Button, SegmentedControl, SheetDrawer } from "@/components/ui";
-import { TaskDrawer } from "@/features/tasks/TaskDrawer";
+import { TaskDrawer } from "@/components/task/TaskDrawer";
 import {
   TaskProjectProvider,
   useTaskProject,
-} from "@/features/tasks/TaskProjectContext";
-import { TaskKanbanBoard } from "@/features/tasks/TaskKanbanBoard";
-import { TaskFiltersBar } from "@/features/tasks/TaskFiltersBar";
-import { TaskBulkToolbar } from "@/features/tasks/TaskBulkToolbar";
-import { TaskGanttView } from "@/features/tasks/TaskGanttView";
-import { demoAssigneesDisplayList } from "@/features/tasks/demoUsers";
-import { taskWorkflowTKey, taskPriorityTKey } from "@/features/tasks/fixtures";
-import { taskTypeKeyTKey } from "@/features/tasks/taskI18nKeys";
+} from "@/hooks/task/TaskProjectContext";
+import { TaskKanbanBoard } from "@/components/task/TaskKanbanBoard";
+import { TaskFiltersBar } from "@/components/task/TaskFiltersBar";
+import { TaskBulkToolbar } from "@/components/task/TaskBulkToolbar";
+import { TaskGanttView } from "@/components/task/TaskGanttView";
+import { demoAssigneesDisplayList } from "@/utils/task/demoUsers";
+import { taskWorkflowTKey, taskPriorityTKey } from "@/utils/task/fixtures";
+import { taskTypeKeyTKey } from "@/utils/task/taskI18nKeys";
 import {
   taskTablePriorityPillClassKey,
   taskTableTypePillClassKey,
-} from "@/features/tasks/taskPresentation";
-import { taskDrawingListCell } from "@/features/tasks/taskDrawingDisplay";
+} from "@/utils/task/taskPresentation";
+import { taskDrawingListCell } from "@/utils/task/taskDrawingDisplay";
 import { getTasksDefaultViewPref } from "@/lib/userPreferences";
 import type { BuildWireTask } from "@/types/task";
 

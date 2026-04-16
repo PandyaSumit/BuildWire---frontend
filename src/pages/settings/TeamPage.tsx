@@ -9,7 +9,7 @@ import {
   removeOrganizationMember,
   resendOrganizationInvite,
   updateOrganizationMemberRole,
-} from '@/api/organizations';
+} from '@/services/organization/organizationService';
 import type { OrganizationInviteRow, OrganizationMemberRow } from '@/types/organization';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';

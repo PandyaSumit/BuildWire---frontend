@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { taskWorkflowTKey, type TaskColumn } from "@/features/tasks/fixtures";
+import { taskWorkflowTKey, type TaskColumn } from "@/utils/task/fixtures";
 import type { OverviewTaskStats } from "@/utils/project/overviewTaskStats";
 
 const COL_INCOMPLETE: Record<

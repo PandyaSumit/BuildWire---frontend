@@ -19,7 +19,7 @@ npm run lint
 
 Application code lives under **`src/`**. The `@/` import alias maps to `src/` (see `vite.config.ts` and `tsconfig.json`).
 
-For **layer conventions** (`components/`, `hooks/`, `services/`, `utils/`, `types/` with domain subfolders such as `project/`), see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+For **layer conventions** (`components/`, `hooks/`, `services/`, `utils/`, `types/` with domain subfolders such as `project/`), see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md). For a **structured plan** (what belongs in `pages/` vs other folders, dependency rules, checklists), see [`docs/FOLDER_AND_FILE_STRUCTURE_PLAN.md`](docs/FOLDER_AND_FILE_STRUCTURE_PLAN.md).
 
 ```
 src/
@@ -27,12 +27,11 @@ src/
   App.tsx               # Route definitions
   styles/globals.css    # Tailwind + design tokens + fonts
   vite-env.d.ts
-  components/           # ui/, layout/, theme/, providers/, auth/, brand/, project/
-  hooks/                # use* hooks; e.g. hooks/project/
-  services/             # API + integrations; e.g. services/project/
-  utils/                # Pure helpers; e.g. utils/project/
+  components/           # ui/, layout/, theme/, providers/, auth/, brand/, project/, task/
+  hooks/                # use* hooks; e.g. hooks/project/, hooks/task/
+  services/             # API + integrations; e.g. services/project/, task/, auth/, organization/
+  utils/                # Pure helpers; e.g. utils/project/, utils/task/, utils/notification/
   types/                # Shared + domain types; e.g. types/project/
-  features/             # Vertical slices still here (e.g. tasks/, plans/) — migrate toward layers over time
   pages/
     auth/               # Login, signup, verify email, password flows
     onboarding/       # Invite + welcome

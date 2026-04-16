@@ -1,5 +1,5 @@
 import type { BuildWireTask, TaskListFilters, TaskStatus } from '@/types/task';
-import { DEMO_ACTOR_USER_ID } from '@/features/tasks/demoUsers';
+import { DEMO_ACTOR_USER_ID } from '@/utils/task/demoUsers';
 
 const TERMINAL: TaskStatus[] = ['done', 'void'];
 

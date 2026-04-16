@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TaskPriorityKey, TaskStatus } from '@/types/task';
-import { KANBAN_STATUSES } from '@/features/tasks/taskConstants';
-import { useTaskProject } from '@/features/tasks/TaskProjectContext';
-import { taskWorkflowTKey, taskPriorityTKey } from '@/features/tasks/fixtures';
-import { DEMO_USERS } from '@/features/tasks/demoUsers';
+import { KANBAN_STATUSES } from '@/utils/task/taskConstants';
+import { useTaskProject } from '@/hooks/task/TaskProjectContext';
+import { taskWorkflowTKey, taskPriorityTKey } from '@/utils/task/fixtures';
+import { DEMO_USERS } from '@/utils/task/demoUsers';
 import { DeleteConfirmDialog } from '@/components/ui';
 
 export function TaskBulkToolbar({ onClearSelection }: { onClearSelection: () => void }) {

@@ -2,20 +2,21 @@
 
 The codebase favors a **layer-first** layout under `src/`: code is grouped by **role** (components, hooks, services, types, utils), then by **domain** inside each layer (e.g. `project/`).
 
+For the **full responsibility plan** (what belongs in `pages/` vs other folders, dependency rules, and checklists), see [FOLDER_AND_FILE_STRUCTURE_PLAN.md](./FOLDER_AND_FILE_STRUCTURE_PLAN.md).
+
 ## Global layers (`src/`)
 
 | Folder | Purpose |
 |--------|---------|
 | `components/` | Composed UI and app shell (see below). |
-| `hooks/` | React hooks; domain-specific hooks under `hooks/<domain>/` (e.g. `hooks/project/useProjectUi.ts`). |
-| `services/` | Side effects, persistence, HTTP/API modules; group by domain (e.g. `services/project/projectApi.ts`, mock/demo data loaders). |
+| `hooks/` | React hooks; domain-specific hooks under `hooks/<domain>/` (e.g. `hooks/project/useProjectUi.ts`, `hooks/task/TaskProjectContext.tsx` for task list state). |
+| `services/` | Side effects, persistence, HTTP/API modules; group by domain (e.g. `services/project/projectApi.ts`, `services/task/taskService.ts`, `services/auth/authService.ts`, `services/organization/organizationService.ts`). |
 | `utils/` | Pure helpers and derivations; domain subfolders (e.g. `utils/project/`). |
 | `types/` | TypeScript types; shared (`types/task.ts`) or domain (`types/project/mockUi.ts`). |
 | `lib/` | App-wide infrastructure (API client, theme, RBAC helpers). |
 | `config/` | Static configuration (navigation, PM labels). |
-| `pages/` | Route screens — keep **thin** (layout + composition). Group by **area** (see below). Under a domain folder, omit redundant prefixes in filenames. |
-| `api/` | Optional thin re-exports for legacy paths; prefer `services/` for new code. |
-| `features/` | Remaining vertical slices (e.g. `tasks/`, `plans/`) until migrated to the same layer pattern. |
+| `pages/` | **Module-based route screens** — each subfolder is a **domain module** containing only route-level pages for that area. Keep files **thin**: routing + layout composition; logic and reusable UI live elsewhere (see [FOLDER_AND_FILE_STRUCTURE_PLAN.md](./FOLDER_AND_FILE_STRUCTURE_PLAN.md)). |
+| `api/` | Deprecated thin re-exports for legacy paths; prefer `services/` for new code. |
 
 ## `components/` layout
 
@@ -27,9 +28,12 @@ The codebase favors a **layer-first** layout under `src/`: code is grouped by **
 | `components/providers/` | App-level providers (e.g. `StoreProvider`). Barrel: `@/components/providers`. |
 | `components/auth/` | Auth-specific forms and `AuthProvider` (not the same as `pages/auth/` routes). |
 | `components/brand/` | Logos and marks. |
-| `components/project/` | Project workspace UI (modals, module shell, drawers, project context). |
+| `components/project/` | Project workspace UI (modals, module shell, drawers, project context, `drawing/` for plan viewer). |
+| `components/task/` | Task views (kanban, list columns, drawers, filters) used from `pages/projects/TasksPage`. |
 
-## `pages/` layout (route composition)
+## `pages/` layout (by module)
+
+Each row is a **`pages/<module>/`** folder: all **route-level pages** for that domain live there. Pages should only handle **routing and composition**; business logic, data, and reusable widgets belong in `hooks/`, `services/`, `components/`, etc.
 
 | Folder | Purpose |
 |--------|---------|
@@ -43,7 +47,7 @@ The codebase favors a **layer-first** layout under `src/`: code is grouped by **
 | `pages/projects/` | Project catalog + project-scoped module screens. |
 | `pages/shared/` | Shared page wrappers (`AppPage`). |
 
-`App.tsx` imports from these barrels or explicit paths; avoid dumping new screens at `pages/` root unless they are truly global one-offs.
+`App.tsx` imports from these barrels or explicit paths. **Do not** add new product screens at `pages/` root—place them under the right **module** folder (or `shared/` for cross-cutting page shells).
 
 ## Project domain (example)
 

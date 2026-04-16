@@ -1,6 +1,6 @@
 import type { BuildWireTask, TaskPriorityKey, TaskStatus, TaskTradeKey, TaskTypeKey } from '@/types/task';
-import { MOCK_TASKS, type UiTask } from '@/features/tasks/fixtures';
-import { demoUserIdFromName } from '@/features/tasks/demoUsers';
+import { MOCK_TASKS, type UiTask } from '@/utils/task/fixtures';
+import { demoUserIdFromName } from '@/utils/task/demoUsers';
 
 function mapType(t: UiTask['type']): TaskTypeKey {
   switch (t.type) {

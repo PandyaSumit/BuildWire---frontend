@@ -6,16 +6,16 @@ import {
   type LayerVisibility,
   type AnnotationStyle,
   DEFAULT_ANNOTATION_STYLE,
-} from "@/features/plans/DrawingViewerToolbar";
-import { DrawingViewerTaskPanel } from "@/features/plans/DrawingViewerTaskPanel";
+} from "@/components/project/drawing/DrawingViewerToolbar";
+import { DrawingViewerTaskPanel } from "@/components/project/drawing/DrawingViewerTaskPanel";
 import {
   PlanCanvasViewer,
   type PlanCanvasPin,
   type PlanCanvasViewerHandle,
   type Annotation,
-} from "@/features/plans/PlanCanvasViewer";
-import { MOCK_TASKS } from "@/features/tasks/fixtures";
-import { DEMO_PLAN_PDF_URL } from "@/features/plans/pdf";
+} from "@/components/project/drawing/PlanCanvasViewer";
+import { MOCK_TASKS } from "@/utils/task/fixtures";
+import { DEMO_PLAN_PDF_URL } from "@/utils/project/planPdf";
 import {
   getDrawingPlanById,
   getDemoPinsForPlan,

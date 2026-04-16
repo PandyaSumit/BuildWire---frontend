@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Alert, Button, Checkbox, Input } from '@/components/ui';
-import { acceptInvite, getInviteDetails, type InviteDetailsDto } from '@/api/auth';
+import { acceptInvite, getInviteDetails, type InviteDetailsDto } from '@/services/auth/authService';
 import { setAccessToken } from '@/lib/tokenStore';
 
 export default function InvitePage() {

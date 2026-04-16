@@ -14,15 +14,15 @@ import {
 } from '@dnd-kit/core';
 import type { BuildWireTask } from '@/types/task';
 import type { KanbanBoardSectionPersisted } from '@/lib/kanbanBoardPrefs';
-import { useTaskProject } from '@/features/tasks/TaskProjectContext';
+import { useTaskProject } from '@/hooks/task/TaskProjectContext';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PM_TASK_STATUS_BADGE } from '@/design-system/pm-label-system';
 import { useOptionalProjectUi } from '@/hooks/project/useProjectUi';
-import { priorityBorderClassKey } from '@/features/tasks/taskPresentation';
-import { taskWorkflowTKey } from '@/features/tasks/fixtures';
-import { taskTradeKeyTKey } from '@/features/tasks/taskI18nKeys';
-import { demoPrimaryAssigneeName, demoPrimaryInitials } from '@/features/tasks/demoUsers';
+import { priorityBorderClassKey } from '@/utils/task/taskPresentation';
+import { taskWorkflowTKey } from '@/utils/task/fixtures';
+import { taskTradeKeyTKey } from '@/utils/task/taskI18nKeys';
+import { demoPrimaryAssigneeName, demoPrimaryInitials } from '@/utils/task/demoUsers';
 
 const SECTION_DROP_PREFIX = 'sec-';
 

@@ -1,5 +1,5 @@
 import type { BuildWireTask } from '@/types/task';
-import { TaskDrawer } from '@/features/tasks/TaskDrawer';
+import { TaskDrawer } from './TaskDrawer';
 
 type Props = {
   onClose: () => void;
