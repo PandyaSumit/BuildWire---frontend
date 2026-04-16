@@ -1,6 +1,6 @@
 import { AppPage } from '@/pages/shared/AppPage';
 
-export default function OrganizationSettingsPage() {
+export default function OrganizationPage() {
   return (
     <AppPage
       title="Organization"

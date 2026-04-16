@@ -4,8 +4,8 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { Badge } from "@/components/ui/badge";
 import { KpiStatCard } from "@/components/ui/kpi-stat-card";
-import { ModulePageShell } from "@/features/project-ui/components";
-import { DUMMY_SCHEDULE_PHASES } from "@/features/project-ui/projectDummyData";
+import { ModulePageShell } from "@/components/project";
+import { DUMMY_SCHEDULE_PHASES } from "@/services/project/projectDummyData";
 
 type Tab = "timeline" | "milestones" | "workload" | "lookahead";
 
@@ -404,7 +404,7 @@ function LookaheadView() {
 }
 
 // ── Main page ─────────────────────────────────────────────────────────────────
-export default function ProjectSchedulePage() {
+export default function SchedulePage() {
   const [tab, setTab] = useState<Tab>("timeline");
 
   return (

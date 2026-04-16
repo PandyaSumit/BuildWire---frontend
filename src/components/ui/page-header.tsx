@@ -11,7 +11,7 @@ type PageHeaderProps = {
 };
 
 /**
- * Consistent page-level header: title + description on the left,
+ * Consistent page-level header: title on the left,
  * action buttons on the right.
  */
 export function PageHeader({ title, description, actions, toolbar, className = '' }: PageHeaderProps) {
@@ -22,9 +22,6 @@ export function PageHeader({ title, description, actions, toolbar, className = '
           <h1 className="font-[family-name:var(--font-dm-sans)] text-[20px] font-bold tracking-tight text-primary leading-tight sm:text-[22px]">
             {title}
           </h1>
-          {description && (
-            <p className="mt-1 text-[13px] leading-relaxed text-secondary max-w-prose">{description}</p>
-          )}
         </div>
         {actions && (
           <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>

@@ -3,10 +3,10 @@ import { Avatar } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { ACTIVITY_ENTITY_ICON } from "@/config/pm/activity";
-import { ModulePageShell } from "@/features/project-ui/components";
+import { ModulePageShell } from "@/components/project";
 import {
   type LogEvent,
-} from "@/features/project-ui/projectDummyData";
+} from "@/services/project/projectDummyData";
 
 type EntityFilter =
   | "all"
@@ -162,7 +162,7 @@ const EventRow = memo(function EventRow({ event }: { event: LogEvent }) {
 });
 
 // ── Main page ─────────────────────────────────────────────────────────────────
-export default function ProjectActivityPage() {
+export default function ActivityPage() {
   const [entityFilter, setEntityFilter] = useState<EntityFilter>("all");
   const [userFilter, setUserFilter] = useState<string>("all");
   const [search, setSearch] = useState("");

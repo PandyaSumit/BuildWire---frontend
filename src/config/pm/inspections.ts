@@ -1,5 +1,5 @@
 import type { BadgeProps } from '@/components/ui/badge';
-import type { DummyInspection } from '@/features/project-ui/projectDummyData';
+import type { DummyInspection } from '@/services/project/projectDummyData';
 import { PM_INSPECTION_RESULT_BADGE, PM_INSPECTION_TYPE_PILL } from '@/design-system/pm-label-system';
 
 /** @deprecated Prefer `PM_INSPECTION_RESULT_BADGE` from `@/design-system` */

@@ -21,12 +21,12 @@ import {
   SemanticPill,
   ModulePageShell,
   FilterPopover,
-} from "@/features/project-ui/components";
+} from "@/components/project";
 import {
   computeRfiStats,
   DUMMY_RFIS,
   type DummyRfiRow,
-} from "@/features/project-ui/projectDummyData";
+} from "@/services/project/projectDummyData";
 
 const TRADE_OTHER = "__other__";
 
@@ -721,7 +721,7 @@ function nextRfiNumber(rows: DummyRfiRow[]) {
   return `RFI-${String(max + 1).padStart(3, "0")}`;
 }
 
-export default function ProjectRfisPage() {
+export default function RfisPage() {
   const { t } = useTranslation();
   const { query, setQuery } = useGlobalSearch();
   const [rfiRows, setRfiRows] = useState<DummyRfiRow[]>(() => [...DUMMY_RFIS]);

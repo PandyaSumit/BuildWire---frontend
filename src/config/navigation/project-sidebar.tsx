@@ -1,6 +1,6 @@
 import type { OrgRole } from '@/types/rbac';
 import { canAccessCommercial } from '@/lib/rbac';
-import { getMockUiProject } from '@/features/project-ui/fixtures';
+import { getMockUiProject } from '@/services/project/projectFixtures';
 import type { NavGroupDef } from './nav-types';
 import { icons } from './icons';
 

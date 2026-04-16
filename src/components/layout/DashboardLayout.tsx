@@ -3,7 +3,7 @@ import { Outlet, useLocation } from "react-router-dom";
 import { Sidebar } from "./sidebar";
 import { Header } from "./header";
 import { EmailVerificationBanner } from "@/components/auth/EmailVerificationBanner";
-import { ProjectUiProvider } from "@/features/project-ui/ProjectUiContext";
+import { ProjectUiProvider } from "@/components/project/ProjectUiProvider";
 import {
   SidebarLayoutProvider,
   useSidebarLayout,

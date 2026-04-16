@@ -8,7 +8,7 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { Avatar, Button } from "@/components/ui";
+import { Avatar, Button, SegmentedControl } from "@/components/ui";
 import { Select } from "@/components/ui/select";
 import type { BuildWireTask, TaskPriorityKey, TaskStatus } from "@/types/task";
 import {
@@ -68,10 +68,14 @@ function MetaRow({
   );
 }
 
+type TaskDetailTab = "task" | "checklist" | "collab";
+
 export type TaskDrawerProps =
   | {
       mode: "create";
       onClose: () => void;
+      expanded?: boolean;
+      onToggleExpand?: () => void;
       onCreated?: (task: BuildWireTask) => void;
       /** Kanban section to add the new task into */
       defaultKanbanSectionId?: string;
@@ -80,6 +84,8 @@ export type TaskDrawerProps =
       mode: "edit";
       task: BuildWireTask;
       onClose: () => void;
+      expanded?: boolean;
+      onToggleExpand?: () => void;
     };
 
 function draftFingerprint(d: TaskEditorDraft): string {
@@ -406,11 +412,15 @@ const MOCK_SUBTASKS = [
 function TaskDrawerCreate({
   projectId,
   onClose,
+  expanded = false,
+  onToggleExpand,
   onCreated,
   defaultKanbanSectionId,
 }: {
   projectId: string;
   onClose: () => void;
+  expanded?: boolean;
+  onToggleExpand?: () => void;
   onCreated?: (task: BuildWireTask) => void;
   defaultKanbanSectionId?: string;
 }) {
@@ -536,6 +546,23 @@ function TaskDrawerCreate({
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-1">
+            {onToggleExpand ? (
+              <button
+                type="button"
+                onClick={onToggleExpand}
+                className="rounded-lg p-2 text-secondary hover:bg-surface hover:text-primary"
+                aria-label={expanded ? "Exit expanded view" : "Expand drawer"}
+                title={expanded ? "Exit expanded view" : "Expand drawer"}
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {expanded ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 15H5v4M15 9h4V5M19 15v4h-4M5 9V5h4" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 3h6v6M9 21H3v-6M21 15v6h-6M3 9V3h6" />
+                  )}
+                </svg>
+              </button>
+            ) : null}
             <button
               type="button"
               className="rounded-lg px-3 py-1.5 text-sm font-medium text-secondary hover:bg-surface hover:text-primary"
@@ -600,7 +627,7 @@ function TaskDrawerCreate({
       </header>
 
       <div
-        className="min-h-0 flex-1 overflow-y-auto px-4 py-4"
+        className={`min-h-0 flex-1 overflow-y-auto px-4 py-4 ${expanded ? "lg:px-6 lg:py-5" : ""}`}
         role="tabpanel"
         id={`task-panel-create-${tab}`}
         aria-label={
@@ -707,10 +734,14 @@ function TaskDrawerEdit({
   task,
   projectId,
   onClose,
+  expanded = false,
+  onToggleExpand,
 }: {
   task: BuildWireTask;
   projectId: string;
   onClose: () => void;
+  expanded?: boolean;
+  onToggleExpand?: () => void;
 }) {
   const { t } = useTranslation();
   const { patchTask, tasks, kanbanSections } = useTaskProject();
@@ -865,6 +896,23 @@ function TaskDrawerEdit({
             >
               {t("taskDetailDrawer.share")}
             </button>
+            {onToggleExpand ? (
+              <button
+                type="button"
+                onClick={onToggleExpand}
+                className="rounded-lg p-2 text-secondary hover:bg-surface hover:text-primary"
+                aria-label={expanded ? "Exit expanded view" : "Expand drawer"}
+                title={expanded ? "Exit expanded view" : "Expand drawer"}
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {expanded ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 15H5v4M15 9h4V5M19 15v4h-4M5 9V5h4" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 3h6v6M9 21H3v-6M21 15v6h-6M3 9V3h6" />
+                  )}
+                </svg>
+              </button>
+            ) : null}
             <button
               type="button"
               onClick={onClose}
@@ -903,8 +951,10 @@ function TaskDrawerEdit({
         </div>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-4">
-﻿        <div className="rounded-xl border border-border/70 bg-surface/20 p-4">
+      <div className={`min-h-0 flex-1 overflow-y-auto px-4 py-4 ${expanded ? "lg:px-6 lg:py-5" : ""}`}>
+        <div className={expanded ? "grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1.15fr)_340px]" : "space-y-6"}>
+          <div className="min-w-0">
+            <div className="rounded-xl border border-border/70 bg-surface/20 p-4">
           <MetaRow label={t("taskDetailDrawer.metaAssignees")}>
             <div className="space-y-2">
               <div className="flex min-h-8 flex-wrap items-center gap-0.5 ps-0.5">
@@ -1047,23 +1097,21 @@ function TaskDrawerEdit({
             </MetaRow>
           ) : null}
         </div>
+            <div className="mt-5">
+              <h3 className="mb-2 text-sm font-semibold text-primary">
+                {t("taskDetailDrawer.sectionDescription")}
+              </h3>
+              <textarea
+                value={draft.description}
+                onChange={(e) => update({ description: e.target.value })}
+                placeholder={t("taskDetailDrawer.descriptionPlaceholder")}
+                rows={expanded ? 10 : 6}
+                className="w-full resize-y rounded-xl border border-border/70 bg-bg px-3 py-3 text-sm text-primary placeholder:text-muted"
+              />
+            </div>
 
-
-        <div className="mt-5">
-          <h3 className="mb-2 text-sm font-semibold text-primary">
-            {t("taskDetailDrawer.sectionDescription")}
-          </h3>
-          <textarea
-            value={draft.description}
-            onChange={(e) => update({ description: e.target.value })}
-            placeholder={t("taskDetailDrawer.descriptionPlaceholder")}
-            rows={6}
-            className="w-full resize-y rounded-xl border border-border/70 bg-bg px-3 py-3 text-sm text-primary placeholder:text-muted"
-          />
-        </div>
-
-        <div className="mt-6">
-          <Section
+            <div className="mt-6">
+              <Section
             icon={
               <Icon>
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1082,83 +1130,86 @@ function TaskDrawerEdit({
                 {doneSub}/{subtasks.length}
               </span>
             }
-          >
-            <p className="mb-2 text-xs text-muted">
-              {t("taskDetailDrawer.subtasksDemoHint")}
-            </p>
-            <ul className="space-y-2">
-              {subtasks.map((s) => (
-                <li key={s.id}>
-                  <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-transparent px-1 py-1 hover:bg-bg/60">
-                    <input
-                      type="checkbox"
-                      checked={s.done}
-                      onChange={() =>
-                        setSubtasks((prev) =>
-                          prev.map((x) =>
-                            x.id === s.id ? { ...x, done: !x.done } : x,
-                          ),
-                        )
-                      }
-                      className="mt-0.5 h-4 w-4 rounded border-border text-brand"
-                    />
-                    <span
-                      className={`text-sm ${s.done ? "text-muted line-through" : "text-primary"}`}
-                    >
-                      {s.label}
-                    </span>
-                  </label>
-                </li>
-              ))}
-            </ul>
-            <button
-              type="button"
-              className="mt-2 text-xs font-medium text-brand hover:underline"
-            >
-              {t("taskDetailDrawer.addSubtask")}
-            </button>
-          </Section>
-        </div>
+              >
+                <p className="mb-2 text-xs text-muted">
+                  {t("taskDetailDrawer.subtasksDemoHint")}
+                </p>
+                <ul className="space-y-2">
+                  {subtasks.map((s) => (
+                    <li key={s.id}>
+                      <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-transparent px-1 py-1 hover:bg-bg/60">
+                        <input
+                          type="checkbox"
+                          checked={s.done}
+                          onChange={() =>
+                            setSubtasks((prev) =>
+                              prev.map((x) =>
+                                x.id === s.id ? { ...x, done: !x.done } : x,
+                              ),
+                            )
+                          }
+                          className="mt-0.5 h-4 w-4 rounded border-border text-brand"
+                        />
+                        <span
+                          className={`text-sm ${s.done ? "text-muted line-through" : "text-primary"}`}
+                        >
+                          {s.label}
+                        </span>
+                      </label>
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  type="button"
+                  className="mt-2 text-xs font-medium text-brand hover:underline"
+                >
+                  {t("taskDetailDrawer.addSubtask")}
+                </button>
+              </Section>
+            </div>
 
-        <div className="mt-6">
-          <Section
+            <div className="mt-6">
+              <Section
             title={t("taskDetailDrawer.sectionAttachments")}
             action={
               <span className="text-xs tabular-nums text-muted">
                 {liveTask.attachments?.length ?? 0}
               </span>
             }
-          >
-            <div className="rounded-xl border border-border/70 bg-surface/20 px-4 py-5 text-sm text-secondary">
-              {t("taskDetailDrawer.attachmentsDemo")}
+              >
+                <div className="rounded-xl border border-border/70 bg-surface/20 px-4 py-5 text-sm text-secondary">
+                  {t("taskDetailDrawer.attachmentsDemo")}
+                </div>
+              </Section>
             </div>
-          </Section>
-        </div>
 
-        <div className="mt-8 border-t border-border/40 pt-6">
-          <CollaborationTab
-            task={liveTask}
-            base={base}
-            statusLabel={t(taskWorkflowTKey(draft.status))}
-          />
-        </div>
+            <div className="mt-8 border-t border-border/40 pt-6">
+              <CollaborationTab
+                task={liveTask}
+                base={base}
+                statusLabel={t(taskWorkflowTKey(draft.status))}
+              />
+            </div>
+          </div>
 
-        <div className="mt-8">
-          <TaskSiteCoordinationStrip task={liveTask} base={base} />
-        </div>
-
-        <div className="mt-6">
-          <TaskFormSections
-            mode="edit"
-            draft={draft}
-            update={update}
-            idPrefix={`td-${liveTask.id}`}
-            task={liveTask}
-            projectId={projectId}
-            error={error}
-            layoutVariant="embedded"
-            omitScheduleFields={true}
-          />
+          <div className="min-w-0">
+            <div className="space-y-5">
+              <TaskSiteCoordinationStrip task={liveTask} base={base} />
+              <div className="rounded-xl border border-border/70 bg-surface/20 p-4">
+                <TaskFormSections
+                  mode="edit"
+                  draft={draft}
+                  update={update}
+                  idPrefix={`td-${liveTask.id}`}
+                  task={liveTask}
+                  projectId={projectId}
+                  error={error}
+                  layoutVariant="embedded"
+                  omitScheduleFields={true}
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1179,6 +1230,8 @@ export function TaskDrawer(props: TaskDrawerProps) {
       <TaskDrawerCreate
         projectId={projectId}
         onClose={props.onClose}
+        expanded={props.expanded}
+        onToggleExpand={props.onToggleExpand}
         onCreated={props.onCreated}
         defaultKanbanSectionId={props.defaultKanbanSectionId}
       />
@@ -1190,6 +1243,8 @@ export function TaskDrawer(props: TaskDrawerProps) {
       task={props.task}
       projectId={projectId}
       onClose={props.onClose}
+      expanded={props.expanded}
+      onToggleExpand={props.onToggleExpand}
     />
   );
 }

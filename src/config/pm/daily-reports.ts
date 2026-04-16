@@ -1,5 +1,5 @@
 import type { BadgeProps } from '@/components/ui/badge';
-import type { CalendarDot } from '@/features/project-ui/projectDummyData';
+import type { CalendarDot } from '@/services/project/projectDummyData';
 import {
   PM_DAILY_REPORT_CALENDAR_LEGEND,
   PM_DAILY_REPORT_STATUS_BADGE,

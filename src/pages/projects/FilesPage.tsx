@@ -6,12 +6,12 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { FILE_TYPE_CARD_BADGE } from "@/config/pm/files";
-import { ModulePageShell } from "@/features/project-ui/components";
+import { ModulePageShell } from "@/components/project";
 import {
   DUMMY_FILES,
   DUMMY_FOLDERS,
   type DummyFile,
-} from "@/features/project-ui/projectDummyData";
+} from "@/services/project/projectDummyData";
 
 function fileRowKey(r: DummyFile) {
   return `${r.folder}::${r.name}`;
@@ -134,7 +134,7 @@ function FolderItem({
 }
 
 // ── Main page ─────────────────────────────────────────────────────────────────
-export default function ProjectFilesPage() {
+export default function FilesPage() {
   const { t } = useTranslation();
   const [folder, setFolder] = useState<string | null>(null);
   const [view, setView] = useState<"list" | "grid">("list");

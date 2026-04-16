@@ -1,4 +1,4 @@
-import { useTheme } from './theme-provider';
+import { useTheme } from './ThemeProvider';
 
 /** Not used in app header; kept for showcases or embedded tools. */
 export function ThemeToggle() {

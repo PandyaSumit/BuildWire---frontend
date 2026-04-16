@@ -19,20 +19,30 @@ npm run lint
 
 Application code lives under **`src/`**. The `@/` import alias maps to `src/` (see `vite.config.ts` and `tsconfig.json`).
 
+For **layer conventions** (`components/`, `hooks/`, `services/`, `utils/`, `types/` with domain subfolders such as `project/`), see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
 ```
 src/
   main.tsx              # Entry: BrowserRouter + providers
   App.tsx               # Route definitions
   styles/globals.css    # Tailwind + design tokens + fonts
   vite-env.d.ts
-  components/           # UI, layout (sidebar, header, shell), auth forms, providers
+  components/           # ui/, layout/, theme/, providers/, auth/, brand/, project/
+  hooks/                # use* hooks; e.g. hooks/project/
+  services/             # API + integrations; e.g. services/project/
+  utils/                # Pure helpers; e.g. utils/project/
+  types/                # Shared + domain types; e.g. types/project/
+  features/             # Vertical slices still here (e.g. tasks/, plans/) — migrate toward layers over time
   pages/
-    shared/             # Shared page primitives (e.g. AppPage)
-    projects/           # Project list + project-scoped screens
-    dashboard/          # KPI overview route component (`/dashboard`)
-    workspace/          # Sales, brokers, AI map (`/sales`, `/brokers`, `/intelligence/ai-map`)
-    settings/           # Team, roles, org, billing, bots (`/team`, `/settings/*`)
-    *.tsx at pages root # Public / auth (HomePage, LoginPage, …)
+    auth/               # Login, signup, verify email, password flows
+    onboarding/       # Invite + welcome
+    home/               # Landing (/)
+    dev/                # Component showcase & similar
+    shared/             # AppPage and other shared shells
+    dashboard/          # `/dashboard` (DashboardPage)
+    workspace/          # `/sales`, `/brokers`, `/intelligence/ai-map`
+    settings/           # `/settings/*` (Preferences, Organization, Roles, …)
+    projects/           # `/projects` + `/projects/:id/*` module pages
   routes/               # Route guards (e.g. ProtectedRoute)
   lib/                  # API client, token store, theme helpers
   store/                # Redux store and slices

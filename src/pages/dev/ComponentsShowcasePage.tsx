@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ThemeToggle } from '@/components/theme-toggle';
+import { ThemeToggle } from '@/components/theme';
 import {
   Button,
   Badge,
@@ -15,7 +15,7 @@ import {
   ProgressBar,
 } from '@/components/ui';
 
-export default function ComponentsShowcase() {
+export default function ComponentsShowcasePage() {
   const [checked, setChecked] = useState(false);
   const [selectedRadio, setSelectedRadio] = useState('');
   const [progress, setProgress] = useState(45);

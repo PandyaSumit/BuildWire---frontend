@@ -17,14 +17,14 @@ import {
   InspectionDetailDrawer,
   nextInspectionId,
   ScheduleInspectionDrawer,
-} from "@/features/project-ui/InspectionDrawers";
-import { ModulePageShell, SemanticPill, FilterPopover } from "@/features/project-ui/components";
+} from "@/components/project/drawers/InspectionDrawers";
+import { ModulePageShell, SemanticPill, FilterPopover } from "@/components/project";
 import {
   computeInspectionStats,
   DUMMY_INSPECTIONS,
   type DummyInspection,
   type InspectionResult,
-} from "@/features/project-ui/projectDummyData";
+} from "@/services/project/projectDummyData";
 
 function inspectionRowKey(r: DummyInspection) {
   return r.id;
@@ -52,7 +52,7 @@ function matchesInspectionQuery(row: DummyInspection, q: string): boolean {
   return blob.includes(n);
 }
 
-export default function ProjectInspectionsPage() {
+export default function InspectionsPage() {
   const { t } = useTranslation();
   const { query, setQuery } = useGlobalSearch();
   const qNorm = query.trim().toLowerCase();

@@ -1,5 +1,5 @@
 import { Navigate, useParams } from 'react-router-dom';
-import { readLastProjectPath } from './lastRoute';
+import { readLastProjectPath } from '@/services/project/lastRoute';
 
 /**
  * `/projects/:projectId` — restores last visited child route, otherwise opens Overview.

@@ -11,13 +11,13 @@ import {
   PM_APPROVAL_TRI_STATE_BADGE,
   PM_APPROVED_PENDING_BADGE,
 } from "@/design-system/pm-label-system";
-import { ModulePageShell } from "@/features/project-ui/components";
+import { ModulePageShell } from "@/components/project";
 import {
   DUMMY_BUDGET_LINES,
   DUMMY_CHANGE_ORDERS,
   DUMMY_EXPENSES,
   DUMMY_PAYMENT_PLANS,
-} from "@/features/project-ui/projectDummyData";
+} from "@/services/project/projectDummyData";
 
 type Tab = "budget" | "expenses" | "change_orders" | "payment_plans" | "invoices";
 
@@ -456,7 +456,7 @@ const PP_COLUMNS: DataTableColumn<PaymentPlan>[] = [
 ];
 
 // ── Main page ─────────────────────────────────────────────────────────────────
-export default function ProjectFinancialsPage() {
+export default function FinancialsPage() {
   const [tab, setTab] = useState<Tab>("budget");
 
   const pendingCO = DUMMY_CHANGE_ORDERS.filter((c) => c.status === "Pending");

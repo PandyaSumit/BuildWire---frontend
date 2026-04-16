@@ -1,4 +1,4 @@
-import type { MockUiProject } from './types';
+import type { MockUiProject } from '@/types/project/mockUi';
 
 const defaults: Omit<MockUiProject, 'id' | 'name'> = {
   type: 'residential',

@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { taskWorkflowTKey, type TaskColumn } from "@/features/tasks/fixtures";
-import type { OverviewTaskStats } from "@/features/project-ui/overviewTaskStats";
+import type { OverviewTaskStats } from "@/utils/project/overviewTaskStats";
 
 const COL_INCOMPLETE: Record<
   Exclude<TaskColumn, "done" | "void">,

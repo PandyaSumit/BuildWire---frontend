@@ -1,7 +1,7 @@
 /**
  * Full workspace presets: surfaces, borders, text, shell, status, and brand.
  * Set on <html> via `data-ws-theme` (omit or `neutral` = BuildWire default in :root / .dark).
- * Keep in sync with preview tokens in PreferencesSettingsPage `workspaceThemeMeta`.
+ * Keep in sync with preview tokens in PreferencesPage `workspaceThemeMeta`.
  */
 
 /* —— General contractor —— */

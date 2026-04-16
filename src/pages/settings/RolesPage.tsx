@@ -13,7 +13,7 @@ import { Select } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 
-export default function RolesSettingsPage() {
+export default function RolesPage() {
   const orgId = useAppSelector((s) => s.auth.user?.org?.id);
   const myRole = useAppSelector((s) => s.auth.user?.org?.role);
   const [loading, setLoading] = useState(true);

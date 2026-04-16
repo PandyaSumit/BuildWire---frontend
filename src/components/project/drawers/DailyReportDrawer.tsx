@@ -10,7 +10,7 @@ import type {
   DailyReportManpowerLine,
   DailyReportRow,
   DailyReportStatus,
-} from "@/features/project-ui/projectDummyData";
+} from "@/services/project/projectDummyData";
 
 function emptyManpowerRow(): DailyReportManpowerLine {
   return { company: "", trade: "", workers: 0, hours: 0, costCode: "" };

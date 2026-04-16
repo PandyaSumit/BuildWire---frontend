@@ -1,12 +1,7 @@
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import {
-  Avatar,
-  Button,
-  SegmentedControl,
-  SheetDrawer,
-} from "@/components/ui";
+import { Avatar, Button, SegmentedControl, SheetDrawer } from "@/components/ui";
 import { TaskDrawer } from "@/features/tasks/TaskDrawer";
 import {
   TaskProjectProvider,
@@ -236,9 +231,7 @@ function AsanaTaskList({
             aria-expanded={filtersOpen}
             aria-controls="tasks-filter-panel"
             className={`h-8 shrink-0 rounded-lg px-2.5 hover:bg-muted/10 hover:text-primary ${
-              filtersOpen
-                ? "bg-primary/8 text-primary dark:bg-white/10"
-                : ""
+              filtersOpen ? "bg-primary/8 text-primary dark:bg-white/10" : ""
             }`}
           >
             {t("tasks.filter")}
@@ -271,7 +264,7 @@ function AsanaTaskList({
         </div>
       </div>
 
-      <div className="min-h-0 min-w-0 flex-1 overflow-auto pt-3">
+      <div className="min-h-0 min-w-0 flex-1 overflow-auto">
         <table className="w-full min-w-[1032px] table-fixed border-separate border-spacing-0 text-[13px]">
           <colgroup>
             <col className="min-w-0 sm:w-[28%]" />
@@ -350,7 +343,9 @@ function AsanaTaskList({
               </th>
               <th className="border-b border-r border-border/30 px-2 py-2 text-center text-xs font-medium text-secondary">
                 <div className="flex items-center justify-center gap-1">
-                  <span className="truncate">{t("tasks.listColCollaborators")}</span>
+                  <span className="truncate">
+                    {t("tasks.listColCollaborators")}
+                  </span>
                   <button
                     type="button"
                     aria-label="Column options"
@@ -499,7 +494,9 @@ function AsanaTaskList({
                                   title={drawingCell.title}
                                 >
                                   <span className="h-1.5 w-1.5 shrink-0 rounded-sm bg-brand/80" />
-                                  <span className="truncate">{drawingCell.label}</span>
+                                  <span className="truncate">
+                                    {drawingCell.label}
+                                  </span>
                                 </Link>
                               ) : drawingCell.label ? (
                                 <span
@@ -507,7 +504,9 @@ function AsanaTaskList({
                                   title={drawingCell.title}
                                 >
                                   <span className="h-1.5 w-1.5 shrink-0 rounded-sm bg-primary/70" />
-                                  <span className="truncate">{drawingCell.label}</span>
+                                  <span className="truncate">
+                                    {drawingCell.label}
+                                  </span>
                                 </span>
                               ) : (
                                 <span className="text-muted">—</span>
@@ -568,6 +567,7 @@ function ProjectTasksInner() {
   const [selectedListTaskId, setSelectedListTaskId] = useState<string | null>(
     null,
   );
+  const [taskDrawerExpanded, setTaskDrawerExpanded] = useState(false);
 
   const { filteredTasks, selectedIds, setSelectedIds, setBulkSelectMode } =
     useTaskProject();
@@ -585,16 +585,19 @@ function ProjectTasksInner() {
 
   const openCreate = useCallback((kanbanSectionId?: string) => {
     setCreateKanbanSectionId(kanbanSectionId);
+    setTaskDrawerExpanded(false);
     setTaskSheet({ kind: "create" });
   }, []);
 
   const openTask = useCallback((task: BuildWireTask) => {
     setSelectedListTaskId(task.id);
+    setTaskDrawerExpanded(false);
     setTaskSheet({ kind: "edit", task });
   }, []);
 
   const closeTaskSheet = useCallback(() => {
     setCreateKanbanSectionId(undefined);
+    setTaskDrawerExpanded(false);
     setTaskSheet({ kind: "none" });
   }, []);
 
@@ -725,12 +728,18 @@ function ProjectTasksInner() {
         title=""
         hideTitleBar
         onClose={closeTaskSheet}
-        widthClassName="max-w-[560px]"
+        widthClassName={
+          taskDrawerExpanded
+            ? "max-w-[min(100vw,1180px)]"
+            : "max-w-[720px]"
+        }
       >
         {taskSheet.kind === "create" ? (
           <TaskDrawer
             mode="create"
             onClose={closeTaskSheet}
+            expanded={taskDrawerExpanded}
+            onToggleExpand={() => setTaskDrawerExpanded((v) => !v)}
             onCreated={(task) => setTaskSheet({ kind: "edit", task })}
             defaultKanbanSectionId={createKanbanSectionId}
           />
@@ -740,6 +749,8 @@ function ProjectTasksInner() {
             mode="edit"
             task={taskSheet.task}
             onClose={closeTaskSheet}
+            expanded={taskDrawerExpanded}
+            onToggleExpand={() => setTaskDrawerExpanded((v) => !v)}
           />
         ) : null}
       </SheetDrawer>
@@ -758,7 +769,7 @@ function ProjectTasksInner() {
   );
 }
 
-export default function ProjectTasksPage() {
+export default function TasksPage() {
   const { projectId } = useParams<{ projectId: string }>();
   const pid = projectId ?? "";
   return (

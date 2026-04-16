@@ -6,12 +6,12 @@ import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Select, type SelectOption } from "@/components/ui/select";
 import { INSPECTION_RESULT_BADGE, INSPECTION_TYPE_PILL_CLASSES } from "@/config/pm/inspections";
-import { SemanticPill } from "@/features/project-ui/components";
+import { SemanticPill } from "@/components/project/SemanticPill";
 import type {
   DummyInspection,
   InspectionChecklistItem,
   InspectionObservation,
-} from "@/features/project-ui/projectDummyData";
+} from "@/services/project/projectDummyData";
 
 const INSPECTION_TYPES = ["Quality", "MEP", "Structural", "Safety", "Fire"] as const;
 

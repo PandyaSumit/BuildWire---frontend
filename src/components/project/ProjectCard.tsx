@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { ProjectDto } from '@/types/project';
 import { ProjectStatusBadge } from './ProjectStatusBadge';
-import { formatDateOnly, formatPersonName } from '@/features/projects/lib/display';
+import { formatDateOnly, formatPersonName } from '@/utils/project/display';
 
 export function ProjectCard({ project }: { project: ProjectDto }) {
   const { t, i18n } = useTranslation();

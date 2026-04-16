@@ -11,8 +11,8 @@ import {
   MEETING_STATUS_BADGE,
   MEETING_TYPE_PILL_CLASSES,
 } from "@/config/pm/meetings";
-import { ModulePageShell, SemanticPill } from "@/features/project-ui/components";
-import { DUMMY_MEETINGS } from "@/features/project-ui/projectDummyData";
+import { ModulePageShell, SemanticPill } from "@/components/project";
+import { DUMMY_MEETINGS } from "@/services/project/projectDummyData";
 
 type MeetingRow = (typeof DUMMY_MEETINGS)[number];
 type FilterStatus = "all" | "Scheduled" | "Completed" | "Cancelled";
@@ -277,7 +277,7 @@ function MeetingDrawer({
 }
 
 // ── Main page ─────────────────────────────────────────────────────────────────
-export default function ProjectMeetingsPage() {
+export default function MeetingsPage() {
   const [filterStatus, setFilterStatus] = useState<FilterStatus>("all");
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<MeetingRow | null>(null);

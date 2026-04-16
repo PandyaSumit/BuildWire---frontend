@@ -19,11 +19,11 @@ import { DEMO_PLAN_PDF_URL } from "@/features/plans/pdf";
 import {
   getDrawingPlanById,
   getDemoPinsForPlan,
-} from "@/features/project-ui/projectDummyData";
+} from "@/services/project/projectDummyData";
 
 /* ─── Page ─────────────────────────────────────────────────────────── */
 
-export default function ProjectDrawingViewerPage() {
+export default function DrawingViewerPage() {
   const { projectId, planId } = useParams<{
     projectId: string;
     planId: string;

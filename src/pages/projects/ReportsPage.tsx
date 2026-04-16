@@ -10,8 +10,8 @@ import {
 import {
   ModulePageShell,
   ModuleSplitLayout,
-} from "@/features/project-ui/components";
-import { DUMMY_REPORTS_BY_CATEGORY } from "@/features/project-ui/projectDummyData";
+} from "@/components/project";
+import { DUMMY_REPORTS_BY_CATEGORY } from "@/services/project/projectDummyData";
 
 // ── Extended report metadata ──────────────────────────────────────────────────
 const REPORT_META: Record<string, { lastRun?: string; scheduled?: string; format: string[]; starred?: boolean }> = {
@@ -143,7 +143,7 @@ function RunReportModal({ title, onClose }: { title: string; onClose: () => void
 }
 
 // ── Main page ─────────────────────────────────────────────────────────────────
-export default function ProjectReportsPage() {
+export default function ReportsPage() {
   const [cat, setCat] = useState<ReportCategoryId>("Overview");
   const [tab, setTab] = useState<Tab>("reports");
   const [search, setSearch] = useState("");
@@ -168,7 +168,8 @@ export default function ProjectReportsPage() {
   const toggleStar = (title: string) =>
     setStarred((prev) => {
       const next = new Set(prev);
-      next.has(title) ? next.delete(title) : next.add(title);
+      if (next.has(title)) next.delete(title);
+      else next.add(title);
       return next;
     });
 

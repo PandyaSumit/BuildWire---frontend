@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { PM_PROJECT_STATUS_CAPSULE } from '@/design-system/pm-label-system';
 import type { ProjectStatus } from '@/types/project';
-import { projectStatusTKey } from '@/features/projects/lib/display';
+import { projectStatusTKey } from '@/utils/project/display';
 
 export function ProjectStatusBadge({ status }: { status: ProjectStatus }) {
   const { t } = useTranslation();

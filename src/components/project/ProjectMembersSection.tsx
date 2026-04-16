@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { OrganizationMemberRow } from '@/types/organization';
 import type { ProjectMemberDto, ProjectMemberRole } from '@/types/project';
-import { formatPersonName, projectMemberRoleTKey } from '@/features/projects/lib/display';
+import { formatPersonName, projectMemberRoleTKey } from '@/utils/project/display';
 import { Select } from '@/components/ui/select';
 
 const projectRoles: ProjectMemberRole[] = ['project_manager', 'supervisor', 'worker', 'guest'];

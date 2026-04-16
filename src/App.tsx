@@ -2,81 +2,58 @@ import { lazy } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "./routes/ProtectedRoute";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
-import HomePage from "./pages/HomePage";
-import LoginPage from "./pages/LoginPage";
-import SignupPage from "./pages/SignupPage";
-import ForgotPasswordPage from "./pages/ForgotPasswordPage";
-import ResetPasswordPage from "./pages/ResetPasswordPage";
-import VerifyEmailPage from "./pages/VerifyEmailPage";
-import InvitePage from "./pages/InvitePage";
-import WelcomePage from "./pages/WelcomePage";
-import ComponentsShowcasePage from "./pages/ComponentsShowcasePage";
+import { HomePage } from "./pages/home";
+import {
+  LoginPage,
+  SignupPage,
+  ForgotPasswordPage,
+  ResetPasswordPage,
+  VerifyEmailPage,
+} from "./pages/auth";
+import { InvitePage, WelcomePage } from "./pages/onboarding";
+import { ComponentsShowcasePage } from "./pages/dev";
 
-import DashboardHomePage from "./pages/dashboard/Dashboard";
+import { DashboardPage } from "./pages/dashboard";
 import { SalesPage, BrokersPage, AiMapPage } from "./pages/workspace";
 import {
-  TeamPage,
-  RolesSettingsPage,
-  OrganizationSettingsPage,
+  TeamPage as OrgTeamPage,
+  RolesPage,
+  OrganizationPage,
   BillingPage,
   BotIntegrationsPage,
-  PreferencesSettingsPage,
+  PreferencesPage,
 } from "./pages/settings";
 
-import ProjectsListPage from "./pages/projects/ProjectsListPage";
-import { ProjectRouteLayout } from "@/features/project-ui/ProjectRouteLayout";
+import ListPage from "./pages/projects/ListPage";
+import { ProjectRouteLayout } from "@/components/project/ProjectRouteLayout";
 
 const ProjectIndexEntry = lazy(() =>
-  import("@/features/project-ui/ProjectIndexEntry").then((m) => ({
+  import("@/components/project/ProjectIndexEntry").then((m) => ({
     default: m.ProjectIndexEntry,
   })),
 );
-const ProjectOverviewPage = lazy(() =>
-  import("@/pages/projects/ProjectOverviewPage").then((m) => ({
-    default: m.ProjectOverviewPage,
-  })),
+const OverviewPage = lazy(() => import("./pages/projects/OverviewPage"));
+const TasksPage = lazy(() => import("./pages/projects/TasksPage"));
+const FilesPage = lazy(() => import("./pages/projects/FilesPage"));
+const RfisPage = lazy(() => import("./pages/projects/RfisPage"));
+const BudgetRedirect = lazy(() => import("./pages/projects/BudgetRedirect"));
+const DrawingsPage = lazy(() => import("./pages/projects/DrawingsPage"));
+const DrawingViewerPage = lazy(
+  () => import("./pages/projects/DrawingViewerPage"),
 );
-const ProjectTasksPage = lazy(
-  () => import("./pages/projects/ProjectTasksPage"),
+const DailyReportsPage = lazy(
+  () => import("./pages/projects/DailyReportsPage"),
 );
-const ProjectFilesPage = lazy(
-  () => import("./pages/projects/ProjectFilesPage"),
+const InspectionsPage = lazy(
+  () => import("./pages/projects/InspectionsPage"),
 );
-const ProjectRfisPage = lazy(() => import("./pages/projects/ProjectRfisPage"));
-const ProjectBudgetRedirect = lazy(
-  () => import("./pages/projects/ProjectBudgetRedirect"),
-);
-const ProjectDrawingsPage = lazy(
-  () => import("./pages/projects/ProjectDrawingsPage"),
-);
-const ProjectDrawingViewerPage = lazy(
-  () => import("./pages/projects/ProjectDrawingViewerPage"),
-);
-const ProjectDailyReportsPage = lazy(
-  () => import("./pages/projects/ProjectDailyReportsPage"),
-);
-const ProjectInspectionsPage = lazy(
-  () => import("./pages/projects/ProjectInspectionsPage"),
-);
-const ProjectSchedulePage = lazy(
-  () => import("./pages/projects/ProjectSchedulePage"),
-);
-const ProjectReportsPage = lazy(
-  () => import("./pages/projects/ProjectReportsPage"),
-);
-const ProjectMeetingsPage = lazy(
-  () => import("./pages/projects/ProjectMeetingsPage"),
-);
-const ProjectFinancialsPage = lazy(
-  () => import("./pages/projects/ProjectFinancialsPage"),
-);
-const ProjectTeamPage = lazy(() => import("./pages/projects/ProjectTeamPage"));
-const ProjectActivityPage = lazy(
-  () => import("./pages/projects/ProjectActivityPage"),
-);
-const ProjectInventoryPage = lazy(
-  () => import("./pages/projects/ProjectInventoryPage"),
-);
+const SchedulePage = lazy(() => import("./pages/projects/SchedulePage"));
+const ReportsPage = lazy(() => import("./pages/projects/ReportsPage"));
+const MeetingsPage = lazy(() => import("./pages/projects/MeetingsPage"));
+const FinancialsPage = lazy(() => import("./pages/projects/FinancialsPage"));
+const ProjectTeamPage = lazy(() => import("./pages/projects/TeamPage"));
+const ActivityPage = lazy(() => import("./pages/projects/ActivityPage"));
+const InventoryPage = lazy(() => import("./pages/projects/InventoryPage"));
 
 /** Authenticated app shell: each feature has its own top-level path (not nested under `/dashboard`). */
 export default function App() {
@@ -99,36 +76,36 @@ export default function App() {
           </ProtectedRoute>
         }
       >
-        <Route path="dashboard" element={<DashboardHomePage />} />
-        <Route path="projects" element={<ProjectsListPage />} />
+        <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="projects" element={<ListPage />} />
 
         <Route path="projects/:projectId" element={<ProjectRouteLayout />}>
           <Route index element={<ProjectIndexEntry />} />
-          <Route path="overview" element={<ProjectOverviewPage />} />
-          <Route path="tasks" element={<ProjectTasksPage />} />
-          <Route path="drawings" element={<ProjectDrawingsPage />} />
+          <Route path="overview" element={<OverviewPage />} />
+          <Route path="tasks" element={<TasksPage />} />
+          <Route path="drawings" element={<DrawingsPage />} />
           <Route
             path="drawings/viewer/:planId"
-            element={<ProjectDrawingViewerPage />}
+            element={<DrawingViewerPage />}
           />
-          <Route path="rfis" element={<ProjectRfisPage />} />
-          <Route path="daily-reports" element={<ProjectDailyReportsPage />} />
-          <Route path="inspections" element={<ProjectInspectionsPage />} />
-          <Route path="files" element={<ProjectFilesPage />} />
-          <Route path="schedule" element={<ProjectSchedulePage />} />
-          <Route path="reports" element={<ProjectReportsPage />} />
-          <Route path="meetings" element={<ProjectMeetingsPage />} />
-          <Route path="financials" element={<ProjectFinancialsPage />} />
+          <Route path="rfis" element={<RfisPage />} />
+          <Route path="daily-reports" element={<DailyReportsPage />} />
+          <Route path="inspections" element={<InspectionsPage />} />
+          <Route path="files" element={<FilesPage />} />
+          <Route path="schedule" element={<SchedulePage />} />
+          <Route path="reports" element={<ReportsPage />} />
+          <Route path="meetings" element={<MeetingsPage />} />
+          <Route path="financials" element={<FinancialsPage />} />
           <Route path="team" element={<ProjectTeamPage />} />
-          <Route path="activity" element={<ProjectActivityPage />} />
-          <Route path="inventory" element={<ProjectInventoryPage />} />
-          <Route path="budget" element={<ProjectBudgetRedirect />} />
+          <Route path="activity" element={<ActivityPage />} />
+          <Route path="inventory" element={<InventoryPage />} />
+          <Route path="budget" element={<BudgetRedirect />} />
         </Route>
 
         <Route path="sales" element={<SalesPage />} />
         <Route path="brokers" element={<BrokersPage />} />
         <Route path="intelligence/ai-map" element={<AiMapPage />} />
-        <Route path="team" element={<TeamPage />} />
+        <Route path="team" element={<OrgTeamPage />} />
 
         <Route
           path="settings"
@@ -136,12 +113,12 @@ export default function App() {
         />
         <Route
           path="settings/preferences"
-          element={<PreferencesSettingsPage />}
+          element={<PreferencesPage />}
         />
-        <Route path="settings/roles" element={<RolesSettingsPage />} />
+        <Route path="settings/roles" element={<RolesPage />} />
         <Route
           path="settings/organization"
-          element={<OrganizationSettingsPage />}
+          element={<OrganizationPage />}
         />
         <Route path="settings/billing" element={<BillingPage />} />
         <Route

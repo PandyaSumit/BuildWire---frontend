@@ -10,11 +10,11 @@ import {
   FilterChipGroup,
   ModulePageShell,
   SemanticPill,
-} from "@/features/project-ui/components";
+} from "@/components/project";
 import {
   DUMMY_DRAWING_PLANS,
   type DrawingPlanCard,
-} from "@/features/project-ui/projectDummyData";
+} from "@/services/project/projectDummyData";
 
 function DrawingCard({
   plan,
@@ -145,7 +145,7 @@ function DrawingCard({
   );
 }
 
-export default function ProjectDrawingsPage() {
+export default function DrawingsPage() {
   const { projectId } = useParams<{ projectId: string }>();
   const pid = projectId ?? "";
 

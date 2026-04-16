@@ -10,14 +10,14 @@ import { ProgressBar } from "@/components/ui/progress-bar";
 import { SheetDrawer } from "@/components/ui/sheet-drawer";
 import { StatsBar } from "@/components/ui/stats-bar";
 import { TEAM_ROLE_BADGE_VARIANT } from "@/config/pm/team";
-import { ModulePageShell } from "@/features/project-ui/components";
+import { ModulePageShell } from "@/components/project";
 import {
   DUMMY_SUBCONTRACTORS,
   DUMMY_TEAM_MEMBERS,
   DUMMY_TEAM_STATS,
   type DummySub,
   type DummyTeamMember,
-} from "@/features/project-ui/projectDummyData";
+} from "@/services/project/projectDummyData";
 
 type RoleFilter = "all" | "PM" | "Supervisor" | "Worker" | "Guest";
 
@@ -390,7 +390,7 @@ const SUB_COLUMNS: DataTableColumn<DummySub>[] = [
 ];
 
 // ── Main page ─────────────────────────────────────────────────────────────────
-export default function ProjectTeamPage() {
+export default function TeamPage() {
   const s = DUMMY_TEAM_STATS;
   const [roleFilter, setRoleFilter] = useState<RoleFilter>("all");
   const [search, setSearch] = useState("");

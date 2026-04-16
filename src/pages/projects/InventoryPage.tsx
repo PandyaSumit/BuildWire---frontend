@@ -7,13 +7,13 @@ import { Select, type SelectOption } from "@/components/ui/select";
 import { SheetDrawer } from "@/components/ui/sheet-drawer";
 import { StatsBar } from "@/components/ui/stats-bar";
 import { INVENTORY_UNIT_STATUS_STYLE } from "@/config/pm/inventory";
-import { ModulePageShell } from "@/features/project-ui/components";
+import { ModulePageShell } from "@/components/project";
 import {
   DUMMY_INVENTORY_STATS,
   DUMMY_UNITS_L7,
   type DummyUnit,
   type UnitStatus,
-} from "@/features/project-ui/projectDummyData";
+} from "@/services/project/projectDummyData";
 
 const ALL_FLOORS = ["L12", "L11", "L10", "L9", "L8", "L7", "L6", "L5"];
 
@@ -235,7 +235,7 @@ function FloorSummaryBar({ units }: { units: DummyUnit[] }) {
 }
 
 // ── Main page ─────────────────────────────────────────────────────────────────
-export default function ProjectInventoryPage() {
+export default function InventoryPage() {
   const s = DUMMY_INVENTORY_STATS;
   const [selectedFloor, setSelectedFloor] = useState("L7");
   const [statusFilter, setStatusFilter] = useState<UnitStatus | "all">("all");

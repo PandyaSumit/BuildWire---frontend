@@ -9,8 +9,8 @@ import { PageHeader } from "@/components/ui/page-header";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { SheetDrawer } from "@/components/ui/sheet-drawer";
 import { DAILY_REPORT_CALENDAR_LEGEND, DAILY_REPORT_STATUS_BADGE, WEEKDAY_LABELS } from "@/config/pm/daily-reports";
-import { DailyReportDrawer } from "@/features/project-ui/DailyReportDrawer";
-import { ModulePageShell } from "@/features/project-ui/components";
+import { DailyReportDrawer } from "@/components/project/drawers/DailyReportDrawer";
+import { ModulePageShell } from "@/components/project";
 import {
   buildDailyReportDayDotsForMonth,
   dailyReportMissingCutoffForMonth,
@@ -21,7 +21,7 @@ import {
   totalDailyReportCrew,
   type CalendarDot,
   type DailyReportRow,
-} from "@/features/project-ui/projectDummyData";
+} from "@/services/project/projectDummyData";
 
 const calCellH = "h-10 w-full min-w-0 sm:h-12";
 
@@ -85,7 +85,7 @@ function matchesDailyReportQuery(row: DailyReportRow, q: string): boolean {
   return blob.includes(n);
 }
 
-export default function ProjectDailyReportsPage() {
+export default function DailyReportsPage() {
   const { t, i18n } = useTranslation();
   const { query } = useGlobalSearch();
   const qNorm = query.trim().toLowerCase();

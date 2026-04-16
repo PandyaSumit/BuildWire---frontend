@@ -27,7 +27,7 @@ const ACTIVITY_ROWS = [
   },
 ];
 
-export default function Dashboard() {
+export default function DashboardPage() {
   const { t } = useTranslation();
 
   return (

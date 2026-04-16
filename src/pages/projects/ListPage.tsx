@@ -4,13 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hooks';
 import { AppPage } from '@/pages/shared/AppPage';
-import { listProjects, createProject } from '@/api/projects';
+import { listProjects, createProject } from '@/services/project/projectApi';
 import type { ProjectDto, ProjectStatus } from '@/types/project';
 import { useDebouncedValue } from '@/hooks/useDebouncedValue';
-import { ProjectCard } from '@/features/projects/components/ProjectCard';
-import { ProjectsListEmpty } from '@/features/projects/components/ProjectsListEmpty';
-import { CreateProjectModal } from '@/features/projects/components/CreateProjectModal';
-import { projectStatusTKey } from '@/features/projects/lib/display';
+import { ProjectCard } from '@/components/project/ProjectCard';
+import { ProjectsListEmpty } from '@/components/project/ProjectsListEmpty';
+import { CreateProjectModal } from '@/components/project/CreateProjectModal';
+import { projectStatusTKey } from '@/utils/project/display';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 
@@ -28,7 +28,7 @@ function isAbortError(err: unknown): boolean {
   return code === 'ERR_CANCELED' || name === 'AbortError' || name === 'CanceledError';
 }
 
-export default function ProjectsListPage() {
+export default function ListPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const orgId = useAppSelector((s) => s.auth.user?.org?.id);

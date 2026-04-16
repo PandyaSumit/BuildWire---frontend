@@ -5,7 +5,7 @@ import { useSidebarMode } from '@/hooks/useSidebarMode';
 import { useSidebarLayout } from '@/components/layout/SidebarLayoutContext';
 import { LanguageMenu } from '@/components/layout/LanguageMenu';
 import { GlobalSearchBar } from '@/components/layout/GlobalSearchBar';
-import { useOptionalProjectUi } from '@/features/project-ui/ProjectUiContext';
+import { useOptionalProjectUi } from '@/hooks/project/useProjectUi';
 
 interface HeaderProps {
   title?: string;

@@ -1,9 +1,9 @@
 import { useMemo } from "react";
-import { useProjectUi } from "@/features/project-ui/ProjectUiContext";
-import { computeOverviewTaskStats } from "@/features/project-ui/overviewTaskStats";
+import { useProjectUi } from "@/hooks/project/useProjectUi";
+import { computeOverviewTaskStats } from "@/utils/project/overviewTaskStats";
 import { Badge } from "@/components/ui/badge";
-import { OverviewExecutionSnapshot } from "@/pages/projects/OverviewExecutionSnapshot";
-import { OverviewRollups } from "@/pages/projects/OverviewRollups";
+import { OverviewExecutionSnapshot } from "@/components/project/overview/OverviewExecutionSnapshot";
+import { OverviewRollups } from "@/components/project/overview/OverviewRollups";
 
 function typeBadge(t: string) {
   const map: Record<string, "default" | "success" | "warning"> = {
@@ -15,7 +15,7 @@ function typeBadge(t: string) {
   return map[t] ?? "default";
 }
 
-export function ProjectOverviewPage() {
+export default function OverviewPage() {
   const { project } = useProjectUi();
   const taskStats = useMemo(() => computeOverviewTaskStats(), []);
 

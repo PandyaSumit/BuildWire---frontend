@@ -18,7 +18,7 @@ import { useTaskProject } from '@/features/tasks/TaskProjectContext';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { PM_TASK_STATUS_BADGE } from '@/design-system/pm-label-system';
-import { useOptionalProjectUi } from '@/features/project-ui/ProjectUiContext';
+import { useOptionalProjectUi } from '@/hooks/project/useProjectUi';
 import { priorityBorderClassKey } from '@/features/tasks/taskPresentation';
 import { taskWorkflowTKey } from '@/features/tasks/fixtures';
 import { taskTradeKeyTKey } from '@/features/tasks/taskI18nKeys';

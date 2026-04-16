@@ -1,4 +1,4 @@
-import type { UnitStatus } from '@/features/project-ui/projectDummyData';
+import type { UnitStatus } from '@/services/project/projectDummyData';
 
 export const INVENTORY_UNIT_STATUS_STYLE: Record<UnitStatus, string> = {
   available: 'border-border bg-muted/15 text-secondary',

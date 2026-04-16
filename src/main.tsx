@@ -4,9 +4,9 @@ import { BrowserRouter } from 'react-router-dom';
 import './styles/globals.css';
 import './styles/workspace-themes.css';
 import App from './App';
-import { ThemeProvider } from '@/components/theme-provider';
+import { ThemeProvider } from '@/components/theme';
 import { AppI18n } from '@/i18n/AppI18n';
-import { StoreProvider } from '@/components/providers/StoreProvider';
+import { StoreProvider } from '@/components/providers';
 import { AuthProvider } from '@/components/auth/AuthProvider';
 
 createRoot(document.getElementById('root')!).render(

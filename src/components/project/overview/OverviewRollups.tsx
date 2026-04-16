@@ -3,7 +3,7 @@ import {
   DUMMY_INSPECTION_STATS,
   DUMMY_RFIS_STATS,
   DUMMY_SCHEDULE_PHASES,
-} from "@/features/project-ui/projectDummyData";
+} from "@/services/project/projectDummyData";
 
 /** Sample rollup — replace with API fields later. */
 const SCHEDULE_VARIANCE_DAYS = -4;

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { useTheme, type ThemePreference } from "@/components/theme-provider";
+import { useTheme, type ThemePreference } from "@/components/theme";
 import { LanguageMenu } from "@/components/layout/LanguageMenu";
 import { useAppSelector } from "@/store/hooks";
 import { Checkbox, Select } from "@/components/ui";
@@ -360,7 +360,7 @@ const appearanceOptions: {
   },
 ];
 
-export default function PreferencesSettingsPage() {
+export default function PreferencesPage() {
   const { t } = useTranslation();
   const user = useAppSelector((s) => s.auth.user);
   const { themePreference, setThemePreference, workspaceTheme, setWorkspaceTheme } =
