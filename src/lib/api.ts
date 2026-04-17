@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { getAccessToken, setAccessToken, clearAccessToken } from './tokenStore';
+import { getRefreshToken, setRefreshToken, clearRefreshToken } from './refreshTokenStore';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
 
@@ -8,6 +9,20 @@ const api = axios.create({
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 });
+
+/** Full URL for a request config (used to avoid refresh-on-refresh and refresh-after-failed-login). */
+const combinedRequestUrl = (config: { baseURL?: string; url?: string } | undefined): string => {
+  if (!config) return '';
+  const base = config.baseURL || '';
+  const path = config.url || '';
+  if (path.startsWith('http')) return path;
+  return `${base.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
+};
+
+const shouldSkipAuthRefreshRetry = (config: { baseURL?: string; url?: string } | undefined): boolean => {
+  const u = combinedRequestUrl(config);
+  return /\/auth\/(login|register|refresh)(\?|$)/i.test(u);
+};
 
 api.interceptors.request.use(
   (config) => {
@@ -28,20 +43,27 @@ api.interceptors.response.use(
       _retryCount?: number;
     };
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !shouldSkipAuthRefreshRetry(originalRequest)
+    ) {
       originalRequest._retry = true;
       try {
+        const rt = getRefreshToken();
         const { data } = await axios.post(
           `${API_BASE_URL}/auth/refresh`,
-          {},
+          rt ? { refreshToken: rt } : {},
           { withCredentials: true }
         );
         const newToken = data.data.accessToken;
         setAccessToken(newToken);
+        if (data.data.refreshToken) setRefreshToken(data.data.refreshToken);
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return api(originalRequest);
       } catch {
         clearAccessToken();
+        clearRefreshToken();
         const isAuthPage = ['/login', '/signup', '/forgot-password', '/reset-password', '/invite', '/verify-email'].some(
           (p) => typeof window !== 'undefined' && window.location.pathname.startsWith(p)
         );
