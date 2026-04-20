@@ -113,7 +113,7 @@ export function TaskFiltersBar() {
   const prioVal = filters.priorities[0] ?? '';
 
   return (
-    <div className="mb-3 px-6">
+    <div>
       <div className="rounded-lg border border-border/60 bg-surface/35 px-2.5 py-1.5">
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
           <FilterField label={t('tasks.filters.type')} labelId={`${uid}-type-lbl`}>

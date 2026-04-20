@@ -210,21 +210,17 @@ function AsanaTaskList({
   }, []);
 
   return (
-    <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-      <div className="flex min-h-11 shrink-0 items-center justify-between gap-4 border-b border-border/35 py-2.5">
-        <Button
-          type="button"
-          variant="primary"
-          size="sm"
-          onClick={onAddTask}
-          className="h-8 shrink-0 gap-1.5 px-3 !py-0 text-[12px] font-semibold"
-        >
-          <span className="text-[15px] font-normal leading-none" aria-hidden>
-            +
-          </span>
-          {t("tasks.listAddTask")}
-        </Button>
-        <div className="flex min-w-0 flex-wrap items-center justify-end gap-x-2 gap-y-1 text-[12px] text-secondary sm:gap-x-2.5">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+      <div
+        id="tasks-filter-panel"
+        className="flex min-h-11 shrink-0 items-center gap-3 border-b border-border/35 py-2"
+      >
+        {filtersOpen ? (
+          <div className="min-w-0 flex-1">
+            <TaskFiltersBar />
+          </div>
+        ) : null}
+        <div className="ml-auto flex shrink-0 flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-secondary">
           <button
             type="button"
             onClick={onToggleFilters}
@@ -645,38 +641,41 @@ function ProjectTasksInner() {
           </h1>
         </div>
 
-        <div className="mt-2 min-w-0 border-b border-border/55">
-          <div>
-            <SegmentedControl<View>
-              variant="underline"
-              className="min-w-0 !border-b-0"
-              value={view}
-              onChange={setView}
-              options={[
-                { value: "kanban", label: t("tasks.viewKanban") },
-                { value: "list", label: t("tasks.viewList") },
-                { value: "schedule", label: t("tasks.viewSchedule") },
-                { value: "floor", label: t("tasks.viewFloorPlan") },
-              ]}
-            />
-          </div>
+        <div className="mt-2 flex min-w-0 items-center justify-between border-b border-border/55">
+          <SegmentedControl<View>
+            variant="underline"
+            className="min-w-0 !border-b-0"
+            value={view}
+            onChange={setView}
+            options={[
+              { value: "kanban", label: t("tasks.viewKanban") },
+              { value: "list", label: t("tasks.viewList") },
+              { value: "schedule", label: t("tasks.viewSchedule") },
+              { value: "floor", label: t("tasks.viewFloorPlan") },
+            ]}
+          />
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
+            onClick={() => openCreate()}
+            className="mb-1.5 h-8 shrink-0 gap-1.5 px-3 !py-0 text-[12px] font-semibold"
+          >
+            <span className="text-[15px] font-normal leading-none" aria-hidden>+</span>
+            {t("tasks.listAddTask")}
+          </Button>
         </div>
       </div>
-
-      {view === "kanban" || view === "list" ? (
-        <div
-          id="tasks-filter-panel"
-          className={filtersOpen ? "mt-4" : ""}
-          hidden={!filtersOpen}
-        >
-          {filtersOpen ? <TaskFiltersBar /> : null}
-        </div>
-      ) : null}
 
       {view === "kanban" ? (
         <div
           className={`min-h-0 flex-1 overflow-hidden ${filtersOpen ? "mt-5" : "mt-6"}`}
         >
+          {filtersOpen ? (
+            <div id="tasks-filter-panel" className="mb-4">
+              <TaskFiltersBar />
+            </div>
+          ) : null}
           <TaskKanbanBoard
             onOpenTask={openTask}
             onRequestCreate={openCreate}

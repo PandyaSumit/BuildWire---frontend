@@ -1,9 +1,11 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useProjectUi } from "@/hooks/project/useProjectUi";
 import { computeOverviewTaskStats } from "@/utils/project/overviewTaskStats";
 import { Badge } from "@/components/ui/badge";
 import { OverviewExecutionSnapshot } from "@/components/project/overview/OverviewExecutionSnapshot";
 import { OverviewRollups } from "@/components/project/overview/OverviewRollups";
+import { EditProjectModal } from "@/components/project/EditProjectModal";
+import type { ProjectStatus } from "@/types/project";
 
 function typeBadge(t: string) {
   const map: Record<string, "default" | "success" | "warning"> = {
@@ -15,9 +17,37 @@ function typeBadge(t: string) {
   return map[t] ?? "default";
 }
 
+function statusLabelToKey(label: string): ProjectStatus {
+  const map: Record<string, ProjectStatus> = {
+    Active: "active",
+    Planning: "planning",
+    "On Hold": "on_hold",
+  };
+  return map[label] ?? "planning";
+}
+
 export default function OverviewPage() {
   const { project } = useProjectUi();
   const taskStats = useMemo(() => computeOverviewTaskStats(), []);
+  const [editOpen, setEditOpen] = useState(false);
+
+  const projectDto = useMemo(
+    () => ({
+      id: project.id,
+      org_id: "",
+      name: project.name,
+      description: null,
+      status: statusLabelToKey(project.statusLabel),
+      start_date: project.startDate || null,
+      end_date: project.endDate || null,
+      address: {},
+      budget: { amount: 0, currency: "USD" } as never,
+      cover_image_url: null,
+      created_by_id: "",
+      settings: {},
+    }),
+    [project],
+  );
 
   return (
     <div className="relative min-h-[calc(100vh-4rem)] space-y-8 p-6">
@@ -68,6 +98,7 @@ export default function OverviewPage() {
         <div className="flex flex-wrap gap-2">
           <button
             type="button"
+            onClick={() => setEditOpen(true)}
             className="rounded-lg border border-border bg-bg px-4 py-2 text-sm font-medium text-primary hover:bg-muted/10"
           >
             Edit project
@@ -84,6 +115,13 @@ export default function OverviewPage() {
       <OverviewRollups projectId={project.id} />
 
       <OverviewExecutionSnapshot projectId={project.id} stats={taskStats} />
+
+      <EditProjectModal
+        open={editOpen}
+        project={projectDto}
+        onClose={() => setEditOpen(false)}
+        onSubmit={async () => { setEditOpen(false); }}
+      />
     </div>
   );
 }

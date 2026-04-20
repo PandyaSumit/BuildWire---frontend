@@ -35,7 +35,8 @@ export function EditProjectModal({ open, project, onClose, onSubmit }: Props) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!project || !open) return;
@@ -44,7 +45,8 @@ export function EditProjectModal({ open, project, onClose, onSubmit }: Props) {
     setStatus(project.status);
     setStartDate(dateInputValue(project.start_date));
     setEndDate(dateInputValue(project.end_date));
-    setError(null);
+    setNameError(null);
+    setSubmitError(null);
   }, [project, open]);
 
   useEffect(() => {
@@ -60,10 +62,11 @@ export function EditProjectModal({ open, project, onClose, onSubmit }: Props) {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setError(null);
+    setNameError(null);
+    setSubmitError(null);
     const trimmed = name.trim();
     if (!trimmed) {
-      setError(t('editProject.errorNameRequired'));
+      setNameError(t('editProject.errorNameRequired'));
       return;
     }
     setSubmitting(true);
@@ -78,7 +81,7 @@ export function EditProjectModal({ open, project, onClose, onSubmit }: Props) {
       onClose();
     } catch (err) {
       const msg = err as { response?: { data?: { error?: string; message?: string } } };
-      setError(msg.response?.data?.error || msg.response?.data?.message || t('editProject.errorFailed'));
+      setSubmitError(msg.response?.data?.error || msg.response?.data?.message || t('editProject.errorFailed'));
     } finally {
       setSubmitting(false);
     }
@@ -112,10 +115,11 @@ export function EditProjectModal({ open, project, onClose, onSubmit }: Props) {
               <input
                 id="edit-project-name"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-primary placeholder:text-muted focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                onChange={(e) => { setName(e.target.value); setNameError(null); }}
+                className={`w-full rounded-lg border bg-bg px-3 py-2 text-sm text-primary placeholder:text-muted focus:outline-none focus:ring-1 ${nameError ? 'border-danger focus:border-danger focus:ring-danger' : 'border-border focus:border-brand focus:ring-brand'}`}
                 disabled={submitting}
               />
+              {nameError ? <p className="mt-1 text-xs text-danger">{nameError}</p> : null}
             </div>
             <div>
               <label htmlFor="edit-project-desc" className="mb-1 block text-sm font-medium text-primary">
@@ -174,7 +178,7 @@ export function EditProjectModal({ open, project, onClose, onSubmit }: Props) {
             </div>
           </div>
 
-          {error ? <p className="mt-3 text-sm text-danger">{error}</p> : null}
+          {submitError ? <p className="mt-3 text-sm text-danger">{submitError}</p> : null}
 
           <div className="mt-6 flex justify-end gap-2">
             <button

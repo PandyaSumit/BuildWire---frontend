@@ -94,9 +94,10 @@ export function TaskFormSections({
             value={draft.title}
             onChange={(e) => update({ title: e.target.value })}
             placeholder={t("newTaskDrawer.titlePlaceholder")}
-            className="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-primary placeholder:text-muted focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+            className={`w-full rounded-lg border bg-bg px-3 py-2 text-sm text-primary placeholder:text-muted focus:outline-none focus:ring-1 ${error ? 'border-danger focus:border-danger focus:ring-danger' : 'border-border focus:border-brand focus:ring-brand'}`}
             autoFocus={autoFocusTitle}
           />
+          {error ? <p className="mt-1 text-xs text-danger">{error}</p> : null}
         </div>
       ) : null}
 
@@ -488,7 +489,6 @@ export function TaskFormSections({
         </p>
       ) : null}
 
-      {error ? <p className="text-sm text-danger">{error}</p> : null}
     </div>
   );
 }

@@ -65,13 +65,13 @@ export function DailyReportDrawer({
   const [deliveries, setDeliveries] = useState<DailyReportDeliveryLine[]>([]);
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState<{ date?: string; narrative?: string; manpower?: string }>({});
 
   const editingDate = report?.date ?? null;
 
   useEffect(() => {
     if (!open) return;
-    setError("");
+    setErrors({});
     if (report) {
       setDateIso(report.date);
       setSubmittedBy(report.submittedBy);
@@ -107,18 +107,10 @@ export function DailyReportDrawer({
   );
 
   function buildRow(status: DailyReportStatus): DailyReportRow | null {
-    if (!dateIso) {
-      setError(t("dailyReportsPage.create.errorDate"));
-      return null;
-    }
-    if (dateConflict) {
-      setError(t("dailyReportsPage.create.errorDateTaken"));
-      return null;
-    }
-    if (!narrative.trim()) {
-      setError(t("dailyReportsPage.create.errorNarrative"));
-      return null;
-    }
+    const newErrors: { date?: string; narrative?: string; manpower?: string } = {};
+    if (!dateIso) newErrors.date = t("dailyReportsPage.create.errorDate");
+    else if (dateConflict) newErrors.date = t("dailyReportsPage.create.errorDateTaken");
+    if (!narrative.trim()) newErrors.narrative = t("dailyReportsPage.create.errorNarrative");
     const mp = manpower
       .filter((m) => m.company.trim() || m.trade.trim() || (m.workers ?? 0) > 0)
       .map((m) => ({
@@ -129,7 +121,10 @@ export function DailyReportDrawer({
         ...(m.costCode?.trim() ? { costCode: m.costCode.trim() } : {}),
       }));
     if (mp.length === 0 || mp.every((m) => m.workers === 0)) {
-      setError(t("dailyReportsPage.create.errorManpower"));
+      newErrors.manpower = t("dailyReportsPage.create.errorManpower");
+    }
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return null;
     }
     const linked = parseRfis(linkedRfisRaw);
@@ -193,23 +188,17 @@ export function DailyReportDrawer({
       </div>
 
       <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
-        {error ? (
-          <p className="rounded-md border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">
-            {error}
-          </p>
-        ) : null}
-
-        <DatePicker
-          label={t("dailyReportsPage.create.fieldDate")}
-          value={dateIso}
-          onChange={(e) => setDateIso(e.target.value)}
-          fullWidth
-          className="pr-10"
-          disabled={readOnly}
-        />
-        {dateConflict ? (
-          <p className="text-xs text-danger">{t("dailyReportsPage.create.errorDateTaken")}</p>
-        ) : null}
+        <div>
+          <DatePicker
+            label={t("dailyReportsPage.create.fieldDate")}
+            required
+            value={dateIso}
+            onChange={(e) => { setDateIso(e.target.value); setErrors((p) => ({ ...p, date: undefined })); }}
+            fullWidth
+            disabled={readOnly}
+          />
+          {errors.date ? <p className="mt-1 text-xs text-danger">{errors.date}</p> : null}
+        </div>
 
         <Input
           label={t("dailyReportsPage.create.fieldSubmittedBy")}
@@ -224,16 +213,20 @@ export function DailyReportDrawer({
           placeholder={t("dailyReportsPage.create.fieldWeatherPh")}
           disabled={readOnly}
         />
-        <Textarea
-          label={t("dailyReportsPage.create.fieldNarrative")}
-          fullWidth
-          value={narrative}
-          onChange={(e) => setNarrative(e.target.value)}
-          placeholder={t("dailyReportsPage.create.fieldNarrativePh")}
-          rows={5}
-          className="min-h-[7rem] w-full"
-          disabled={readOnly}
-        />
+        <div>
+          <Textarea
+            label={t("dailyReportsPage.create.fieldNarrative")}
+            required
+            fullWidth
+            value={narrative}
+            onChange={(e) => { setNarrative(e.target.value); setErrors((p) => ({ ...p, narrative: undefined })); }}
+            placeholder={t("dailyReportsPage.create.fieldNarrativePh")}
+            rows={5}
+            className="min-h-[7rem] w-full"
+            disabled={readOnly}
+          />
+          {errors.narrative ? <p className="mt-1 text-xs text-danger">{errors.narrative}</p> : null}
+        </div>
         <Input
           label={t("dailyReportsPage.create.fieldLinkedRfis")}
           value={linkedRfisRaw}
@@ -293,9 +286,10 @@ export function DailyReportDrawer({
           ) : null}
         </div>
 
+        {errors.manpower ? <p className="text-xs text-danger">{errors.manpower}</p> : null}
         <details className="rounded-lg border border-border/50 bg-muted/[0.04] [&_summary]:cursor-pointer" open>
           <summary className="px-3 py-2.5 text-xs font-semibold uppercase tracking-wide text-muted">
-            {t("dailyReportsPage.create.sectionManpower")} ({totalWorkers} {t("dailyReportsPage.create.workersSuffix")})
+            {t("dailyReportsPage.create.sectionManpower")} <span className="text-danger">*</span> ({totalWorkers} {t("dailyReportsPage.create.workersSuffix")})
           </summary>
           <div className="space-y-3 border-t border-border/35 px-3 py-3">
             {manpower.map((row, i) => (
@@ -328,6 +322,7 @@ export function DailyReportDrawer({
                     setManpower((prev) =>
                       prev.map((p, j) => (j === i ? { ...p, workers: Number.isFinite(v) ? v : 0 } : p)),
                     );
+                    setErrors((p) => ({ ...p, manpower: undefined }));
                   }}
                   disabled={readOnly}
                 />

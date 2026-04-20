@@ -20,7 +20,8 @@ export function CreateProjectModal({ open, onClose, onSubmit }: Props) {
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState<ProjectStatus>('planning');
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -35,10 +36,11 @@ export function CreateProjectModal({ open, onClose, onSubmit }: Props) {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setError(null);
+    setNameError(null);
+    setSubmitError(null);
     const trimmed = name.trim();
     if (!trimmed) {
-      setError(t('createProject.errorNameRequired'));
+      setNameError(t('createProject.errorNameRequired'));
       return;
     }
     setSubmitting(true);
@@ -54,7 +56,7 @@ export function CreateProjectModal({ open, onClose, onSubmit }: Props) {
       onClose();
     } catch (err) {
       const msg = err as { response?: { data?: { error?: string; message?: string } } };
-      setError(msg.response?.data?.error || msg.response?.data?.message || t('createProject.errorFailed'));
+      setSubmitError(msg.response?.data?.error || msg.response?.data?.message || t('createProject.errorFailed'));
     } finally {
       setSubmitting(false);
     }
@@ -88,12 +90,13 @@ export function CreateProjectModal({ open, onClose, onSubmit }: Props) {
               <input
                 id="project-name"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-primary placeholder:text-muted focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                onChange={(e) => { setName(e.target.value); setNameError(null); }}
+                className={`w-full rounded-lg border bg-bg px-3 py-2 text-sm text-primary placeholder:text-muted focus:outline-none focus:ring-1 ${nameError ? 'border-danger focus:border-danger focus:ring-danger' : 'border-border focus:border-brand focus:ring-brand'}`}
                 placeholder={t('createProject.namePlaceholder')}
                 autoFocus
                 disabled={submitting}
               />
+              {nameError ? <p className="mt-1 text-xs text-danger">{nameError}</p> : null}
             </div>
             <div>
               <label htmlFor="project-desc" className="mb-1 block text-sm font-medium text-primary">
@@ -125,7 +128,7 @@ export function CreateProjectModal({ open, onClose, onSubmit }: Props) {
             </div>
           </div>
 
-          {error ? <p className="mt-3 text-sm text-danger">{error}</p> : null}
+          {submitError ? <p className="mt-3 text-sm text-danger">{submitError}</p> : null}
 
           <div className="mt-6 flex justify-end gap-2">
             <button

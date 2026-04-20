@@ -77,7 +77,7 @@ export function DeleteProjectDialog({ open, projectName, onClose, onConfirm }: P
           disabled={submitting}
           autoComplete="off"
         />
-        {error ? <p className="mt-3 text-sm text-danger">{error}</p> : null}
+        {error ? <p className="mt-1 text-xs text-danger">{error}</p> : null}
         <div className="mt-6 flex justify-end gap-2">
           <button
             type="button"
