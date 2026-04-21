@@ -50,7 +50,15 @@
     "globalSearchPlaceholder": "Search projects, tasks, RFIs, daily reports, inspections, files…",
     "globalSearchAria": "Global search",
     "notifications": "Notifications",
-    "language": "Language"
+    "language": "Language",
+    "aiAssistant": "AI assistant",
+    "breadcrumbAria": "Breadcrumb"
+  },
+  "aiAssistant": {
+    "defaultTitle": "Assistant",
+    "close": "Close assistant",
+    "placeholderIntro": "Connect your AI backend here to summarize tasks, RFIs, drawings, and site context. This panel is layout-isolated so workspace theme changes do not break it.",
+    "placeholderHint": "Tip: use Preferences to switch between docked and modal layouts."
   },
   "account": {
     "fallbackName": "Account",
@@ -97,6 +105,17 @@
     "notificationsHint": "Email preferences are UI-only until notifications are connected to your account.",
     "digest": "Daily report digest",
     "rfiNotify": "RFI assignments and mentions",
+    "aiAssistant": "AI assistant",
+    "aiAssistantHint": "Panel placement and width. Docked layouts shrink the main workspace so content reflows predictably. On narrow screens, dock modes open as a modal sheet instead. Saved on this device.",
+    "aiAssistantLayout": "Layout",
+    "aiAssistantLayoutDockEnd": "Dock right (pushes content)",
+    "aiAssistantLayoutDockStart": "Dock left (before content)",
+    "aiAssistantLayoutModal": "Modal overlay",
+    "aiAssistantWidth": "Panel width",
+    "aiAssistantRememberOpen": "Remember open or closed between visits",
+    "aiAssistantDefaultOpen": "Start open when remember is off",
+    "aiAssistantIsolated": "Use fixed assistant styling (ignore workspace theme inside panel)",
+    "aiAssistantTitleField": "Panel title",
     "appearanceLightTitle": "Light",
     "appearanceLightDesc": "Light surfaces and high readability in bright environments.",
     "appearanceDarkTitle": "Dark",
@@ -746,5 +765,33 @@
     "actionRename": "Rename",
     "actionMove": "Move…",
     "actionDelete": "Delete"
+  },
+  "botIntegrationsPage": {
+    "title": "Bot integrations",
+    "description": "Connect automation and bots to your organization — administrators only.",
+    "adminBannerTitle": "Organization administrators only",
+    "adminBannerBody": "Only organization admins can connect or disconnect bots. Ask an admin if you need this enabled.",
+    "demoNoteTitle": "Preview",
+    "demoNoteBody": "Connect and disconnect here update this screen only. Your organization’s API will replace these placeholders when backend integration is available.",
+    "whatsappTitle": "WhatsApp",
+    "whatsappDesc": "Use WhatsApp Business Platform for RFIs, updates, and site handoffs. Meta will call your webhook URL; secrets stay on the server.",
+    "telegramTitle": "Telegram",
+    "telegramDesc": "Use a Telegram bot for notifications and quick replies. After setup, tokens and signing secrets are stored server-side.",
+    "statusConnected": "Connected",
+    "statusDisconnected": "Not connected",
+    "webhookUrl": "Webhook URL",
+    "placeholderWebhook": "Generated when you connect",
+    "verifyToken": "Verify token",
+    "botToken": "Bot token",
+    "placeholderSecret": "Set during connection",
+    "secretStored": "Credentials configured",
+    "credentialsHint": "Secrets are never returned to the browser after setup.",
+    "credentialsPendingWa": "When you connect, you will finish Meta’s flow — verify token and app secrets are stored only on BuildWire servers.",
+    "credentialsPendingTg": "When you connect, you will paste your bot token once; it is stored only on BuildWire servers.",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "copy": "Copy",
+    "copied": "Copied",
+    "docs": "Documentation"
   }
 }

@@ -50,7 +50,8 @@
     "globalSearchPlaceholder": "Buscar proyectos, tareas, RFIs, informes diarios, inspecciones, archivos…",
     "globalSearchAria": "Búsqueda global",
     "notifications": "Notificaciones",
-    "language": "Idioma"
+    "language": "Idioma",
+    "breadcrumbAria": "Migas de pan"
   },
   "account": {
     "fallbackName": "Cuenta",
@@ -731,5 +732,33 @@
     "actionRename": "Rename",
     "actionMove": "Move…",
     "actionDelete": "Delete"
+  },
+  "botIntegrationsPage": {
+    "title": "Integraciones de bots",
+    "description": "Conecta automatización y bots a tu organización — solo administradores.",
+    "adminBannerTitle": "Solo administradores de la organización",
+    "adminBannerBody": "Solo los administradores pueden conectar o desconectar bots. Pide acceso a un administrador si lo necesitas.",
+    "demoNoteTitle": "Vista previa",
+    "demoNoteBody": "Conectar y desconectar solo actualiza esta pantalla. La API de tu organización sustituirá estos valores cuando esté disponible.",
+    "whatsappTitle": "WhatsApp",
+    "whatsappDesc": "Usa WhatsApp Business para RFIs, actualizaciones y entregas en obra. Meta llamará a tu URL de webhook; los secretos quedan en el servidor.",
+    "telegramTitle": "Telegram",
+    "telegramDesc": "Usa un bot de Telegram para avisos y respuestas rápidas. Tras la configuración, los tokens se guardan en el servidor.",
+    "statusConnected": "Conectado",
+    "statusDisconnected": "Sin conectar",
+    "webhookUrl": "URL del webhook",
+    "placeholderWebhook": "Se genera al conectar",
+    "verifyToken": "Token de verificación",
+    "botToken": "Token del bot",
+    "placeholderSecret": "Se define al conectar",
+    "secretStored": "Credenciales configuradas",
+    "credentialsHint": "Los secretos no vuelven al navegador tras la configuración.",
+    "credentialsPendingWa": "Al conectar completarás el flujo de Meta; el token de verificación y los secretos de la app solo se guardan en los servidores de BuildWire.",
+    "credentialsPendingTg": "Al conectar pegarás el token del bot una vez; solo se guarda en los servidores de BuildWire.",
+    "connect": "Conectar",
+    "disconnect": "Desconectar",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "docs": "Documentación"
   }
 }

@@ -17,14 +17,17 @@
     "axios": "^1.13.6",
     "claude": "^0.1.1",
     "i18next": "^25.10.3",
+    "leaflet": "^1.9.4",
     "pdfjs-dist": "^4.4.168",
     "react": "^18",
     "react-dom": "^18",
     "react-i18next": "^16.6.0",
+    "react-leaflet": "^4.2.1",
     "react-redux": "^9.2.0",
     "react-router-dom": "^6.28.0"
   },
   "devDependencies": {
+    "@types/leaflet": "^1.9.21",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

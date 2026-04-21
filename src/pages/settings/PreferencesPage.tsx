@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useTheme, type ThemePreference } from "@/components/theme";
 import { LanguageMenu } from "@/components/layout/LanguageMenu";
 import { useAppSelector } from "@/store/hooks";
-import { Checkbox, Select } from "@/components/ui";
+import { Checkbox, Input, Select } from "@/components/ui";
 import {
   getDateFormatPref,
   getNotifyDailyDigest,
@@ -15,11 +15,18 @@ import {
   setNotifyRfi,
   setTasksDefaultViewPref,
   setUnitsPref,
+  getAiAssistantUserConfig,
+  setAiAssistantUserConfig,
   type DateFormatPref,
   type TasksViewPref,
   type UnitsPref,
   type WorkspaceThemePref,
 } from "@/lib/userPreferences";
+import type {
+  AiAssistantPresentation,
+  AiAssistantUserConfig,
+} from "@/components/ai-assistant/types";
+import { normalizeAiAssistantUserConfig } from "@/components/ai-assistant/config";
 
 function ThemePreview({ kind }: { kind: ThemePreference }) {
   if (kind === "light") {
@@ -36,11 +43,11 @@ function ThemePreview({ kind }: { kind: ThemePreference }) {
   }
   if (kind === "dark") {
     return (
-      <div className="mt-3 overflow-hidden rounded-md border border-border bg-[hsl(210_6.5%_12.2%)]">
+      <div className="mt-3 overflow-hidden rounded-md border border-border bg-[hsl(240_6%_10%)]">
         <div className="flex h-14 gap-0.5 p-1">
-          <div className="w-2 rounded-sm bg-[hsl(210_8%_10%)]" />
-          <div className="min-w-0 flex-1 rounded-sm bg-[hsl(210_5%_14%)]">
-            <div className="h-2 w-8 bg-[hsl(210_10%_22%)]" />
+          <div className="w-2 rounded-sm bg-[hsl(240_6%_10%)]" />
+          <div className="min-w-0 flex-1 rounded-sm bg-[hsl(240_5%_12%)]">
+            <div className="h-2 w-8 bg-[hsl(240_4%_20%)]" />
           </div>
         </div>
       </div>
@@ -52,9 +59,9 @@ function ThemePreview({ kind }: { kind: ThemePreference }) {
         <div className="w-1.5 rounded-sm bg-[hsl(0_0%_90%)]" />
         <div className="min-w-0 flex-1 rounded-sm bg-white" />
       </div>
-      <div className="flex h-14 flex-1 gap-0.5 bg-[hsl(210_6.5%_12.2%)] p-1">
-        <div className="w-1.5 rounded-sm bg-[hsl(210_8%_10%)]" />
-        <div className="min-w-0 flex-1 rounded-sm bg-[hsl(210_5%_14%)]" />
+      <div className="flex h-14 flex-1 gap-0.5 bg-[hsl(240_6%_10%)] p-1">
+        <div className="w-1.5 rounded-sm bg-[hsl(240_6%_10%)]" />
+        <div className="min-w-0 flex-1 rounded-sm bg-[hsl(240_5%_12%)]" />
       </div>
     </div>
   );
@@ -88,10 +95,10 @@ const workspaceThemeMeta: {
       brand: "0 0% 9%",
     },
     dark: {
-      bg: "210 6.5% 12.2%",
-      surface: "0 0% 12%",
-      border: "0 0% 20%",
-      sidebar: "210 6.5% 12.2%",
+      bg: "240 6% 10%",
+      surface: "240 5% 12%",
+      border: "240 4% 20%",
+      sidebar: "240 6% 10%",
       brand: "0 0% 100%",
     },
   },
@@ -107,10 +114,10 @@ const workspaceThemeMeta: {
       brand: "215 45% 38%",
     },
     dark: {
-      bg: "215 14% 8%",
+      bg: "240 6% 10%",
       surface: "215 12% 11%",
       border: "215 12% 22%",
-      sidebar: "215 16% 7%",
+      sidebar: "240 6% 10%",
       brand: "215 72% 70%",
     },
   },
@@ -126,10 +133,10 @@ const workspaceThemeMeta: {
       brand: "204 40% 34%",
     },
     dark: {
-      bg: "200 18% 7%",
+      bg: "240 6% 10%",
       surface: "200 14% 10%",
       border: "200 14% 20%",
-      sidebar: "200 20% 6%",
+      sidebar: "240 6% 10%",
       brand: "198 58% 60%",
     },
   },
@@ -145,10 +152,10 @@ const workspaceThemeMeta: {
       brand: "221 78% 44%",
     },
     dark: {
-      bg: "222 18% 7%",
+      bg: "240 6% 10%",
       surface: "222 14% 10%",
       border: "222 14% 20%",
-      sidebar: "222 20% 6%",
+      sidebar: "240 6% 10%",
       brand: "213 90% 66%",
     },
   },
@@ -164,10 +171,10 @@ const workspaceThemeMeta: {
       brand: "18 88% 38%",
     },
     dark: {
-      bg: "28 16% 8%",
+      bg: "240 6% 10%",
       surface: "26 14% 11%",
       border: "28 14% 22%",
-      sidebar: "28 18% 7%",
+      sidebar: "240 6% 10%",
       brand: "28 96% 56%",
     },
   },
@@ -183,10 +190,10 @@ const workspaceThemeMeta: {
       brand: "152 58% 28%",
     },
     dark: {
-      bg: "150 16% 7%",
+      bg: "240 6% 10%",
       surface: "148 14% 10%",
       border: "148 14% 20%",
-      sidebar: "150 18% 6%",
+      sidebar: "240 6% 10%",
       brand: "148 55% 48%",
     },
   },
@@ -203,10 +210,10 @@ const workspaceThemeMeta: {
       brand: "12 64% 38%",
     },
     dark: {
-      bg: "20 14% 8%",
+      bg: "240 6% 10%",
       surface: "18 12% 11%",
       border: "20 12% 22%",
-      sidebar: "22 16% 7%",
+      sidebar: "240 6% 10%",
       brand: "22 75% 64%",
     },
   },
@@ -222,10 +229,10 @@ const workspaceThemeMeta: {
       brand: "262 44% 44%",
     },
     dark: {
-      bg: "262 16% 7%",
+      bg: "240 6% 10%",
       surface: "260 14% 10%",
       border: "262 14% 20%",
-      sidebar: "264 18% 6%",
+      sidebar: "240 6% 10%",
       brand: "268 58% 70%",
     },
   },
@@ -241,10 +248,10 @@ const workspaceThemeMeta: {
       brand: "42 90% 38%",
     },
     dark: {
-      bg: "45 18% 7%",
+      bg: "240 6% 10%",
       surface: "42 14% 10%",
       border: "45 14% 20%",
-      sidebar: "46 20% 6%",
+      sidebar: "240 6% 10%",
       brand: "48 92% 54%",
     },
   },
@@ -378,6 +385,22 @@ export default function PreferencesPage() {
   const [units, setUnits] = useState<UnitsPref>(() => getUnitsPref());
   const [dailyDigest, setDailyDigest] = useState(() => getNotifyDailyDigest());
   const [rfiNotify, setRfiNotify] = useState(() => getNotifyRfi());
+
+  const [aiAssistant, setAiAssistant] = useState(() => getAiAssistantUserConfig());
+  const [aiTitleDraft, setAiTitleDraft] = useState(() => getAiAssistantUserConfig().title);
+
+  const persistAiAssistant = useCallback(
+    (patch: Partial<AiAssistantUserConfig>) => {
+      const next = normalizeAiAssistantUserConfig({ ...aiAssistant, ...patch });
+      setAiAssistant(next);
+      setAiAssistantUserConfig(next);
+    },
+    [aiAssistant],
+  );
+
+  useEffect(() => {
+    setAiTitleDraft(aiAssistant.title);
+  }, [aiAssistant.title]);
 
   useEffect(() => {
     setDraftAppearance(themePreference);
@@ -589,6 +612,68 @@ export default function PreferencesPage() {
           }}
           triggerClassName="sm:max-w-xs"
         />
+      </section>
+
+      <section className="space-y-4 border-b border-border pb-10">
+        <div>
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">
+            {t("prefs.aiAssistant")}
+          </h2>
+          <p className="mt-1 max-w-2xl text-sm text-secondary">{t("prefs.aiAssistantHint")}</p>
+        </div>
+        <div className="max-w-xl space-y-4">
+          <Select
+            label={t("prefs.aiAssistantLayout")}
+            options={[
+              { value: "dock_end", label: t("prefs.aiAssistantLayoutDockEnd") },
+              { value: "dock_start", label: t("prefs.aiAssistantLayoutDockStart") },
+              { value: "modal", label: t("prefs.aiAssistantLayoutModal") },
+            ]}
+            value={aiAssistant.presentation}
+            onValueChange={(v) =>
+              persistAiAssistant({ presentation: v as AiAssistantPresentation })
+            }
+            triggerClassName="sm:max-w-md"
+          />
+          <Select
+            label={t("prefs.aiAssistantWidth")}
+            options={[
+              { value: "360", label: "360 px" },
+              { value: "400", label: "400 px" },
+              { value: "440", label: "440 px" },
+              { value: "480", label: "480 px" },
+              { value: "520", label: "520 px" },
+            ]}
+            value={String(aiAssistant.widthPx)}
+            onValueChange={(v) => persistAiAssistant({ widthPx: Number(v) })}
+            triggerClassName="sm:max-w-xs"
+          />
+          <Input
+            label={t("prefs.aiAssistantTitleField")}
+            value={aiTitleDraft}
+            onChange={(e) => setAiTitleDraft(e.target.value)}
+            onBlur={() => {
+              if (aiTitleDraft.trim() === aiAssistant.title) return;
+              persistAiAssistant({ title: aiTitleDraft.trim() || aiAssistant.title });
+            }}
+            maxLength={48}
+          />
+          <Checkbox
+            label={t("prefs.aiAssistantRememberOpen")}
+            checked={aiAssistant.rememberOpen}
+            onChange={(e) => persistAiAssistant({ rememberOpen: e.target.checked })}
+          />
+          <Checkbox
+            label={t("prefs.aiAssistantDefaultOpen")}
+            checked={aiAssistant.defaultOpen}
+            onChange={(e) => persistAiAssistant({ defaultOpen: e.target.checked })}
+          />
+          <Checkbox
+            label={t("prefs.aiAssistantIsolated")}
+            checked={aiAssistant.isolatedChrome}
+            onChange={(e) => persistAiAssistant({ isolatedChrome: e.target.checked })}
+          />
+        </div>
       </section>
 
       <section className="space-y-4 border-b border-border pb-10">

@@ -5,6 +5,11 @@ import {
     isAppLocale,
     type AppLocale,
 } from '@/i18n/locales';
+import type { AiAssistantUserConfig } from '@/components/ai-assistant/types';
+export type { AiAssistantPresentation, AiAssistantUserConfig } from '@/components/ai-assistant/types';
+import { normalizeAiAssistantUserConfig } from '@/components/ai-assistant/config';
+
+export { DEFAULT_AI_ASSISTANT_USER_CONFIG } from '@/components/ai-assistant/config';
 
 export const PREF_KEYS = {
     dateFormat: 'buildwire-pref-date-format',
@@ -14,6 +19,8 @@ export const PREF_KEYS = {
     notifyRfi: 'buildwire-pref-notify-rfi',
     workspaceTheme: 'buildwire-pref-workspace-theme',
     locale: 'buildwire-pref-locale',
+    aiAssistant: 'buildwire-pref-ai-assistant',
+    aiAssistantOpen: 'buildwire-pref-ai-assistant-open',
 } as const;
 
 export type { AppLocale };
@@ -149,6 +156,57 @@ export function getLocalePref(): AppLocale {
 export function setLocalePref(locale: AppLocale) {
     try {
         localStorage.setItem(PREF_KEYS.locale, locale);
+    } catch {
+        /* ignore */
+    }
+}
+
+// —— AI assistant (layout + behaviour) ——————————————————————————
+
+export const AI_ASSISTANT_CONFIG_CHANGED = 'bw-ai-assistant-config';
+
+export function getAiAssistantUserConfig(): AiAssistantUserConfig {
+    try {
+        const raw = localStorage.getItem(PREF_KEYS.aiAssistant);
+        if (!raw) return normalizeAiAssistantUserConfig(null);
+        const parsed = JSON.parse(raw) as Partial<AiAssistantUserConfig>;
+        return normalizeAiAssistantUserConfig(parsed);
+    } catch {
+        return normalizeAiAssistantUserConfig(null);
+    }
+}
+
+export function setAiAssistantUserConfig(config: AiAssistantUserConfig) {
+    try {
+        localStorage.setItem(PREF_KEYS.aiAssistant, JSON.stringify(config));
+        window.dispatchEvent(new Event(AI_ASSISTANT_CONFIG_CHANGED));
+    } catch {
+        /* ignore */
+    }
+}
+
+export function getAiAssistantOpenState(): boolean | null {
+    try {
+        const v = localStorage.getItem(PREF_KEYS.aiAssistantOpen);
+        if (v === '1') return true;
+        if (v === '0') return false;
+        return null;
+    } catch {
+        return null;
+    }
+}
+
+export function setAiAssistantOpenState(open: boolean) {
+    try {
+        localStorage.setItem(PREF_KEYS.aiAssistantOpen, open ? '1' : '0');
+    } catch {
+        /* ignore */
+    }
+}
+
+export function clearAiAssistantOpenState() {
+    try {
+        localStorage.removeItem(PREF_KEYS.aiAssistantOpen);
     } catch {
         /* ignore */
     }

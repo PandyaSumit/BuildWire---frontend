@@ -50,7 +50,8 @@
     "globalSearchPlaceholder": "ابحث في المشاريع والمهام وطلبات المعلومات والتقارير اليومية والفحوصات والملفات…",
     "globalSearchAria": "بحث عام",
     "notifications": "الإشعارات",
-    "language": "اللغة"
+    "language": "اللغة",
+    "breadcrumbAria": "مسار التنقل"
   },
   "account": {
     "fallbackName": "الحساب",
@@ -708,5 +709,33 @@
     "actionRename": "Rename",
     "actionMove": "Move…",
     "actionDelete": "Delete"
+  },
+  "botIntegrationsPage": {
+    "title": "تكاملات البوتات",
+    "description": "اربط الأتمتة والبوتات بمؤسستك — للمسؤولين فقط.",
+    "adminBannerTitle": "للمسؤولين عن المؤسسة فقط",
+    "adminBannerBody": "يمكن لمسؤولي المؤسسة فقط ربط البوتات أو فصلها. اطلب من مسؤول التفعيل إن احتجت.",
+    "demoNoteTitle": "معاينة",
+    "demoNoteBody": "الربط والفصل هنا يحدّث هذه الشاشة فقط. ستستبدل واجهة مؤسستك هذه القيم عند توفر التكامل في الخادم.",
+    "whatsappTitle": "واتساب",
+    "whatsappDesc": "استخدم منصة واتساب للأعمال لطلبات المعلومات والتحديثات وتسليم الموقع. ستتصل ميتا بعنوان الويب هوك؛ الأسرار تبقى على الخادم.",
+    "telegramTitle": "تيليغرام",
+    "telegramDesc": "استخدم بوت تيليغرام للإشعارات والردود السريعة. بعد الإعداد تُخزَّن الرموز على الخادم.",
+    "statusConnected": "متصل",
+    "statusDisconnected": "غير متصل",
+    "webhookUrl": "رابط الويب هوك",
+    "placeholderWebhook": "يُنشأ عند الربط",
+    "verifyToken": "رمز التحقق",
+    "botToken": "رمز البوت",
+    "placeholderSecret": "يُضبط أثناء الربط",
+    "secretStored": "تم ضبط بيانات الاعتماد",
+    "credentialsHint": "لا تُعاد الأسرار إلى المتصفح بعد الإعداد.",
+    "credentialsPendingWa": "عند الربط ستُكمل مسار ميتا؛ يُخزَّن رمز التحقق وأسرار التطبيق على خوادم BuildWire فقط.",
+    "credentialsPendingTg": "عند الربط تلصق رمز البوت مرة واحدة؛ يُخزَّن على خوادم BuildWire فقط.",
+    "connect": "ربط",
+    "disconnect": "فصل",
+    "copy": "نسخ",
+    "copied": "تم النسخ",
+    "docs": "التوثيق"
   }
 }

@@ -1,11 +1,16 @@
-import type { ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { useMemo, type ReactNode } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import {
+  formatShellBreadcrumbFallback,
+  orgShellBreadcrumbNavKey,
+} from '@/utils/orgShellBreadcrumb';
 import { useSidebarMode } from '@/hooks/useSidebarMode';
 import { useSidebarLayout } from '@/components/layout/SidebarLayoutContext';
 import { LanguageMenu } from '@/components/layout/LanguageMenu';
 import { GlobalSearchBar } from '@/components/layout/GlobalSearchBar';
 import { useOptionalProjectUi } from '@/hooks/project/useProjectUi';
+import { useAiAssistant } from '@/components/ai-assistant';
 
 interface HeaderProps {
   title?: string;
@@ -18,10 +23,19 @@ const iconBtn =
 
 export function Header({ title, subtitle, actions }: HeaderProps) {
   const { t } = useTranslation();
+  const { pathname } = useLocation();
   const sidebarMode = useSidebarMode();
   const showProjectBack = sidebarMode.mode === 'project';
   const projectUi = useOptionalProjectUi();
   const { mobileOpen, setMobileOpen } = useSidebarLayout();
+  const { open: aiOpen, toggle: toggleAiAssistant } = useAiAssistant();
+
+  const shellBreadcrumbLabel = useMemo(() => {
+    const key = orgShellBreadcrumbNavKey(pathname);
+    if (key) return t(key);
+    const fb = formatShellBreadcrumbFallback(pathname);
+    return fb || t('nav.dashboard');
+  }, [pathname, t]);
 
   return (
     <header className="sticky top-0 z-40 flex h-[52px] items-center gap-2 border-b border-border/50 bg-header/95 px-2.5 backdrop-blur-sm sm:px-4 dark:border-white/[0.05]">
@@ -74,11 +88,14 @@ export function Header({ title, subtitle, actions }: HeaderProps) {
         )}
 
         {!showProjectBack && !title && (
-          <div className="min-w-0 text-[12px]">
-            <span className="font-semibold text-primary">BuildWire</span>
-            <span className="mx-1 text-muted/40">/</span>
-            <span className="text-muted">{t('nav.projects')}</span>
-          </div>
+          <nav
+            aria-label={t('header.breadcrumbAria')}
+            className="flex min-w-0 items-center gap-1 text-[12px]"
+          >
+            <span className="shrink-0 font-semibold text-primary">BuildWire</span>
+            <span className="shrink-0 text-muted/40">/</span>
+            <span className="truncate text-muted">{shellBreadcrumbLabel}</span>
+          </nav>
         )}
       </div>
 
@@ -98,6 +115,23 @@ export function Header({ title, subtitle, actions }: HeaderProps) {
         <div className="hidden md:block">
           <LanguageMenu />
         </div>
+
+        <button
+          type="button"
+          className={`${iconBtn} ${aiOpen ? 'bg-brand/12 text-brand' : ''}`}
+          onClick={toggleAiAssistant}
+          aria-label={t('header.aiAssistant', { defaultValue: 'AI assistant' })}
+          aria-pressed={aiOpen}
+        >
+          <svg className="h-[17px] w-[17px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={1.75}
+              d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.847a4.5 4.5 0 003.09 3.09L15.75 12l-2.847.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
+            />
+          </svg>
+        </button>
 
         <button type="button" className={iconBtn} aria-label={t('header.notifications')}>
           <svg className="h-[17px] w-[17px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>

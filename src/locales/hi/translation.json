@@ -50,7 +50,8 @@
     "globalSearchPlaceholder": "प्रोजेक्ट, टास्क, RFI, दैनिक रिपोर्ट, निरीक्षण, फ़ाइलें खोजें…",
     "globalSearchAria": "वैश्विक खोज",
     "notifications": "सूचनाएँ",
-    "language": "भाषा"
+    "language": "भाषा",
+    "breadcrumbAria": "ब्रेडक्रंब"
   },
   "account": {
     "fallbackName": "खाता",
@@ -708,5 +709,33 @@
     "actionRename": "Rename",
     "actionMove": "Move…",
     "actionDelete": "Delete"
+  },
+  "botIntegrationsPage": {
+    "title": "बॉट इंटीग्रेशन",
+    "description": "अपने संगठन में ऑटोमेशन और बॉट जोड़ें — केवल व्यवस्थापक।",
+    "adminBannerTitle": "केवल संगठन व्यवस्थापक",
+    "adminBannerBody": "केवल संगठन व्यवस्थापक बॉट कनेक्ट या डिस्कनेक्ट कर सकते हैं। आवश्यकता हो तो व्यवस्थापक से संपर्क करें।",
+    "demoNoteTitle": "पूर्वावलोकन",
+    "demoNoteBody": "यहाँ कनेक्ट/डिस्कनेक्ट केवल इस स्क्रीन को अपडेट करता है। बैकएंड तैयार होने पर आपकी API इन प्लेसहोल्डर को बदल देगी।",
+    "whatsappTitle": "WhatsApp",
+    "whatsappDesc": "RFI, अपडेट और साइट हैंडऑफ के लिए WhatsApp Business Platform। Meta आपके webhook URL को कॉल करेगा; सीक्रेट सर्वर पर रहते हैं।",
+    "telegramTitle": "Telegram",
+    "telegramDesc": "सूचनाओं और त्वरित उत्तरों के लिए Telegram बॉट। सेटअप के बाद टोकन सर्वर-साइड संग्रहीत होते हैं।",
+    "statusConnected": "जुड़ा हुआ",
+    "statusDisconnected": "जुड़ा नहीं",
+    "webhookUrl": "Webhook URL",
+    "placeholderWebhook": "कनेक्ट करने पर बनेगा",
+    "verifyToken": "Verify टोकन",
+    "botToken": "बॉट टोकन",
+    "placeholderSecret": "कनेक्ट के दौरान सेट",
+    "secretStored": "क्रेडेंशियल कॉन्फ़िगर",
+    "credentialsHint": "सेटअप के बाद सीक्रेट ब्राउज़र पर वापस नहीं भेजे जाते।",
+    "credentialsPendingWa": "कनेक्ट करते समय Meta फ़्लो पूरा करेंगे — verify टोकन और ऐप सीक्रेट केवल BuildWire सर्वर पर संग्रहीत होते हैं।",
+    "credentialsPendingTg": "कनेक्ट करते समय एक बार बॉट टोकन चिपकाएँ; यह केवल BuildWire सर्वर पर संग्रहीत होता है।",
+    "connect": "कनेक्ट करें",
+    "disconnect": "डिस्कनेक्ट",
+    "copy": "कॉपी",
+    "copied": "कॉपी हो गया",
+    "docs": "दस्तावेज़"
   }
 }
