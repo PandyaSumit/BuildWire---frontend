@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useGlobalSearch } from "@/components/layout/GlobalSearchContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { IconPlus } from "@/components/ui/icons";
 import { DataTable, type DataTableColumn } from "@/components/ui/data-table";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
@@ -255,8 +256,8 @@ export default function DailyReportsPage() {
                 { value: "list", label: t("dailyReportsPage.modeList") },
               ]}
             />
-            <Button type="button" size="sm" onClick={() => openNew()}>
-              {t("dailyReportsPage.newReport")}
+            <Button type="button" size="sm" className="inline-flex items-center gap-1.5" onClick={() => openNew()}>
+              <IconPlus />{t("dailyReportsPage.newReport")}
             </Button>
           </>
         }

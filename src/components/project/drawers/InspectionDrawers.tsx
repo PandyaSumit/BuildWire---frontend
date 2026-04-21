@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { IconCalendar, IconFileText } from "@/components/ui/icons";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Select, type SelectOption } from "@/components/ui/select";
@@ -214,11 +215,11 @@ export function InspectionDetailDrawer({
       </div>
 
       <div className="flex shrink-0 flex-wrap justify-end gap-2 border-t border-border/60 px-5 py-3">
-        <Button size="sm" variant="secondary" type="button" onClick={onClose}>
+        <Button size="sm" variant="secondary" type="button" className="inline-flex items-center gap-1.5" onClick={onClose}>
           {t("inspectionPage.close")}
         </Button>
-        <Button size="sm" variant="secondary" type="button">
-          {t("inspectionPage.openPdf")}
+        <Button size="sm" variant="secondary" type="button" className="inline-flex items-center gap-1.5">
+          <IconFileText />{t("inspectionPage.openPdf")}
         </Button>
       </div>
     </div>
@@ -371,11 +372,11 @@ export function ScheduleInspectionDrawer({
         <p className="text-[12px] text-muted">{t("inspectionPage.schedule.hint")}</p>
       </div>
       <div className="flex shrink-0 justify-end gap-2 border-t border-border/60 px-5 py-3">
-        <Button type="button" variant="secondary" size="sm" onClick={onClose}>
+        <Button type="button" variant="secondary" size="sm" className="inline-flex items-center gap-1.5" onClick={onClose}>
           {t("inspectionPage.schedule.cancel")}
         </Button>
-        <Button type="button" variant="primary" size="sm" onClick={handleSubmit}>
-          {t("inspectionPage.schedule.submit")}
+        <Button type="button" variant="primary" size="sm" className="inline-flex items-center gap-1.5" onClick={handleSubmit}>
+          <IconCalendar />{t("inspectionPage.schedule.submit")}
         </Button>
       </div>
     </div>

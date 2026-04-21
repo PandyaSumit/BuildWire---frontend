@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
+import { IconThumbDown, IconThumbUp, IconSave, IconSend } from "@/components/ui/icons";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -499,24 +500,25 @@ export function DailyReportDrawer({
               type="button"
               variant="primary"
               size="sm"
+              className="inline-flex items-center gap-1.5"
               onClick={() => {
                 if (report) onApprove?.(report.date);
                 onClose();
               }}
             >
-              {t("dailyReportsPage.drawer.approve")}
+              <IconThumbUp />{t("dailyReportsPage.drawer.approve")}
             </Button>
             <Button
               type="button"
               variant="secondary"
               size="sm"
-              className="border-danger/40 text-danger hover:bg-danger/10"
+              className="inline-flex items-center gap-1.5 border-danger/40 text-danger hover:bg-danger/10"
               onClick={() => {
                 if (report) onReject?.(report.date);
                 onClose();
               }}
             >
-              {t("dailyReportsPage.drawer.reject")}
+              <IconThumbDown />{t("dailyReportsPage.drawer.reject")}
             </Button>
           </div>
         ) : null}
@@ -528,14 +530,14 @@ export function DailyReportDrawer({
           </div>
         ) : (
           <div className="flex flex-wrap justify-end gap-2">
-            <Button type="button" variant="secondary" size="sm" onClick={onClose}>
+            <Button type="button" variant="secondary" size="sm" className="inline-flex items-center gap-1.5" onClick={onClose}>
               {t("dailyReportsPage.create.cancel")}
             </Button>
-            <Button type="button" variant="secondary" size="sm" onClick={handleSaveDraft}>
-              {t("dailyReportsPage.create.saveDraft")}
+            <Button type="button" variant="secondary" size="sm" className="inline-flex items-center gap-1.5" onClick={handleSaveDraft}>
+              <IconSave />{t("dailyReportsPage.create.saveDraft")}
             </Button>
-            <Button type="button" variant="primary" size="sm" onClick={handleSubmit}>
-              {t("dailyReportsPage.create.submit")}
+            <Button type="button" variant="primary" size="sm" className="inline-flex items-center gap-1.5" onClick={handleSubmit}>
+              <IconSend />{t("dailyReportsPage.create.submit")}
             </Button>
           </div>
         )}

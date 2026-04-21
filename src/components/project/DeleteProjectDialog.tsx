@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { IconTrash } from '@/components/ui/icons';
 
 type Props = {
   open: boolean;
@@ -78,22 +80,26 @@ export function DeleteProjectDialog({ open, projectName, onClose, onConfirm }: P
           autoComplete="off"
         />
         {error ? <p className="mt-1 text-xs text-danger">{error}</p> : null}
-        <div className="mt-6 flex justify-end gap-2">
-          <button
+        <div className="mt-6 flex justify-end gap-3 border-t border-border/40 pt-4">
+          <Button
             type="button"
-            className="rounded-lg px-4 py-2 text-sm font-medium text-secondary transition-colors hover:bg-surface"
+            variant="secondary"
+            size="md"
             onClick={() => !submitting && onClose()}
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
-            disabled={!match || submitting}
+            variant="danger"
+            size="md"
+            disabled={!match}
+            loading={submitting}
+            loadingText="Deleting…"
             onClick={() => void handleDelete()}
-            className="rounded-lg bg-danger px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {submitting ? 'Deleting…' : 'Delete project'}
-          </button>
+            <IconTrash className="mr-1.5" />Delete project
+          </Button>
         </div>
       </div>
     </div>

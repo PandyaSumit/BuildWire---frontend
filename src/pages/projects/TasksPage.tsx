@@ -1,14 +1,16 @@
-import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Avatar, Button, SegmentedControl, SheetDrawer } from "@/components/ui";
+import { IconPlus } from "@/components/ui/icons";
 import { TaskDrawer } from "@/components/task/TaskDrawer";
 import {
   TaskProjectProvider,
   useTaskProject,
 } from "@/hooks/task/TaskProjectContext";
 import { TaskKanbanBoard } from "@/components/task/TaskKanbanBoard";
-import { TaskFiltersBar } from "@/components/task/TaskFiltersBar";
+import { TaskFiltersBar, useTaskFilterCount } from "@/components/task/TaskFiltersBar";
+import { TaskGroupPanel, type GroupByKey, type GroupSortOrder } from "@/components/task/TaskGroupPanel";
 import { TaskBulkToolbar } from "@/components/task/TaskBulkToolbar";
 import { TaskGanttView } from "@/components/task/TaskGanttView";
 import { demoAssigneesDisplayList } from "@/utils/task/demoUsers";
@@ -24,7 +26,7 @@ import type { BuildWireTask } from "@/types/task";
 
 type View = "kanban" | "list" | "schedule" | "floor";
 
-type AsanaSection = { id: string; rows: BuildWireTask[] };
+type AsanaSection = { id: string; rows: BuildWireTask[]; label?: string };
 
 function toDateMidday(isoDate: string) {
   return new Date(`${isoDate}T12:00:00`);
@@ -63,6 +65,49 @@ function buildAsanaSections(rows: BuildWireTask[]): AsanaSection[] {
   });
 
   return sections;
+}
+
+const PRIORITY_ORDER = ['critical', 'high', 'medium', 'low'];
+const STATUS_ORDER = ['open', 'in_progress', 'in_review', 'blocked', 'awaiting_inspection', 'done', 'void'];
+
+function buildGroupedSections(
+  rows: BuildWireTask[],
+  groupBy: GroupByKey,
+  sortOrder: GroupSortOrder,
+): AsanaSection[] {
+  if (groupBy === 'sections') return buildAsanaSections(rows);
+
+  const groupMap = new Map<string, BuildWireTask[]>();
+  for (const task of rows) {
+    let key: string;
+    switch (groupBy) {
+      case 'priority': key = task.priority; break;
+      case 'status': key = task.status; break;
+      case 'type': key = task.type; break;
+      case 'trade': key = task.trade || 'none'; break;
+      case 'floor': key = task.floor || 'none'; break;
+      case 'due_date': key = task.due_date.slice(0, 10) || 'none'; break;
+      default: key = 'none';
+    }
+    if (!groupMap.has(key)) groupMap.set(key, []);
+    groupMap.get(key)!.push(task);
+  }
+
+  let keys = Array.from(groupMap.keys());
+  if (sortOrder === 'asc') {
+    if (groupBy === 'priority') keys.sort((a, b) => PRIORITY_ORDER.indexOf(a) - PRIORITY_ORDER.indexOf(b));
+    else if (groupBy === 'status') keys.sort((a, b) => STATUS_ORDER.indexOf(a) - STATUS_ORDER.indexOf(b));
+    else keys.sort((a, b) => a.localeCompare(b));
+  } else if (sortOrder === 'desc') {
+    if (groupBy === 'priority') keys.sort((a, b) => PRIORITY_ORDER.indexOf(b) - PRIORITY_ORDER.indexOf(a));
+    else if (groupBy === 'status') keys.sort((a, b) => STATUS_ORDER.indexOf(b) - STATUS_ORDER.indexOf(a));
+    else keys.sort((a, b) => b.localeCompare(a));
+  } else {
+    if (groupBy === 'priority') keys.sort((a, b) => PRIORITY_ORDER.indexOf(a) - PRIORITY_ORDER.indexOf(b));
+    else if (groupBy === 'status') keys.sort((a, b) => STATUS_ORDER.indexOf(a) - STATUS_ORDER.indexOf(b));
+  }
+
+  return keys.map((key) => ({ id: `${groupBy}:${key}`, rows: groupMap.get(key)!, label: key }));
 }
 
 function formatShortDueRange(startIso: string, endIso: string): string {
@@ -187,79 +232,29 @@ function TaskCommentIcon({ className }: { className?: string }) {
 function AsanaTaskList({
   projectId,
   sections,
+  groupBy,
   onOpenTask,
   onAddTask,
   selectedTaskId,
   onSelectTask,
-  filtersOpen,
-  onToggleFilters,
 }: {
   projectId: string | undefined;
   sections: AsanaSection[];
+  groupBy: GroupByKey;
   onOpenTask: (task: BuildWireTask) => void;
   onAddTask: () => void;
   selectedTaskId: string | null;
   onSelectTask: (id: string) => void;
-  filtersOpen: boolean;
-  onToggleFilters: () => void;
 }) {
   const { t } = useTranslation();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+
   const toggleSection = useCallback((id: string) => {
     setCollapsed((prev) => ({ ...prev, [id]: !prev[id] }));
   }, []);
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-      <div
-        id="tasks-filter-panel"
-        className="flex min-h-11 shrink-0 items-center gap-3 border-b border-border/35 py-2"
-      >
-        {filtersOpen ? (
-          <div className="min-w-0 flex-1">
-            <TaskFiltersBar />
-          </div>
-        ) : null}
-        <div className="ml-auto flex shrink-0 flex-wrap items-center gap-x-2 gap-y-1 text-[12px] text-secondary">
-          <button
-            type="button"
-            onClick={onToggleFilters}
-            aria-expanded={filtersOpen}
-            aria-controls="tasks-filter-panel"
-            className={`h-8 shrink-0 rounded-lg px-2.5 hover:bg-muted/10 hover:text-primary ${
-              filtersOpen ? "bg-primary/8 text-primary dark:bg-white/10" : ""
-            }`}
-          >
-            {t("tasks.filter")}
-          </button>
-          <button
-            type="button"
-            className="inline-flex h-8 shrink-0 items-center rounded-lg bg-primary/8 px-2.5 text-[12px] text-primary dark:bg-white/10 dark:text-primary"
-          >
-            {t("tasks.listToolbarSort")}
-          </button>
-          <button
-            type="button"
-            className="h-8 shrink-0 rounded-lg px-2.5 hover:bg-muted/10 hover:text-primary"
-          >
-            {t("tasks.listToolbarGroup")}
-          </button>
-          <button
-            type="button"
-            className="h-8 shrink-0 rounded-lg px-2.5 hover:bg-muted/10 hover:text-primary"
-          >
-            {t("tasks.listToolbarOptions")}
-          </button>
-          <button
-            type="button"
-            title={t("tasks.listToolbarSearch")}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[15px] leading-none hover:bg-muted/10 hover:text-primary"
-          >
-            ⌕
-          </button>
-        </div>
-      </div>
-
       <div className="min-h-0 min-w-0 flex-1 overflow-auto">
         <table className="w-full min-w-[1032px] table-fixed border-separate border-spacing-0 text-[13px]">
           <colgroup>
@@ -392,7 +387,17 @@ function AsanaTaskList({
                         <span className="w-3 text-center text-xs text-muted">
                           {isCollapsed ? "▸" : "▾"}
                         </span>
-                        <span>{t(listSectionTKey(section.id))}</span>
+                        <span>
+                          {section.label
+                            ? groupBy === 'priority'
+                              ? t(taskPriorityTKey(section.label as Parameters<typeof taskPriorityTKey>[0]))
+                              : groupBy === 'status'
+                              ? t(taskWorkflowTKey(section.label as Parameters<typeof taskWorkflowTKey>[0]))
+                              : groupBy === 'type'
+                              ? t(taskTypeKeyTKey(section.label as Parameters<typeof taskTypeKeyTKey>[0]))
+                              : section.label === 'none' ? t('tasks.group.noValue') : section.label
+                            : t(listSectionTKey(section.id))}
+                        </span>
                       </button>
                     </td>
                   </tr>
@@ -560,13 +565,19 @@ function ProjectTasksInner() {
     | { kind: "edit"; task: BuildWireTask }
   >({ kind: "none" });
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [groupOpen, setGroupOpen] = useState(false);
+  const [groupBy, setGroupBy] = useState<GroupByKey>('sections');
+  const [groupSortOrder, setGroupSortOrder] = useState<GroupSortOrder>('custom');
+  const [searchExpanded, setSearchExpanded] = useState(false);
+  const searchRef = useRef<HTMLInputElement>(null);
   const [selectedListTaskId, setSelectedListTaskId] = useState<string | null>(
     null,
   );
   const [taskDrawerExpanded, setTaskDrawerExpanded] = useState(false);
 
-  const { filteredTasks, selectedIds, setSelectedIds, setBulkSelectMode } =
+  const { filteredTasks, selectedIds, setSelectedIds, setBulkSelectMode, filters, setFilters } =
     useTaskProject();
+  const activeFilterCount = useTaskFilterCount();
 
   useEffect(() => {
     if (!filteredTasks.length) {
@@ -599,9 +610,20 @@ function ProjectTasksInner() {
 
   const tableRows = useMemo(() => filteredTasks, [filteredTasks]);
   const asanaSections = useMemo(
-    () => buildAsanaSections(tableRows),
-    [tableRows],
+    () => buildGroupedSections(tableRows, groupBy, groupSortOrder),
+    [tableRows, groupBy, groupSortOrder],
   );
+
+  const handleGroupByChange = useCallback((v: GroupByKey) => {
+    setGroupBy(v);
+    setGroupSortOrder('custom');
+  }, []);
+
+  const handleGroupClear = useCallback(() => {
+    setGroupBy('sections');
+    setGroupSortOrder('custom');
+    setGroupOpen(false);
+  }, []);
 
   const clearSelection = useCallback(() => {
     setSelectedIds(new Set());
@@ -628,6 +650,10 @@ function ProjectTasksInner() {
     return () => window.removeEventListener("keydown", onKey);
   }, [openCreate]);
 
+  useEffect(() => {
+    if (searchExpanded) searchRef.current?.focus();
+  }, [searchExpanded]);
+
   return (
     <div
       className={`relative flex min-h-0 min-w-0 flex-1 flex-col px-6 pt-6 ${
@@ -635,13 +661,25 @@ function ProjectTasksInner() {
       }`}
     >
       <div className="shrink-0">
-        <div>
+        {/* Row 1: heading + Add task button */}
+        <div className="flex items-center justify-between">
           <h1 className="font-[family-name:var(--font-dm-sans)] text-2xl font-bold tracking-tight text-primary">
             {t("tasks.title")}
           </h1>
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
+            onClick={() => openCreate()}
+            className="inline-flex h-8 shrink-0 items-center gap-1.5 px-3 !py-0 text-[12px] font-semibold"
+          >
+            <IconPlus />
+            {t("tasks.listAddTask")}
+          </Button>
         </div>
 
-        <div className="mt-2 flex min-w-0 items-center justify-between border-b border-border/55">
+        {/* Row 2: tabs (left) + toolbar buttons (right) */}
+        <div className="relative mt-2 flex min-w-0 items-center justify-between border-b border-border/55">
           <SegmentedControl<View>
             variant="underline"
             className="min-w-0 !border-b-0"
@@ -654,28 +692,75 @@ function ProjectTasksInner() {
               { value: "floor", label: t("tasks.viewFloorPlan") },
             ]}
           />
-          <Button
-            type="button"
-            variant="primary"
-            size="sm"
-            onClick={() => openCreate()}
-            className="mb-1.5 h-8 shrink-0 gap-1.5 px-3 !py-0 text-[12px] font-semibold"
-          >
-            <span className="text-[15px] font-normal leading-none" aria-hidden>+</span>
-            {t("tasks.listAddTask")}
-          </Button>
+
+          {/* Toolbar buttons */}
+          <div className="mb-1 flex shrink-0 items-center gap-x-1 text-[12px] text-secondary">
+            {searchExpanded ? (
+              <div className="flex items-center gap-2 rounded-lg border border-border/50 bg-surface/40 px-2.5 py-1">
+                <svg className="h-3.5 w-3.5 shrink-0 text-muted" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+                  <path d="M6.5 1a5.5 5.5 0 1 0 3.535 9.596l3.185 3.184a.75.75 0 1 0 1.06-1.06L11.096 10.03A5.5 5.5 0 0 0 6.5 1zm-4 5.5a4 4 0 1 1 8 0 4 4 0 0 1-8 0z" />
+                </svg>
+                <input
+                  ref={searchRef}
+                  type="text"
+                  value={filters.search}
+                  onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
+                  placeholder={t("tasks.workspaceSearchPlaceholder")}
+                  className="w-44 bg-transparent text-[12px] text-primary placeholder:text-muted focus:outline-none"
+                  onBlur={() => { if (!filters.search.trim()) setSearchExpanded(false); }}
+                />
+                <button type="button" onClick={() => { setFilters((f) => ({ ...f, search: '' })); setSearchExpanded(false); }} className="shrink-0 rounded p-0.5 text-muted hover:text-primary" aria-label="Close search">
+                  <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor" aria-hidden><path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06z" /></svg>
+                </button>
+              </div>
+            ) : (
+              <>
+                <button type="button" onClick={() => { setFiltersOpen((v) => !v); setGroupOpen(false); }} aria-expanded={filtersOpen} className={`inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-2.5 hover:bg-muted/10 hover:text-primary ${filtersOpen ? "bg-muted/10 text-primary" : ""}`}>
+                  <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor" aria-hidden><path d="M1.5 3.25a.75.75 0 0 1 .75-.75h11.5a.75.75 0 0 1 0 1.5H2.25a.75.75 0 0 1-.75-.75zM3 7.25a.75.75 0 0 1 .75-.75h8.5a.75.75 0 0 1 0 1.5h-8.5A.75.75 0 0 1 3 7.25zm2 4a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 11.25z" /></svg>
+                  {t("tasks.filter")}
+                  {activeFilterCount > 0 ? <span className="flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-brand px-1 text-[10px] font-semibold text-white">{activeFilterCount}</span> : null}
+                </button>
+                <button type="button" className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg bg-muted/8 px-2.5 text-primary dark:bg-white/8">
+                  <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor" aria-hidden><path d="M3.5 3.75a.75.75 0 0 0-1.5 0v8.5a.75.75 0 0 0 1.5 0v-8.5zm5.25 0a.75.75 0 0 0-1.5 0v8.5a.75.75 0 0 0 1.5 0V7.5l3.22 5.28a.75.75 0 0 0 1.28-.78V3.75a.75.75 0 0 0-1.5 0v4.75L8.75 3.22z" /></svg>
+                  {t("tasks.listToolbarSort")}
+                </button>
+                <button type="button" onClick={() => { setGroupOpen((v) => !v); setFiltersOpen(false); }} aria-expanded={groupOpen} className={`inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-2.5 hover:bg-muted/10 hover:text-primary ${groupBy !== 'sections' || groupOpen ? "bg-muted/10 text-primary" : ""}`}>
+                  <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor" aria-hidden><path d="M1 2.75A.75.75 0 0 1 1.75 2h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 1 2.75zm0 5A.75.75 0 0 1 1.75 7h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 1 7.75zm0 5a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75zM9.25 2a.75.75 0 0 0 0 1.5h5a.75.75 0 0 0 0-1.5h-5zm0 5a.75.75 0 0 0 0 1.5h5a.75.75 0 0 0 0-1.5h-5zm0 5a.75.75 0 0 0 0 1.5h5a.75.75 0 0 0 0-1.5h-5z" /></svg>
+                  {t("tasks.listToolbarGroup")}
+                </button>
+                <button type="button" className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg px-2.5 hover:bg-muted/10 hover:text-primary">
+                  <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor" aria-hidden><path d="M8 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM1.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm13 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z" /></svg>
+                  {t("tasks.listToolbarOptions")}
+                </button>
+                <button type="button" title={t("tasks.listToolbarSearch")} onClick={() => setSearchExpanded(true)} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg hover:bg-muted/10 hover:text-primary">
+                  <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor" aria-hidden><path d="M6.5 1a5.5 5.5 0 1 0 3.535 9.596l3.185 3.184a.75.75 0 1 0 1.06-1.06L11.096 10.03A5.5 5.5 0 0 0 6.5 1zm-4 5.5a4 4 0 1 1 8 0 4 4 0 0 1-8 0z" /></svg>
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Floating panels — anchored to this row */}
+          {filtersOpen ? (
+            <div className="absolute right-0 top-full z-30 mt-1 w-[500px] max-w-full">
+              <TaskFiltersBar />
+            </div>
+          ) : null}
+          {groupOpen ? (
+            <div className="absolute right-0 top-full z-30 mt-1 w-[500px] max-w-full">
+              <TaskGroupPanel
+                groupBy={groupBy}
+                sortOrder={groupSortOrder}
+                onGroupByChange={handleGroupByChange}
+                onSortOrderChange={setGroupSortOrder}
+                onClear={handleGroupClear}
+              />
+            </div>
+          ) : null}
         </div>
       </div>
 
       {view === "kanban" ? (
-        <div
-          className={`min-h-0 flex-1 overflow-hidden ${filtersOpen ? "mt-5" : "mt-6"}`}
-        >
-          {filtersOpen ? (
-            <div id="tasks-filter-panel" className="mb-4">
-              <TaskFiltersBar />
-            </div>
-          ) : null}
+        <div className="min-h-0 flex-1 overflow-hidden mt-4">
           <TaskKanbanBoard
             onOpenTask={openTask}
             onRequestCreate={openCreate}
@@ -690,12 +775,11 @@ function ProjectTasksInner() {
           <AsanaTaskList
             projectId={projectId}
             sections={asanaSections}
+            groupBy={groupBy}
             onOpenTask={openTask}
             onAddTask={openCreate}
             selectedTaskId={selectedListTaskId}
             onSelectTask={setSelectedListTaskId}
-            filtersOpen={filtersOpen}
-            onToggleFilters={() => setFiltersOpen((v) => !v)}
           />
         </div>
       ) : null}

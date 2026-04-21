@@ -16,7 +16,6 @@ import type { BuildWireTask } from '@/types/task';
 import type { KanbanBoardSectionPersisted } from '@/lib/kanbanBoardPrefs';
 import { useTaskProject } from '@/hooks/task/TaskProjectContext';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { PM_TASK_STATUS_BADGE } from '@/design-system/pm-label-system';
 import { useOptionalProjectUi } from '@/hooks/project/useProjectUi';
 import { priorityBorderClassKey } from '@/utils/task/taskPresentation';
@@ -80,29 +79,15 @@ const SECTION_COL_CLASS =
   'flex w-full shrink-0 flex-col md:w-[280px] md:max-w-[280px] md:shrink-0';
 
 function KanbanToolbar({
-  onAddTask,
   filtersOpen,
   onToggleFilters,
 }: {
-  onAddTask: () => void;
   filtersOpen: boolean;
   onToggleFilters: () => void;
 }) {
   const { t } = useTranslation();
   return (
-    <div className="mb-5 flex min-h-10 shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border/25 pb-3">
-      <Button
-        type="button"
-        variant="primary"
-        size="sm"
-        onClick={onAddTask}
-        className="h-8 shrink-0 gap-1.5 px-3 !py-0 text-[12px] font-semibold"
-      >
-        <span className="text-[15px] font-normal leading-none" aria-hidden>
-          +
-        </span>
-        {t('tasks.listAddTask')}
-      </Button>
+    <div className="mb-5 flex min-h-10 shrink-0 flex-wrap items-center justify-end gap-2 border-b border-border/25 pb-3">
       <div className="flex min-w-0 flex-wrap items-center justify-end gap-x-1.5 text-[12px] text-secondary sm:gap-x-2">
         <button
           type="button"
@@ -523,7 +508,6 @@ export function TaskKanbanBoard({
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         {onToggleFilters ? (
           <KanbanToolbar
-            onAddTask={() => onRequestCreate()}
             filtersOpen={filtersOpen}
             onToggleFilters={onToggleFilters}
           />

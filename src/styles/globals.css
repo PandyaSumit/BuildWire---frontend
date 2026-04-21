@@ -66,11 +66,11 @@
 }
 
 .dark {
-  --bg:       222 14% 11%;
-  --surface:  222 13% 14%;
-  --elevated: 222 12% 18%;
+  --bg:       240 6% 10%;
+  --surface:  240 5% 12%;
+  --elevated: 240 5% 15%;
 
-  --border: 218 10% 24%;
+  --border: 240 4% 20%;
 
   --text-primary:   0 0% 94%;
   --text-secondary: 215 10% 65%;
@@ -85,8 +85,8 @@
   --danger:  0 72% 62%;
   --info:    199 89% 56%;
 
-  --sidebar-bg: 222 16% 9%;
-  --header-bg:  222 14% 11%;
+  --sidebar-bg: 240 6% 10%;
+  --header-bg:  240 6% 10%;
 
   --scrollbar-thumb:       0 0% 30%;
   --scrollbar-thumb-hover: 0 0% 44%;

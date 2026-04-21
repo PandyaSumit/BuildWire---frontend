@@ -22,12 +22,10 @@ import {
   taskWorkflowTKey,
 } from "@/utils/task/fixtures";
 import { Select } from "@/components/ui/select";
+import { UserMultiSelect } from "@/components/ui/UserMultiSelect";
 import { DEMO_USERS } from "@/utils/task/demoUsers";
 import type { TaskEditorDraft } from "@/utils/task/taskEditorState";
 
-function toggleId(arr: string[], id: string): string[] {
-  return arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id];
-}
 
 type Props = {
   mode: "create" | "edit";
@@ -200,54 +198,20 @@ export function TaskFormSections({
       </div>
 
       {!embedded ? (
-        <fieldset className="rounded-lg border border-border/60 p-3">
-          <legend className="px-1 text-xs font-semibold text-muted">
-            {t("newTaskDrawer.assignees")}
-          </legend>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {DEMO_USERS.map((u) => (
-              <label
-                key={u.id}
-                className="flex cursor-pointer items-center gap-2 text-sm text-primary"
-              >
-                <input
-                  type="checkbox"
-                  checked={draft.assignees.includes(u.id)}
-                  onChange={() =>
-                    update({ assignees: toggleId(draft.assignees, u.id) })
-                  }
-                  className="rounded border-border"
-                />
-                {u.name}
-              </label>
-            ))}
-          </div>
-        </fieldset>
+        <UserMultiSelect
+          label={t("newTaskDrawer.assignees")}
+          users={DEMO_USERS}
+          selectedIds={draft.assignees}
+          onChange={(ids) => update({ assignees: ids })}
+        />
       ) : null}
 
-      <fieldset className="rounded-lg border border-border/60 p-3">
-        <legend className="px-1 text-xs font-semibold text-muted">
-          {t("newTaskDrawer.watchers")}
-        </legend>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {DEMO_USERS.map((u) => (
-            <label
-              key={u.id}
-              className="flex cursor-pointer items-center gap-2 text-sm text-primary"
-            >
-              <input
-                type="checkbox"
-                checked={draft.watchers.includes(u.id)}
-                onChange={() =>
-                  update({ watchers: toggleId(draft.watchers, u.id) })
-                }
-                className="rounded border-border"
-              />
-              {u.name}
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      <UserMultiSelect
+        label={t("newTaskDrawer.watchers")}
+        users={DEMO_USERS}
+        selectedIds={draft.watchers}
+        onChange={(ids) => update({ watchers: ids })}
+      />
 
       {!omitScheduleFields ? (
         <div

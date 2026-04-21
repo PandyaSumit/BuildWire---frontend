@@ -6,6 +6,7 @@ import { OverviewExecutionSnapshot } from "@/components/project/overview/Overvie
 import { OverviewRollups } from "@/components/project/overview/OverviewRollups";
 import { EditProjectModal } from "@/components/project/EditProjectModal";
 import type { ProjectStatus } from "@/types/project";
+import { IconPencilLine, IconShare } from "@/components/ui/icons";
 
 function typeBadge(t: string) {
   const map: Record<string, "default" | "success" | "warning"> = {
@@ -99,15 +100,15 @@ export default function OverviewPage() {
           <button
             type="button"
             onClick={() => setEditOpen(true)}
-            className="rounded-lg border border-border bg-bg px-4 py-2 text-sm font-medium text-primary hover:bg-muted/10"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-bg px-4 py-2 text-sm font-medium text-primary hover:bg-muted/10"
           >
-            Edit project
+            <IconPencilLine />Edit project
           </button>
           <button
             type="button"
-            className="rounded-lg border border-border bg-bg px-4 py-2 text-sm font-medium text-primary hover:bg-muted/10"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-bg px-4 py-2 text-sm font-medium text-primary hover:bg-muted/10"
           >
-            Share
+            <IconShare />Share
           </button>
         </div>
       </section>

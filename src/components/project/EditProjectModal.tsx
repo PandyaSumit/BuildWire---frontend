@@ -5,6 +5,7 @@ import type { ProjectDto, ProjectStatus } from '@/types/project';
 import { projectStatusTKey } from '@/utils/project/display';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { IconPencilLine } from '@/components/ui/icons';
 
 const statuses: ProjectStatus[] = ['planning', 'active', 'on_hold', 'completed', 'archived'];
 
@@ -180,23 +181,23 @@ export function EditProjectModal({ open, project, onClose, onSubmit }: Props) {
 
           {submitError ? <p className="mt-3 text-sm text-danger">{submitError}</p> : null}
 
-          <div className="mt-6 flex justify-end gap-2">
-            <button
+          <div className="mt-6 flex justify-end gap-3 border-t border-border/40 pt-4">
+            <Button
               type="button"
-              className="rounded-lg px-4 py-2 text-sm font-medium text-secondary transition-colors hover:bg-surface"
+              variant="secondary"
+              size="md"
               onClick={() => !submitting && onClose()}
             >
               {t('common.cancel')}
-            </button>
+            </Button>
             <Button
               type="submit"
               variant="primary"
-              size="sm"
+              size="md"
               loading={submitting}
               loadingText={t('editProject.saving')}
-              className="font-semibold"
             >
-              {t('prefs.saveChanges')}
+              <IconPencilLine className="mr-1.5" />{t('prefs.saveChanges')}
             </Button>
           </div>
         </form>

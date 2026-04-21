@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useGlobalSearch } from "@/components/layout/GlobalSearchContext";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { IconCalendar } from "@/components/ui/icons";
 import { DataTable, type DataTableColumn } from "@/components/ui/data-table";
 import { EmptyState } from "@/components/ui/empty-state";
 import { PageHeader } from "@/components/ui/page-header";
@@ -222,8 +223,8 @@ export default function InspectionsPage() {
         title={t("inspectionPage.title")}
         description={t("inspectionPage.description")}
         actions={
-          <Button type="button" size="sm" onClick={() => setScheduleOpen(true)}>
-            {t("inspectionPage.scheduleCta")}
+          <Button type="button" size="sm" className="inline-flex items-center gap-1.5" onClick={() => setScheduleOpen(true)}>
+            <IconCalendar />{t("inspectionPage.scheduleCta")}
           </Button>
         }
       />

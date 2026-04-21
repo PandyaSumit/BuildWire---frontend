@@ -328,13 +328,31 @@
       "management": "Management"
     },
     "filters": {
+      "title": "Filters",
       "type": "Type",
       "priority": "Priority",
       "assignee": "Assignee",
       "trade": "Trade",
       "floor": "Floor",
       "clear": "Clear",
-      "all": "All"
+      "all": "All",
+      "quickFilters": "Quick filters",
+      "myTasks": "My tasks",
+      "overdue": "Overdue",
+      "blocked": "Blocked",
+      "highPriority": "High priority",
+      "addFilter": "Add filter"
+    },
+    "group": {
+      "title": "Groups",
+      "clear": "Clear",
+      "customOrder": "Custom order",
+      "ascending": "Ascending",
+      "descending": "Descending",
+      "addSubgroup": "Add subgroup",
+      "sections": "Sections",
+      "dueDate": "Due date",
+      "noValue": "No value"
     },
     "workspaceSearchPlaceholder": "Search tasks, locations, IDs…",
     "workspaceSearchAria": "Search tasks",
