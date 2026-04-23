@@ -44,9 +44,7 @@ const DrawingViewerPage = lazy(
 const DailyReportsPage = lazy(
   () => import("./pages/projects/DailyReportsPage"),
 );
-const InspectionsPage = lazy(
-  () => import("./pages/projects/InspectionsPage"),
-);
+const InspectionsPage = lazy(() => import("./pages/projects/InspectionsPage"));
 const SchedulePage = lazy(() => import("./pages/projects/SchedulePage"));
 const ReportsPage = lazy(() => import("./pages/projects/ReportsPage"));
 const MeetingsPage = lazy(() => import("./pages/projects/MeetingsPage"));
@@ -111,15 +109,9 @@ export default function App() {
           path="settings"
           element={<Navigate to="/settings/preferences" replace />}
         />
-        <Route
-          path="settings/preferences"
-          element={<PreferencesPage />}
-        />
+        <Route path="settings/preferences" element={<PreferencesPage />} />
         <Route path="settings/roles" element={<RolesPage />} />
-        <Route
-          path="settings/organization"
-          element={<OrganizationPage />}
-        />
+        <Route path="settings/organization" element={<OrganizationPage />} />
         <Route path="settings/billing" element={<BillingPage />} />
         <Route
           path="settings/bot-integrations"
