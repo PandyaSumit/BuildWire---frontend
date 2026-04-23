@@ -16,7 +16,7 @@ export interface InviteAcceptDto {
     email: string;
   };
   accessToken: string;
-  refreshToken: string;
+  refreshToken?: string;
 }
 
 export async function getInviteDetails(token: string): Promise<InviteDetailsDto> {

@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Alert, Button, Checkbox, Input } from '@/components/ui';
 import { acceptInvite, getInviteDetails, type InviteDetailsDto } from '@/services/auth/authService';
 import { setAccessToken } from '@/lib/tokenStore';
-import { setRefreshToken } from '@/lib/refreshTokenStore';
 
 export default function InvitePage() {
   const { token } = useParams<{ token: string }>();
@@ -61,7 +60,6 @@ export default function InvitePage() {
         needsAccount ? { firstName: firstName.trim(), lastName: lastName.trim(), password: password.trim() } : {}
       );
       setAccessToken(data.accessToken);
-      if (data.refreshToken) setRefreshToken(data.refreshToken);
       navigate('/dashboard');
     } catch (err) {
       const e = err as { response?: { data?: { error?: string; message?: string } } };

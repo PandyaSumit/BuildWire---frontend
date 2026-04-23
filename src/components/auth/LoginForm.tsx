@@ -16,7 +16,7 @@ export function LoginForm() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    rememberMe: false,
+    rememberMe: true,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
