@@ -1,15 +1,14 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '@/store/hooks';
-import { loadUser } from '@/store/authSlice';
+import { bootstrapSession } from '@/lib/sessionBootstrap';
 
 export default function HomePage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(loadUser())
-      .unwrap()
+    bootstrapSession(dispatch)
       .then(() => {
         navigate('/dashboard', { replace: true });
       })
