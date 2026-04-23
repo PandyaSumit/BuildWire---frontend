@@ -1,5 +1,6 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
 
 type FilterPopoverProps = {
   /** Number of active filters — shows a badge on the trigger */
@@ -117,13 +118,15 @@ export function FilterPopover({
 
           {/* Apply button */}
           <div className="border-t border-border/40 px-4 py-3">
-            <button
+            <Button
               type="button"
+              variant="primary"
+              size="sm"
+              fullWidth
               onClick={() => setOpen(false)}
-              className="w-full rounded-lg bg-brand py-1.5 text-[13px] font-semibold text-white transition-all duration-150 hover:bg-brand-hover active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/50"
             >
               {t('filterPopover.apply', { defaultValue: 'Apply' })}
-            </button>
+            </Button>
           </div>
         </div>
       )}

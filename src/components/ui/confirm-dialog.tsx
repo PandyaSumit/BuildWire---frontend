@@ -107,7 +107,7 @@ export function ConfirmDialog({
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <button
         type="button"
-        className="absolute inset-0 bg-black/50 backdrop-blur-[2px]"
+        className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"
         aria-label={t('common.closeDialog')}
         onClick={() => !loading && close()}
       />
@@ -116,27 +116,32 @@ export function ConfirmDialog({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={describedBy}
-        className="relative z-[101] w-full max-w-md rounded-2xl border border-border bg-elevated p-6 shadow-2xl ring-1 ring-black/5 dark:ring-white/10"
+        className="relative z-[101] flex w-full max-w-md flex-col rounded-2xl border border-zinc-700 bg-zinc-900 shadow-2xl shadow-black/60"
       >
-        {variant === 'danger' ? (
-          <div className="mb-4 flex justify-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-danger/15">
-              <DangerIcon />
+        {/* Body */}
+        <div className="px-6 pt-6 pb-4">
+          {variant === 'danger' ? (
+            <div className="mb-4 flex justify-center">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-danger/15">
+                <DangerIcon />
+              </div>
             </div>
-          </div>
-        ) : null}
-        <h2
-          id={titleId}
-          className="text-center font-[family-name:var(--font-dm-sans)] text-lg font-semibold leading-snug text-primary"
-        >
-          {title}
-        </h2>
-        {description ? (
-          <p id={descId} className="mt-2 text-center text-sm leading-relaxed text-secondary">
-            {description}
-          </p>
-        ) : null}
-        <div className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+          ) : null}
+          <h2
+            id={titleId}
+            className="text-center font-[family-name:var(--font-dm-sans)] text-lg font-semibold leading-snug text-primary"
+          >
+            {title}
+          </h2>
+          {description ? (
+            <p id={descId} className="mt-2 text-center text-sm leading-relaxed text-secondary">
+              {description}
+            </p>
+          ) : null}
+        </div>
+
+        {/* Footer */}
+        <div className="flex shrink-0 items-center justify-end gap-3 border-t border-zinc-700/60 px-6 py-4">
           <Button
             ref={cancelRef}
             type="button"

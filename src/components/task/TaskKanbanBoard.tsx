@@ -260,10 +260,18 @@ function KanbanSectionColumn({
           <button
             type="button"
             onClick={() => onToggleCollapse(section.id)}
-            className="flex w-full items-center gap-1 text-start"
+            className="flex w-full items-center gap-1.5 text-start"
             aria-expanded={!collapsed}
           >
-            <span className="shrink-0 text-[10px] text-muted">{collapsed ? '▸' : '▾'}</span>
+            <svg
+              className="h-3.5 w-3.5 shrink-0 text-muted transition-transform"
+              style={{ transform: collapsed ? 'rotate(-90deg)' : undefined }}
+              viewBox="0 0 16 16"
+              fill="currentColor"
+              aria-hidden
+            >
+              <path d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06z" />
+            </svg>
             {renaming ? (
               <input
                 value={renameDraft}
@@ -282,7 +290,7 @@ function KanbanSectionColumn({
               />
             ) : (
               <span
-                className="line-clamp-2 text-left text-[12px] font-semibold leading-snug text-primary"
+                className="line-clamp-2 text-left text-[13px] font-semibold leading-snug text-primary"
                 onDoubleClick={() => {
                   setRenameDraft(title);
                   setRenaming(true);
@@ -298,14 +306,18 @@ function KanbanSectionColumn({
           <button
             type="button"
             onClick={() => onAddTask(section.id)}
-            className="rounded px-1.5 py-0.5 text-[13px] text-muted hover:bg-muted/15 hover:text-primary"
+            className="flex h-7 w-7 items-center justify-center rounded text-muted hover:bg-muted/15 hover:text-primary"
             title={t('tasks.kanbanAddCard')}
           >
-            +
+            <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+              <path d="M8 3a.75.75 0 0 1 .75.75v3.5h3.5a.75.75 0 0 1 0 1.5h-3.5v3.5a.75.75 0 0 1-1.5 0v-3.5h-3.5a.75.75 0 0 1 0-1.5h3.5v-3.5A.75.75 0 0 1 8 3z" />
+            </svg>
           </button>
           <details className="relative">
-            <summary className="list-none cursor-pointer rounded px-1.5 py-0.5 text-muted hover:bg-muted/15 hover:text-primary [&::-webkit-details-marker]:hidden">
-              ⋮
+            <summary className="list-none flex h-7 w-7 cursor-pointer items-center justify-center rounded text-muted hover:bg-muted/15 hover:text-primary [&::-webkit-details-marker]:hidden">
+              <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+                <path d="M8 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM1.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm13 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z" />
+              </svg>
             </summary>
             <div className="absolute end-0 top-full z-20 mt-1 min-w-[9rem] rounded-md border border-border/50 bg-elevated py-1 text-[12px] shadow-lg">
               <button
@@ -372,7 +384,7 @@ function KanbanSectionColumn({
         <button
           type="button"
           onClick={() => onAddTask(section.id)}
-          className="mt-1.5 w-full rounded-md py-1.5 text-center text-[11px] text-muted hover:bg-muted/10 hover:text-secondary"
+          className="mt-1.5 w-full rounded-md py-2 text-center text-[13px] text-muted hover:bg-muted/10 hover:text-secondary"
         >
           {t('tasks.kanbanAddPlaceholder')}
         </button>
@@ -390,10 +402,10 @@ function AddSectionColumn({ onAdd }: { onAdd: () => void }) {
         onClick={onAdd}
         className="flex min-h-[8rem] flex-1 flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-border/40 bg-muted/[0.03] px-2 py-3 text-center text-[11px] font-medium leading-snug text-muted transition hover:border-border/55 hover:bg-muted/15 hover:text-secondary md:min-h-0"
       >
-        <span className="text-[15px] font-normal leading-none" aria-hidden>
-          +
-        </span>
-        {t('tasks.listAddSection')}
+        <svg className="h-5 w-5" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+          <path d="M8 3a.75.75 0 0 1 .75.75v3.5h3.5a.75.75 0 0 1 0 1.5h-3.5v3.5a.75.75 0 0 1-1.5 0v-3.5h-3.5a.75.75 0 0 1 0-1.5h3.5v-3.5A.75.75 0 0 1 8 3z" />
+        </svg>
+        <span className="text-[13px]">{t('tasks.listAddSection')}</span>
       </button>
     </div>
   );

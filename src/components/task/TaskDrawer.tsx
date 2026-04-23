@@ -226,12 +226,9 @@ function CollaborationTab({
             placeholder={t("taskDetailDrawer.writeComment")}
             className="min-w-0 flex-1 rounded-lg border border-border/60 bg-bg px-3 py-2.5 text-sm text-primary placeholder:text-muted focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand/30"
           />
-          <button
-            type="button"
-            className="shrink-0 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white dark:text-bg"
-          >
+          <Button type="button" variant="primary" size="sm">
             {t("taskDetailDrawer.post")}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -292,12 +289,9 @@ function CollaborationTabCreate({ base }: { base: string }) {
             readOnly
             className="min-w-0 flex-1 rounded-lg border border-border/60 bg-bg px-3 py-2.5 text-sm text-primary placeholder:text-muted"
           />
-          <button
-            type="button"
-            className="shrink-0 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white dark:text-bg"
-          >
+          <Button type="button" variant="primary" size="sm">
             {t("taskDetailDrawer.post")}
-          </button>
+          </Button>
         </div>
       </div>
 

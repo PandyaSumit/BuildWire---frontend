@@ -4,6 +4,7 @@ import type { OrganizationMemberRow } from '@/types/organization';
 import type { ProjectMemberDto, ProjectMemberRole } from '@/types/project';
 import { formatPersonName, projectMemberRoleTKey } from '@/utils/project/display';
 import { Select } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import { IconUserPlus, IconUserMinus } from '@/components/ui/icons';
 
 const projectRoles: ProjectMemberRole[] = ['project_manager', 'supervisor', 'worker', 'guest'];
@@ -125,14 +126,18 @@ export function ProjectMembersSection({
               labelClassName="text-xs font-medium text-secondary"
             />
           </div>
-          <button
+          <Button
             type="button"
+            variant="primary"
+            size="md"
             disabled={!userIdToAdd || adding}
+            loading={adding}
+            loadingText={t('projectMembers.adding')}
             onClick={() => void handleAdd()}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white dark:text-bg transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+            iconLeft={<IconUserPlus />}
           >
-            <IconUserPlus />{adding ? t('projectMembers.adding') : t('projectMembers.add')}
-          </button>
+            {t('projectMembers.add')}
+          </Button>
         </div>
       ) : null}
 
