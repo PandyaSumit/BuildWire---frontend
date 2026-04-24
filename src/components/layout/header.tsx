@@ -11,6 +11,8 @@ import { LanguageMenu } from '@/components/layout/LanguageMenu';
 import { GlobalSearchBar } from '@/components/layout/GlobalSearchBar';
 import { useOptionalProjectUi } from '@/hooks/project/useProjectUi';
 import { useAiAssistant } from '@/components/ai-assistant';
+import { WorkspaceSwitcherButton } from '@/components/workspace-switcher';
+import { useWorkspaceSwitcher } from '@/components/workspace-switcher';
 
 interface HeaderProps {
   title?: string;
@@ -24,8 +26,10 @@ const iconBtn =
 export function Header({ title, subtitle, actions }: HeaderProps) {
   const { t } = useTranslation();
   const { pathname } = useLocation();
+  const { activeWorkspace } = useWorkspaceSwitcher();
   const sidebarMode = useSidebarMode();
   const showProjectBack = sidebarMode.mode === 'project';
+  const isMessagesWorkspace = activeWorkspace === 'messages';
   const projectUi = useOptionalProjectUi();
   const { mobileOpen, setMobileOpen } = useSidebarLayout();
   const { open: aiOpen, toggle: toggleAiAssistant } = useAiAssistant();
@@ -36,6 +40,10 @@ export function Header({ title, subtitle, actions }: HeaderProps) {
     const fb = formatShellBreadcrumbFallback(pathname);
     return fb || t('nav.dashboard');
   }, [pathname, t]);
+
+  // In the messages workspace the ConversationList sidebar provides its own
+  // branded header row (with workspace switcher). Hide this global header entirely.
+  if (isMessagesWorkspace) return null;
 
   return (
     <header className="sticky top-0 z-40 flex h-[52px] items-center gap-2 border-b border-border/50 bg-header/95 px-2.5 backdrop-blur-sm sm:px-4 dark:border-white/[0.05]">
@@ -115,6 +123,8 @@ export function Header({ title, subtitle, actions }: HeaderProps) {
         <div className="hidden md:block">
           <LanguageMenu />
         </div>
+
+        <WorkspaceSwitcherButton />
 
         <button
           type="button"

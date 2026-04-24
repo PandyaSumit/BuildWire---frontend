@@ -37,7 +37,13 @@
     "financials": "Finanzas",
     "activityLog": "Registro de actividad",
     "inventory": "Inventario",
-    "aiBadge": "IA"
+    "aiBadge": "IA",
+    "hiringFeed": "Empleos",
+    "candidates": "Candidatos",
+    "workers": "Trabajadores",
+    "inbox": "Bandeja",
+    "channels": "Canales",
+    "directMessages": "Mensajes directos"
   },
   "sidebar": {
     "expand": "Expandir barra lateral",
@@ -760,5 +766,16 @@
     "copy": "Copiar",
     "copied": "Copiado",
     "docs": "Documentación"
+  },
+  "workspaceSwitcher": {
+    "open": "Cambiar espacio",
+    "title": "Cambiar espacio de trabajo",
+    "subtitle": "Elige dónde quieres trabajar ahora.",
+    "projectTitle": "Gestión de proyectos",
+    "projectDescription": "Planificación, ejecución y control de obra.",
+    "hiringTitle": "Contratación y empleos",
+    "hiringDescription": "Bolsa de trabajo, candidatos y asignación de personal.",
+    "messagesTitle": "Mensajes y chat",
+    "messagesDescription": "Canales y conversaciones directas del equipo."
   }
 }

@@ -14,7 +14,11 @@ import { InvitePage, WelcomePage } from "./pages/onboarding";
 import { ComponentsShowcasePage } from "./pages/dev";
 
 import { DashboardPage } from "./pages/dashboard";
-import { SalesPage, BrokersPage, AiMapPage } from "./pages/workspace";
+import {
+  SalesPage,
+  BrokersPage,
+  AiMapPage,
+} from "./pages/workspace";
 import {
   TeamPage as OrgTeamPage,
   RolesPage,
@@ -52,6 +56,12 @@ const FinancialsPage = lazy(() => import("./pages/projects/FinancialsPage"));
 const ProjectTeamPage = lazy(() => import("./pages/projects/TeamPage"));
 const ActivityPage = lazy(() => import("./pages/projects/ActivityPage"));
 const InventoryPage = lazy(() => import("./pages/projects/InventoryPage"));
+const HiringFeedPage = lazy(() => import("./pages/workspace/HiringFeedPage"));
+const HiringCandidatesPage = lazy(
+  () => import("./pages/workspace/HiringCandidatesPage"),
+);
+const HiringWorkersPage = lazy(() => import("./pages/workspace/HiringWorkersPage"));
+const MessagesInboxPage = lazy(() => import("./pages/workspace/MessagesInboxPage"));
 
 /** Authenticated app shell: each feature has its own top-level path (not nested under `/dashboard`). */
 export default function App() {
@@ -102,6 +112,12 @@ export default function App() {
 
         <Route path="sales" element={<SalesPage />} />
         <Route path="brokers" element={<BrokersPage />} />
+        <Route path="hiring" element={<HiringFeedPage />} />
+        <Route path="hiring/candidates" element={<HiringCandidatesPage />} />
+        <Route path="hiring/workers" element={<HiringWorkersPage />} />
+        <Route path="messages" element={<MessagesInboxPage />} />
+        <Route path="messages/channels" element={<Navigate to="/messages" replace />} />
+        <Route path="messages/dms" element={<Navigate to="/messages" replace />} />
         <Route path="intelligence/ai-map" element={<AiMapPage />} />
         <Route path="team" element={<OrgTeamPage />} />
 

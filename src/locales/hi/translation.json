@@ -37,7 +37,13 @@
     "financials": "वित्त",
     "activityLog": "गतिविधि लॉग",
     "inventory": "इन्वेंटरी",
-    "aiBadge": "AI"
+    "aiBadge": "AI",
+    "hiringFeed": "जॉब फ़ीड",
+    "candidates": "उम्मीदवार",
+    "workers": "वर्कर्स",
+    "inbox": "इनबॉक्स",
+    "channels": "चैनल",
+    "directMessages": "डायरेक्ट मैसेज"
   },
   "sidebar": {
     "expand": "साइडबार विस्तृत करें",
@@ -737,5 +743,16 @@
     "copy": "कॉपी",
     "copied": "कॉपी हो गया",
     "docs": "दस्तावेज़"
+  },
+  "workspaceSwitcher": {
+    "open": "वर्कस्पेस बदलें",
+    "title": "वर्कस्पेस बदलें",
+    "subtitle": "अभी जहाँ काम करना है वह चुनें।",
+    "projectTitle": "प्रोजेक्ट मैनेजमेंट",
+    "projectDescription": "निर्माण योजना, निष्पादन और नियंत्रण।",
+    "hiringTitle": "हायरिंग और जॉब्स",
+    "hiringDescription": "जॉब फ़ीड, उम्मीदवार और वर्कर अलोकेशन।",
+    "messagesTitle": "मैसेज और चैट",
+    "messagesDescription": "चैनल और डायरेक्ट टीम बातचीत।"
   }
 }

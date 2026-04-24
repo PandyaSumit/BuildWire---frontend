@@ -37,7 +37,13 @@
     "financials": "المالية",
     "activityLog": "سجل النشاط",
     "inventory": "المخزون",
-    "aiBadge": "ذكاء"
+    "aiBadge": "ذكاء",
+    "hiringFeed": "وظائف",
+    "candidates": "المرشحون",
+    "workers": "العمال",
+    "inbox": "الوارد",
+    "channels": "القنوات",
+    "directMessages": "رسائل مباشرة"
   },
   "sidebar": {
     "expand": "توسيع الشريط الجانبي",
@@ -737,5 +743,16 @@
     "copy": "نسخ",
     "copied": "تم النسخ",
     "docs": "التوثيق"
+  },
+  "workspaceSwitcher": {
+    "open": "تبديل مساحة العمل",
+    "title": "تبديل مساحة العمل",
+    "subtitle": "اختر المساحة التي تريد العمل فيها الآن.",
+    "projectTitle": "إدارة المشاريع",
+    "projectDescription": "تخطيط التنفيذ والتحكم في أعمال البناء.",
+    "hiringTitle": "التوظيف والوظائف",
+    "hiringDescription": "تغذية الوظائف والمرشحين وتوزيع العمال.",
+    "messagesTitle": "الرسائل والدردشة",
+    "messagesDescription": "قنوات ورسائل مباشرة بين أعضاء الفريق."
   }
 }

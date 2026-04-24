@@ -59,6 +59,96 @@ export const icons = {
       />
     </svg>
   ),
+  jobs: (
+    <svg
+      className="w-5 h-5 shrink-0"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2m4 0H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2z"
+      />
+    </svg>
+  ),
+  candidates: (
+    <svg
+      className="w-5 h-5 shrink-0"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M16 14a4 4 0 10-8 0m12 7H4v-1a6 6 0 1112 0v1zm2-14h2m-1-1v2"
+      />
+    </svg>
+  ),
+  workers: (
+    <svg
+      className="w-5 h-5 shrink-0"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M14 6l-4 4m0 0l-4-4m4 4V3m8 18a4 4 0 00-8 0m8 0h3m-3 0H6"
+      />
+    </svg>
+  ),
+  inbox: (
+    <svg
+      className="w-5 h-5 shrink-0"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-3l-2 3h-4l-2-3H4"
+      />
+    </svg>
+  ),
+  channels: (
+    <svg
+      className="w-5 h-5 shrink-0"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M10 4L8 20m8-16l-2 16M4 10h16M3 14h16"
+      />
+    </svg>
+  ),
+  dms: (
+    <svg
+      className="w-5 h-5 shrink-0"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M7 8h10M7 12h6m-8 8l-2-2V6a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2H9l-4 2z"
+      />
+    </svg>
+  ),
   map: (
     <svg
       className="w-5 h-5 shrink-0"

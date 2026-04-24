@@ -13,6 +13,10 @@ import {
   AiAssistantProvider,
   AiAssistantWorkspace,
 } from "@/components/ai-assistant";
+import {
+  WorkspaceSwitcherProvider,
+  useWorkspaceSwitcher,
+} from "@/components/workspace-switcher";
 
 /** Max horizontal distance from left screen edge to start an edge-swipe (ChatGPT / Claude style). */
 const MOBILE_EDGE_SWIPE_START_PX = 40;
@@ -28,6 +32,7 @@ function DashboardShell() {
     mobileDragOffset,
     setMobileDragOffset,
   } = useSidebarLayout();
+  const { isSwitching, activeWorkspace, pendingWorkspace, switchVersion } = useWorkspaceSwitcher();
   const dragStartRef = useRef<number | null>(null);
   const dragOffsetRef = useRef(0);
   const edgeListenersAttachedRef = useRef(false);
@@ -122,6 +127,29 @@ function DashboardShell() {
     finishMobileDrag();
   };
 
+  const workspaceRenderKey = `${activeWorkspace}:${switchVersion}`;
+
+  function WorkspaceLoadingState() {
+    const target = pendingWorkspace ?? activeWorkspace;
+    return (
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden px-4 py-4 lg:px-6">
+        <div className="animate-pulse space-y-4">
+          <div className="h-6 w-56 rounded-md bg-surface" />
+          <div className="h-4 w-80 rounded-md bg-surface" />
+          <div className="grid gap-3 lg:grid-cols-3">
+            <div className="h-28 rounded-[10px] bg-surface" />
+            <div className="h-28 rounded-[10px] bg-surface" />
+            <div className="h-28 rounded-[10px] bg-surface" />
+          </div>
+          <div className="h-[42vh] rounded-[10px] bg-surface" />
+        </div>
+        <div className="mt-3 text-xs text-muted">
+          Preparing {target === "project" ? "Main Workspace" : target === "hiring" ? "Job Hiring Workspace" : "Chat System Workspace"}...
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Mobile backdrop — closes drawer when tapping outside */}
@@ -172,14 +200,25 @@ function DashboardShell() {
       <AiAssistantProvider>
         <div
           className={`flex h-full min-h-0 min-w-0 flex-col overflow-x-hidden transition-[padding] duration-200 ease-out ${
-            collapsed ? "lg:ps-14" : "lg:ps-60"
+            activeWorkspace === "messages" ? "lg:ps-0" : collapsed ? "lg:ps-14" : "lg:ps-60"
           }`}
         >
           <EmailVerificationBanner />
           <Header />
-          <AiAssistantWorkspace>
-            <Outlet />
-          </AiAssistantWorkspace>
+          <div className="flex min-h-0 flex-1 flex-col">
+            {isSwitching ? (
+              <WorkspaceLoadingState />
+            ) : (
+              <div
+                key={workspaceRenderKey}
+                className="flex min-h-0 flex-1 flex-col transition-opacity duration-200 opacity-100"
+              >
+                <AiAssistantWorkspace>
+                  <Outlet />
+                </AiAssistantWorkspace>
+              </div>
+            )}
+          </div>
         </div>
       </AiAssistantProvider>
     </>
@@ -195,13 +234,15 @@ export function DashboardLayout() {
     <div className="h-dvh max-h-dvh overflow-hidden bg-bg">
       <SidebarLayoutProvider>
         <GlobalSearchProvider>
-          {projectId ? (
-            <ProjectUiProvider projectId={projectId}>
+          <WorkspaceSwitcherProvider>
+            {projectId ? (
+              <ProjectUiProvider projectId={projectId}>
+                <DashboardShell />
+              </ProjectUiProvider>
+            ) : (
               <DashboardShell />
-            </ProjectUiProvider>
-          ) : (
-            <DashboardShell />
-          )}
+            )}
+          </WorkspaceSwitcherProvider>
         </GlobalSearchProvider>
       </SidebarLayoutProvider>
     </div>

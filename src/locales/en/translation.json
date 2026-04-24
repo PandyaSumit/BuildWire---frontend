@@ -37,7 +37,13 @@
     "financials": "Financials",
     "activityLog": "Activity Log",
     "inventory": "Inventory",
-    "aiBadge": "AI"
+    "aiBadge": "AI",
+    "hiringFeed": "Job feed",
+    "candidates": "Candidates",
+    "workers": "Workers",
+    "inbox": "Inbox",
+    "channels": "Channels",
+    "directMessages": "Direct messages"
   },
   "sidebar": {
     "expand": "Expand sidebar",
@@ -793,5 +799,16 @@
     "copy": "Copy",
     "copied": "Copied",
     "docs": "Documentation"
+  },
+  "workspaceSwitcher": {
+    "open": "Switch workspace",
+    "title": "Switch workspace",
+    "subtitle": "Choose where you want to work right now.",
+    "projectTitle": "Project Management",
+    "projectDescription": "Construction planning, execution, and controls.",
+    "hiringTitle": "Hiring & Jobs",
+    "hiringDescription": "Job feed, candidates, and worker allocation.",
+    "messagesTitle": "Messages & Chat",
+    "messagesDescription": "Channels and direct team conversations."
   }
 }

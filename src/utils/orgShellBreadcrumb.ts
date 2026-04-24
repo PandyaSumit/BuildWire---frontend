@@ -10,6 +10,12 @@ export function orgShellBreadcrumbNavKey(pathname: string): string | null {
     if (path === "/projects") return "nav.projects";
     if (path === "/sales") return "nav.salesCrm";
     if (path === "/brokers") return "nav.brokers";
+  if (path === "/hiring") return "nav.hiringFeed";
+  if (path.startsWith("/hiring/candidates")) return "nav.candidates";
+  if (path.startsWith("/hiring/workers")) return "nav.workers";
+  if (path === "/messages") return "nav.inbox";
+  if (path.startsWith("/messages/channels")) return "nav.channels";
+  if (path.startsWith("/messages/dms")) return "nav.directMessages";
     if (path === "/intelligence/ai-map") return "nav.aiMap";
     if (path === "/team") return "nav.team";
 

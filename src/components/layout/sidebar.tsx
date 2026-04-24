@@ -6,11 +6,13 @@ import { parseOrgRole } from "@/lib/rbac";
 import { useSidebarMode } from "@/hooks/useSidebarMode";
 import { getGlobalSidebarGroups } from "@/config/navigation/global-sidebar";
 import { getProjectSidebarGroups } from "@/config/navigation/project-sidebar";
+import { getHiringSidebarGroups } from "@/config/navigation/hiring-sidebar";
 import type { NavItemDef } from "@/config/navigation/nav-types";
 import { AccountDropdown } from "@/components/layout/AccountDropdown";
 import { useSidebarLayout } from "@/components/layout/SidebarLayoutContext";
 import { BuildWireMark } from "@/components/brand/BuildWireMark";
 import { BuildWireLogo } from "@/components/brand/BuildWireLogo";
+import { useWorkspaceSwitcher } from "@/components/workspace-switcher";
 
 function isNavActive(pathname: string, item: NavItemDef): boolean {
   if (item.endMatch) return pathname === item.to;
@@ -26,15 +28,19 @@ export function Sidebar() {
   const user = useAppSelector((s) => s.auth.user);
   const orgRole = parseOrgRole(user?.org?.role);
   const sidebarMode = useSidebarMode();
+  const { activeWorkspace } = useWorkspaceSwitcher();
   const { collapsed, toggle, mobileOpen, setMobileOpen } = useSidebarLayout();
+  const isMessagesWorkspace = activeWorkspace === "messages";
 
-  // On mobile, the drawer always shows expanded layout regardless of collapsed state
-  const effectiveCollapsed = collapsed && !mobileOpen;
+  // On mobile, the drawer always shows expanded layout regardless of collapsed state.
+  const effectiveCollapsed = !mobileOpen && collapsed;
 
   const navigation =
-    sidebarMode.mode === "project"
-      ? getProjectSidebarGroups(sidebarMode.projectId, orgRole)
-      : getGlobalSidebarGroups(orgRole);
+    activeWorkspace === "hiring"
+      ? getHiringSidebarGroups()
+      : sidebarMode.mode === "project"
+          ? getProjectSidebarGroups(sidebarMode.projectId, orgRole)
+          : getGlobalSidebarGroups(orgRole);
 
   const [accountOpen, setAccountOpen] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement>(null);
@@ -63,6 +69,9 @@ export function Sidebar() {
     user?.firstName?.[0] && user?.lastName?.[0]
       ? `${user.firstName[0]}${user.lastName[0]}`.toUpperCase()
       : (user?.email?.[0]?.toUpperCase() ?? "?");
+
+  // In messages workspace the ConversationList provides its own full-height sidebar.
+  if (isMessagesWorkspace) return null;
 
   return (
     <>
@@ -130,71 +139,72 @@ export function Sidebar() {
           }`}
         >
           {navigation.map((group, groupIndex) => (
-            <div key={group.groupKey + groupIndex} className={effectiveCollapsed ? "mb-3" : "mb-4"}>
-              <h3
-                className={`mb-1 text-[10.5px] font-semibold uppercase tracking-[0.09em] text-muted/70 ${
-                  effectiveCollapsed ? "sr-only" : "px-2.5"
-                }`}
-              >
-                {t(`navGroup.${group.groupKey}`)}
-              </h3>
-              <div className="flex flex-col gap-px">
-                {group.items.map((item) => {
-                  const active = isNavActive(pathname, item);
-                  const itemLabel = t(`nav.${item.itemKey}`);
-                  return (
-                    <Link
-                      key={item.id}
-                      to={item.to}
-                      title={effectiveCollapsed ? itemLabel : undefined}
-                      className={`relative flex items-center rounded-md text-[13px] font-medium leading-5 transition-colors duration-150 ${
-                        effectiveCollapsed
-                          ? "justify-center px-2 py-2"
-                          : "gap-2.5 px-2.5 py-[7px]"
-                      } ${
-                        active
-                          ? "bg-brand/8 text-primary dark:bg-brand/10"
-                          : "text-secondary hover:bg-primary/6 hover:text-primary"
-                      }`}
-                    >
-                      {!effectiveCollapsed && active && (
-                        <span
-                          className="absolute start-0 top-1/2 h-[18px] w-[3px] -translate-y-1/2 rounded-full bg-brand"
-                          aria-hidden
-                        />
-                      )}
-                      <span
-                        className={`shrink-0 [&>svg]:h-[17px] [&>svg]:w-[17px] transition-colors duration-150 ${
-                          active ? "text-brand" : "text-muted"
+              <div key={group.groupKey + groupIndex} className={effectiveCollapsed ? "mb-3" : "mb-4"}>
+                <h3
+                  className={`mb-1 text-[10.5px] font-semibold uppercase tracking-[0.09em] text-muted/70 ${
+                    effectiveCollapsed ? "sr-only" : "px-2.5"
+                  }`}
+                >
+                  {t(`navGroup.${group.groupKey}`)}
+                </h3>
+                <div className="flex flex-col gap-px">
+                  {group.items.map((item) => {
+                    const active = isNavActive(pathname, item);
+                    const itemLabel = t(`nav.${item.itemKey}`);
+                    return (
+                      <Link
+                        key={item.id}
+                        to={item.to}
+                        title={effectiveCollapsed ? itemLabel : undefined}
+                        className={`relative flex items-center rounded-md text-[13px] font-medium leading-5 transition-colors duration-150 ${
+                          effectiveCollapsed
+                            ? "justify-center px-2 py-2"
+                            : "gap-2.5 px-2.5 py-[7px]"
+                        } ${
+                          active
+                            ? "bg-brand/8 text-primary dark:bg-brand/10"
+                            : "text-secondary hover:bg-primary/6 hover:text-primary"
                         }`}
                       >
-                        {item.icon}
-                      </span>
-                      {!effectiveCollapsed && (
-                        <span className="min-w-0 flex-1 truncate">{itemLabel}</span>
-                      )}
-                      {!effectiveCollapsed && item.showAiBadge && (
-                        <span className="shrink-0 rounded-md border border-border px-1.5 py-px text-[10px] font-semibold uppercase tracking-wide text-muted dark:text-secondary">
-                          {t("nav.aiBadge")}
-                        </span>
-                      )}
-                      {!effectiveCollapsed && item.badge && (
-                        <span className="shrink-0 rounded-full bg-danger/90 px-1.5 py-px text-[10px] font-bold leading-tight text-white">
-                          {item.badge}
-                        </span>
-                      )}
-                      {effectiveCollapsed && item.badge && (
+                        {!effectiveCollapsed && active && (
+                          <span
+                            className="absolute start-0 top-1/2 h-[18px] w-[3px] -translate-y-1/2 rounded-full bg-brand"
+                            aria-hidden
+                          />
+                        )}
                         <span
-                          className="absolute end-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-danger ring-2 ring-sidebar"
-                          aria-hidden
-                        />
-                      )}
-                    </Link>
-                  );
-                })}
+                          className={`shrink-0 [&>svg]:h-[17px] [&>svg]:w-[17px] transition-colors duration-150 ${
+                            active ? "text-brand" : "text-muted"
+                          }`}
+                        >
+                          {item.icon}
+                        </span>
+                        {!effectiveCollapsed && (
+                          <span className="min-w-0 flex-1 truncate">{itemLabel}</span>
+                        )}
+                        {!effectiveCollapsed && item.showAiBadge && (
+                          <span className="shrink-0 rounded-md border border-border px-1.5 py-px text-[10px] font-semibold uppercase tracking-wide text-muted dark:text-secondary">
+                            {t("nav.aiBadge")}
+                          </span>
+                        )}
+                        {!effectiveCollapsed && item.badge && (
+                          <span className="shrink-0 rounded-full bg-danger/90 px-1.5 py-px text-[10px] font-bold leading-tight text-white">
+                            {item.badge}
+                          </span>
+                        )}
+                        {effectiveCollapsed && item.badge && (
+                          <span
+                            className="absolute end-1.5 top-1.5 h-1.5 w-1.5 rounded-full bg-danger ring-2 ring-sidebar"
+                            aria-hidden
+                          />
+                        )}
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          }
         </nav>
 
         <div
