@@ -1,8 +1,8 @@
 import axios from 'axios';
 import { getAccessToken, setAccessToken, clearAccessToken } from './tokenStore';
-import { getRefreshToken, setRefreshToken, clearRefreshToken } from './refreshTokenStore';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
+let refreshInFlight: Promise<string> | null = null;
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -50,20 +50,24 @@ api.interceptors.response.use(
     ) {
       originalRequest._retry = true;
       try {
-        const rt = getRefreshToken();
-        const { data } = await axios.post(
-          `${API_BASE_URL}/auth/refresh`,
-          rt ? { refreshToken: rt } : {},
-          { withCredentials: true }
-        );
-        const newToken = data.data.accessToken;
-        setAccessToken(newToken);
-        if (data.data.refreshToken) setRefreshToken(data.data.refreshToken);
+        if (!refreshInFlight) {
+          refreshInFlight = axios
+            .post(`${API_BASE_URL}/auth/refresh`, {}, { withCredentials: true })
+            .then((res) => {
+              const newToken = res.data.data.accessToken as string;
+              setAccessToken(newToken);
+              return newToken;
+            })
+            .finally(() => {
+              refreshInFlight = null;
+            });
+        }
+
+        const newToken = await refreshInFlight;
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return api(originalRequest);
       } catch {
         clearAccessToken();
-        clearRefreshToken();
         const isAuthPage = ['/login', '/signup', '/forgot-password', '/reset-password', '/invite', '/verify-email'].some(
           (p) => typeof window !== 'undefined' && window.location.pathname.startsWith(p)
         );

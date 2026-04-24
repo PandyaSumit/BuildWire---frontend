@@ -314,13 +314,31 @@
       "management": "إدارة"
     },
     "filters": {
+      "title": "الفلاتر",
       "type": "النوع",
       "priority": "الأولوية",
       "assignee": "المكلف",
       "trade": "التخصص",
       "floor": "الطابق",
       "clear": "مسح",
-      "all": "الكل"
+      "all": "الكل",
+      "quickFilters": "الفلاتر السريعة",
+      "myTasks": "مهامي",
+      "overdue": "متأخرة",
+      "blocked": "محظورة",
+      "highPriority": "أولوية عالية",
+      "addFilter": "إضافة فلتر"
+    },
+    "group": {
+      "title": "المجموعات",
+      "clear": "مسح",
+      "customOrder": "ترتيب مخصص",
+      "ascending": "تصاعدي",
+      "descending": "تنازلي",
+      "addSubgroup": "إضافة مجموعة فرعية",
+      "sections": "الأقسام",
+      "dueDate": "تاريخ الاستحقاق",
+      "noValue": "بلا قيمة"
     },
     "bulk": {
       "selected": "{{count}} محددة",

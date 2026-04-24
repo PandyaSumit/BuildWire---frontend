@@ -32,6 +32,8 @@ export interface SelectProps {
   labelClassName?: string;
   /** Extra classes on the trigger button (e.g. `sm:w-48`). */
   triggerClassName?: string;
+  /** Extra classes on the dropdown listbox (e.g. override background). */
+  dropdownClassName?: string;
   /** `sm` — denser trigger and list (filters, toolbars). */
   size?: 'md' | 'sm';
   'aria-label'?: string;
@@ -67,6 +69,7 @@ export function Select({
   className = '',
   labelClassName = '',
   triggerClassName = '',
+  dropdownClassName = '',
   size = 'md',
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
@@ -227,7 +230,7 @@ export function Select({
             id={listboxId}
             role="listbox"
             aria-labelledby={label ? triggerId : undefined}
-            className="animate-slide-down absolute left-0 right-0 z-[100] mt-1 max-h-60 overflow-auto rounded-xl border border-border/70 bg-elevated py-1 shadow-token-lg"
+            className={`animate-slide-down absolute left-0 right-0 z-[100] mt-1 max-h-60 overflow-auto rounded-xl border border-border/70 bg-elevated py-1 shadow-token-lg ${dropdownClassName}`}
           >
             {options.map((opt, i) => {
               const isSelected = opt.value === value;

@@ -1,11 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '@/lib/api';
 import { setAccessToken, clearAccessToken } from '@/lib/tokenStore';
-import {
-  setRefreshToken,
-  getRefreshToken,
-  clearRefreshToken,
-} from '@/lib/refreshTokenStore';
 import type { OrgRole } from '@/types/rbac';
 
 /**
@@ -67,7 +62,6 @@ export const login = createAsyncThunk(
     try {
       const { data } = await api.post('/auth/login', { email, password, rememberMe });
       setAccessToken(data.data.accessToken);
-      if (data.data.refreshToken) setRefreshToken(data.data.refreshToken);
       return { user: data.data.user as AuthUser };
     } catch (err: unknown) {
       return rejectWithValue(extractError(err, 'Login failed'));
@@ -93,7 +87,6 @@ export const register = createAsyncThunk(
     try {
       const { data } = await api.post('/auth/register', userData);
       setAccessToken(data.data.accessToken);
-      if (data.data.refreshToken) setRefreshToken(data.data.refreshToken);
       return { user: data.data.user as AuthUser };
     } catch (err: unknown) {
       return rejectWithValue(extractError(err, 'Registration failed'));
@@ -103,13 +96,11 @@ export const register = createAsyncThunk(
 
 export const logout = createAsyncThunk('auth/logout', async () => {
   try {
-    const rt = getRefreshToken();
-    await api.post('/auth/logout', rt ? { refreshToken: rt } : {});
+    await api.post('/auth/logout', {});
   } catch {
     // ignore
   }
   clearAccessToken();
-  clearRefreshToken();
 });
 
 export const loadUser = createAsyncThunk(
@@ -117,23 +108,16 @@ export const loadUser = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       try {
-        const rt = getRefreshToken();
-        const { data: refreshData } = await api.post(
-          '/auth/refresh',
-          rt ? { refreshToken: rt } : {}
-        );
+        const { data: refreshData } = await api.post('/auth/refresh', {});
         setAccessToken(refreshData.data.accessToken);
-        if (refreshData.data.refreshToken) setRefreshToken(refreshData.data.refreshToken);
       } catch {
         clearAccessToken();
-        clearRefreshToken();
         return rejectWithValue('refresh');
       }
       const { data } = await api.get('/auth/me');
       return { user: data.data.user as AuthUser };
     } catch {
       clearAccessToken();
-      clearRefreshToken();
       return rejectWithValue('me');
     }
   }

@@ -2,13 +2,14 @@ import { TextareaHTMLAttributes, forwardRef } from 'react';
 
 export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
+  required?: boolean;
   error?: string;
   helperText?: string;
   fullWidth?: boolean;
 }
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ label, error, helperText, fullWidth = false, className = '', ...props }, ref) => {
+  ({ label, required, error, helperText, fullWidth = false, className = '', ...props }, ref) => {
     const widthClass = fullWidth ? 'w-full' : '';
     const errorClass = error ? 'border-danger focus:ring-danger' : 'border-border focus:ring-brand';
 
@@ -16,7 +17,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
       <div className={widthClass}>
         {label && (
           <label className="block text-sm font-medium mb-2 text-primary">
-            {label}
+            {label}{required && <span className="ml-0.5 text-danger">*</span>}
           </label>
         )}
         <textarea

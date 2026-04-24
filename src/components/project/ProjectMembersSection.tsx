@@ -4,6 +4,8 @@ import type { OrganizationMemberRow } from '@/types/organization';
 import type { ProjectMemberDto, ProjectMemberRole } from '@/types/project';
 import { formatPersonName, projectMemberRoleTKey } from '@/utils/project/display';
 import { Select } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { IconUserPlus, IconUserMinus } from '@/components/ui/icons';
 
 const projectRoles: ProjectMemberRole[] = ['project_manager', 'supervisor', 'worker', 'guest'];
 
@@ -124,14 +126,18 @@ export function ProjectMembersSection({
               labelClassName="text-xs font-medium text-secondary"
             />
           </div>
-          <button
+          <Button
             type="button"
+            variant="primary"
+            size="md"
             disabled={!userIdToAdd || adding}
+            loading={adding}
+            loadingText={t('projectMembers.adding')}
             onClick={() => void handleAdd()}
-            className="shrink-0 rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white dark:text-bg transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
+            iconLeft={<IconUserPlus />}
           >
-            {adding ? t('projectMembers.adding') : t('projectMembers.add')}
-          </button>
+            {t('projectMembers.add')}
+          </Button>
         </div>
       ) : null}
 
@@ -175,9 +181,9 @@ export function ProjectMembersSection({
                           type="button"
                           disabled={removingId === m.id}
                           onClick={() => void handleRemove(m.id)}
-                          className="text-xs font-medium text-danger hover:underline disabled:cursor-not-allowed disabled:opacity-40"
+                          className="inline-flex items-center gap-1 text-xs font-medium text-danger hover:underline disabled:cursor-not-allowed disabled:opacity-40"
                         >
-                          {removingId === m.id ? '…' : t('projectMembers.remove')}
+                          <IconUserMinus />{removingId === m.id ? '…' : t('projectMembers.remove')}
                         </button>
                       </td>
                     ) : null}

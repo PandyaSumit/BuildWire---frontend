@@ -22,12 +22,10 @@ import {
   taskWorkflowTKey,
 } from "@/utils/task/fixtures";
 import { Select } from "@/components/ui/select";
+import { UserMultiSelect } from "@/components/ui/UserMultiSelect";
 import { DEMO_USERS } from "@/utils/task/demoUsers";
 import type { TaskEditorDraft } from "@/utils/task/taskEditorState";
 
-function toggleId(arr: string[], id: string): string[] {
-  return arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id];
-}
 
 type Props = {
   mode: "create" | "edit";
@@ -94,9 +92,10 @@ export function TaskFormSections({
             value={draft.title}
             onChange={(e) => update({ title: e.target.value })}
             placeholder={t("newTaskDrawer.titlePlaceholder")}
-            className="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-primary placeholder:text-muted focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+            className={`w-full rounded-lg border bg-bg px-3 py-2 text-sm text-primary placeholder:text-muted focus:outline-none focus:ring-1 ${error ? 'border-danger focus:border-danger focus:ring-danger' : 'border-border focus:border-brand focus:ring-brand'}`}
             autoFocus={autoFocusTitle}
           />
+          {error ? <p className="mt-1 text-xs text-danger">{error}</p> : null}
         </div>
       ) : null}
 
@@ -199,54 +198,20 @@ export function TaskFormSections({
       </div>
 
       {!embedded ? (
-        <fieldset className="rounded-lg border border-border/60 p-3">
-          <legend className="px-1 text-xs font-semibold text-muted">
-            {t("newTaskDrawer.assignees")}
-          </legend>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {DEMO_USERS.map((u) => (
-              <label
-                key={u.id}
-                className="flex cursor-pointer items-center gap-2 text-sm text-primary"
-              >
-                <input
-                  type="checkbox"
-                  checked={draft.assignees.includes(u.id)}
-                  onChange={() =>
-                    update({ assignees: toggleId(draft.assignees, u.id) })
-                  }
-                  className="rounded border-border"
-                />
-                {u.name}
-              </label>
-            ))}
-          </div>
-        </fieldset>
+        <UserMultiSelect
+          label={t("newTaskDrawer.assignees")}
+          users={DEMO_USERS}
+          selectedIds={draft.assignees}
+          onChange={(ids) => update({ assignees: ids })}
+        />
       ) : null}
 
-      <fieldset className="rounded-lg border border-border/60 p-3">
-        <legend className="px-1 text-xs font-semibold text-muted">
-          {t("newTaskDrawer.watchers")}
-        </legend>
-        <div className="mt-2 flex flex-wrap gap-2">
-          {DEMO_USERS.map((u) => (
-            <label
-              key={u.id}
-              className="flex cursor-pointer items-center gap-2 text-sm text-primary"
-            >
-              <input
-                type="checkbox"
-                checked={draft.watchers.includes(u.id)}
-                onChange={() =>
-                  update({ watchers: toggleId(draft.watchers, u.id) })
-                }
-                className="rounded border-border"
-              />
-              {u.name}
-            </label>
-          ))}
-        </div>
-      </fieldset>
+      <UserMultiSelect
+        label={t("newTaskDrawer.watchers")}
+        users={DEMO_USERS}
+        selectedIds={draft.watchers}
+        onChange={(ids) => update({ watchers: ids })}
+      />
 
       {!omitScheduleFields ? (
         <div
@@ -488,7 +453,6 @@ export function TaskFormSections({
         </p>
       ) : null}
 
-      {error ? <p className="text-sm text-danger">{error}</p> : null}
     </div>
   );
 }

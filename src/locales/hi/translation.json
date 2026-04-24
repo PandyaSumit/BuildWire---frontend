@@ -314,13 +314,31 @@
       "management": "प्रबंधन"
     },
     "filters": {
+      "title": "फ़िल्टर",
       "type": "प्रकार",
       "priority": "प्राथमिकता",
       "assignee": "सौंपा गया",
       "trade": "ट्रेड",
       "floor": "मंज़िल",
       "clear": "साफ़ करें",
-      "all": "सभी"
+      "all": "सभी",
+      "quickFilters": "त्वरित फ़िल्टर",
+      "myTasks": "मेरे कार्य",
+      "overdue": "अतिदेय",
+      "blocked": "अवरुद्ध",
+      "highPriority": "उच्च प्राथमिकता",
+      "addFilter": "फ़िल्टर जोड़ें"
+    },
+    "group": {
+      "title": "समूह",
+      "clear": "साफ़ करें",
+      "customOrder": "कस्टम क्रम",
+      "ascending": "आरोही",
+      "descending": "अवरोही",
+      "addSubgroup": "उपसमूह जोड़ें",
+      "sections": "अनुभाग",
+      "dueDate": "नियत तिथि",
+      "noValue": "कोई मान नहीं"
     },
     "bulk": {
       "selected": "{{count}} चयनित",
