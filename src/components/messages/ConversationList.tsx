@@ -12,7 +12,8 @@ type ConversationListProps = {
   onCreateChannel: () => void;
   onCreateGroup: () => void;
   onCreateDM: () => void;
-  openPaletteSignal?: number;
+  /** Increment from parent (e.g. Ctrl+K) to focus search without opening an overlay. */
+  focusSearchSignal?: number;
 };
 
 function Avatar({ name, color }: { name: string; color?: string }) {
@@ -154,28 +155,21 @@ export function ConversationList({
   onCreateChannel,
   onCreateGroup,
   onCreateDM,
-  openPaletteSignal = 0,
+  focusSearchSignal = 0,
 }: ConversationListProps) {
   const channels = conversations.filter((c) => c.kind === "channel");
   const groups = conversations.filter((c) => c.kind === "group");
   const dms = conversations.filter((c) => c.kind === "dm");
   const searching = searchQuery.trim().length > 0;
-  const [paletteOpen, setPaletteOpen] = useState(false);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    searchInputRef.current?.focus();
-    setPaletteOpen(true);
-  }, [openPaletteSignal]);
-
-  useEffect(() => {
-    if (!paletteOpen) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setPaletteOpen(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [paletteOpen]);
+    if (focusSearchSignal === 0) return;
+    const el = searchInputRef.current;
+    if (!el) return;
+    el.focus();
+    el.select();
+  }, [focusSearchSignal]);
 
   return (
     <aside className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden bg-sidebar">
@@ -233,7 +227,7 @@ export function ConversationList({
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchQueryChange(e.target.value)}
-            placeholder="Search conversations"
+            placeholder="Search conversations · Ctrl+K"
             className="h-8 w-full rounded-md border border-border/50 bg-bg/50 pl-8 pr-3 text-[12.5px] text-primary outline-none placeholder:text-muted focus:border-brand/50 focus:bg-bg focus:ring-1 focus:ring-brand/20 transition-all"
           />
         </div>
@@ -290,31 +284,6 @@ export function ConversationList({
           </>
         )}
       </div>
-      {paletteOpen ? (
-        <div className="absolute inset-0 z-[30] bg-sidebar/95 p-3 backdrop-blur-sm">
-          <div className="rounded-lg border border-border bg-surface p-2">
-            <p className="px-2 pb-2 text-[11px] font-semibold uppercase tracking-wider text-muted">
-              Jump to chat
-            </p>
-            <div className="space-y-1">
-              {conversations.map((c) => (
-                <button
-                  key={`jump-${c.id}`}
-                  type="button"
-                  onClick={() => {
-                    onSelect(c.id);
-                    setPaletteOpen(false);
-                  }}
-                  className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-left text-[12px] text-secondary hover:bg-bg hover:text-primary"
-                >
-                  <span>{c.kind === "channel" ? "#" : ""}{c.title}</span>
-                  <span className="text-[10px] text-muted">{c.updatedAt}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      ) : null}
     </aside>
   );
 }

@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 
 type UseMessagesShortcutsArgs = {
-  onOpenJumpPalette: () => void;
+  /** Focus sidebar search / conversation filter (replaces old jump overlay). */
+  onFocusConversationSearch: () => void;
 };
 
 function isEditableTarget(target: EventTarget | null): boolean {
@@ -15,22 +16,24 @@ function isEditableTarget(target: EventTarget | null): boolean {
   );
 }
 
-export function useMessagesShortcuts({ onOpenJumpPalette }: UseMessagesShortcutsArgs) {
+export function useMessagesShortcuts({
+  onFocusConversationSearch,
+}: UseMessagesShortcutsArgs) {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
         event.preventDefault();
-        onOpenJumpPalette();
+        onFocusConversationSearch();
         return;
       }
       if (isEditableTarget(event.target)) return;
       if (event.key === "k") {
         event.preventDefault();
-        onOpenJumpPalette();
+        onFocusConversationSearch();
       }
     };
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [onOpenJumpPalette]);
+  }, [onFocusConversationSearch]);
 }

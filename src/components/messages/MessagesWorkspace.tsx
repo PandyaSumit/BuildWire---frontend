@@ -100,7 +100,7 @@ export function MessagesWorkspace({ mode }: { mode: MessagesWorkspaceMode }) {
   const [dialogName, setDialogName] = useState("");
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [mobileView, setMobileView] = useState<"list" | "chat">("list");
-  const [openPaletteSignal, setOpenPaletteSignal] = useState(0);
+  const [focusSearchSignal, setFocusSearchSignal] = useState(0);
   const { isCompact: isMobileViewport } = useMessagesViewport();
 
   const { width: sidebarWidth, onHandleMouseDown } = useResizableSidebar();
@@ -172,9 +172,9 @@ export function MessagesWorkspace({ mode }: { mode: MessagesWorkspaceMode }) {
   };
 
   useMessagesShortcuts({
-    onOpenJumpPalette: () => {
+    onFocusConversationSearch: () => {
       if (isMobileViewport) setMobileView("list");
-      setOpenPaletteSignal((v) => v + 1);
+      setFocusSearchSignal((v) => v + 1);
     },
   });
 
@@ -187,7 +187,7 @@ export function MessagesWorkspace({ mode }: { mode: MessagesWorkspaceMode }) {
     onCreateChannel: () => setDialogKind("channel"),
     onCreateGroup: () => setDialogKind("group"),
     onCreateDM: () => setDialogKind("dm"),
-    openPaletteSignal,
+    focusSearchSignal,
   } as const;
 
   return (
