@@ -6,6 +6,7 @@ import type {
   Message,
   MessagesWorkspaceMode,
 } from "./types";
+import { useConversationDrafts } from "./useConversationDrafts";
 
 function allowedKinds(mode: MessagesWorkspaceMode): ConversationKind[] {
   if (mode === "channels") return ["channel", "group"];
@@ -20,6 +21,14 @@ function nowHHMM(): string {
   ).padStart(2, "0")}`;
 }
 
+function latestMessageMapByConversation(items: Message[]): Map<string, Message> {
+  const map = new Map<string, Message>();
+  for (const msg of items) {
+    map.set(msg.conversationId, msg);
+  }
+  return map;
+}
+
 export function useMessagesState(mode: MessagesWorkspaceMode) {
   const [conversations, setConversations] = useState<Conversation[]>(
     initialConversations
@@ -29,7 +38,6 @@ export function useMessagesState(mode: MessagesWorkspaceMode) {
     mode === "dms" ? "dm-hillary" : "ch-general"
   );
   const [searchQuery, setSearchQuery] = useState("");
-  const [composerText, setComposerText] = useState("");
   const [typingByConversation, setTypingByConversation] = useState<Record<string, string>>({
     "ch-general": "Project Ops is typing...",
     "dm-hillary": "Hillary is typing...",
@@ -53,6 +61,11 @@ export function useMessagesState(mode: MessagesWorkspaceMode) {
     conversations.find((c) => c.id === selectedConversationId) ??
     visibleConversations[0] ??
     null;
+  const {
+    composerText,
+    setComposerText,
+    clearComposerText,
+  } = useConversationDrafts(selectedConversationId);
 
   const selectedMessages = useMemo(() => {
     if (!selectedConversation) return [];
@@ -82,7 +95,7 @@ export function useMessagesState(mode: MessagesWorkspaceMode) {
           : c
       )
     );
-    setComposerText("");
+    clearComposerText();
 
     if (statusTimeoutRef.current) window.clearTimeout(statusTimeoutRef.current);
     statusTimeoutRef.current = window.setTimeout(() => {
@@ -150,6 +163,30 @@ export function useMessagesState(mode: MessagesWorkspaceMode) {
     );
   };
 
+  const editMessage = (messageId: string, nextText: string) => {
+    const trimmed = nextText.trim();
+    if (!trimmed) return;
+    setMessages((prev) =>
+      prev.map((m) => (m.id === messageId ? { ...m, text: trimmed } : m))
+    );
+  };
+
+  const deleteMessage = (messageId: string) => {
+    setMessages((prevMessages) => {
+      const nextMessages = prevMessages.filter((m) => m.id !== messageId);
+      const latestByConversation = latestMessageMapByConversation(nextMessages);
+      setConversations((prevConversations) =>
+        prevConversations.map((conv) => {
+          const latest = latestByConversation.get(conv.id);
+          return latest
+            ? { ...conv, lastMessage: latest.text, updatedAt: latest.time }
+            : { ...conv, lastMessage: "No messages yet", updatedAt: conv.updatedAt };
+        })
+      );
+      return nextMessages;
+    });
+  };
+
   useEffect(() => {
     return () => {
       if (typingTimeoutRef.current) window.clearTimeout(typingTimeoutRef.current);
@@ -211,6 +248,8 @@ export function useMessagesState(mode: MessagesWorkspaceMode) {
     toggleReaction,
     toggleSaved,
     togglePinned,
+    editMessage,
+    deleteMessage,
     createConversation,
     typingLabel: selectedConversation ? typingByConversation[selectedConversation.id] ?? null : null,
   };

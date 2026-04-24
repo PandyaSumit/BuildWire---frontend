@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { getMessageActionItems, type MessageActionId } from "./messageActions";
+import { buildMentionCandidates } from "./mentionCandidates";
 import type { Conversation, Message, MessageAttachment } from "./types";
+import { useComposerAutocomplete } from "./useComposerAutocomplete";
 
 type MessageGroup = {
   groupId: string;
@@ -48,14 +51,32 @@ function Avatar({ name, color, size = "md" }: { name: string; color?: string; si
 function ToolbarBtn({
   children,
   title,
+  onClick,
+  onKeyDown,
+  ariaExpanded,
+  ariaHaspopup,
+  dataMessageMenuTrigger,
+  buttonRef,
 }: {
   children: React.ReactNode;
   title?: string;
+  onClick?: () => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLButtonElement>) => void;
+  ariaExpanded?: boolean;
+  ariaHaspopup?: "menu" | "dialog" | "listbox";
+  dataMessageMenuTrigger?: boolean;
+  buttonRef?: React.Ref<HTMLButtonElement>;
 }) {
   return (
     <button
+      ref={buttonRef}
       type="button"
       title={title}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      aria-expanded={ariaExpanded}
+      aria-haspopup={ariaHaspopup}
+      data-message-menu-trigger={dataMessageMenuTrigger ? "true" : undefined}
       className="grid h-7 w-7 place-items-center rounded text-muted transition-colors hover:bg-primary/8 hover:text-primary"
     >
       {children}
@@ -72,6 +93,8 @@ type ChatPanelProps = {
   onReact: (messageId: string, emoji: string) => void;
   onToggleSaved: (messageId: string) => void;
   onTogglePinned: (messageId: string) => void;
+  onEditMessage: (messageId: string, text: string) => void;
+  onDeleteMessage: (messageId: string) => void;
   typingLabel?: string | null;
   isMobile?: boolean;
   onBackToConversationList?: () => void;
@@ -85,6 +108,34 @@ type UploadItem = {
   name: string;
   progress: number;
 };
+
+type SlashCommand = {
+  id: string;
+  label: string;
+  description: string;
+  insert: string;
+};
+
+const SLASH_COMMANDS: SlashCommand[] = [
+  {
+    id: "assign",
+    label: "/assign",
+    description: "Assign a task to a teammate",
+    insert: "/assign @team ",
+  },
+  {
+    id: "rfi",
+    label: "/rfi",
+    description: "Create an RFI follow-up message",
+    insert: "/rfi Please share clarification for ",
+  },
+  {
+    id: "meeting",
+    label: "/meeting",
+    description: "Schedule a coordination call",
+    insert: "/meeting Let's schedule a quick sync at ",
+  },
+];
 
 function statusIcon(status?: Message["status"]) {
   if (!status) return null;
@@ -113,22 +164,71 @@ export function ChatPanel({
   onReact,
   onToggleSaved,
   onTogglePinned,
+  onEditMessage,
+  onDeleteMessage,
   typingLabel,
   isMobile = false,
   onBackToConversationList,
   detailsOpen = false,
   onOpenDetails,
 }: ChatPanelProps) {
+  const panelRef = useRef<HTMLElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const unreadRef = useRef<HTMLDivElement>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showTemplatePicker, setShowTemplatePicker] = useState(false);
   const [showSlashHint, setShowSlashHint] = useState(false);
   const [threadMessage, setThreadMessage] = useState<Message | null>(null);
+  const [threadDraft, setThreadDraft] = useState("");
   const [uploads, setUploads] = useState<UploadItem[]>([]);
+  const [menuMessageId, setMenuMessageId] = useState<string | null>(null);
+  const [menuActiveIndex, setMenuActiveIndex] = useState(0);
+  const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
+  const [editingText, setEditingText] = useState("");
+  const [isNearBottom, setIsNearBottom] = useState(true);
+  const [slashActiveIndex, setSlashActiveIndex] = useState(0);
   const uploadTimersRef = useRef<number[]>([]);
+  const menuItemRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const menuTriggerRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const shouldAutoScrollRef = useRef(true);
+
+  const mentionCandidates = useMemo(
+    () => buildMentionCandidates(conversation, messages),
+    [conversation, messages],
+  );
+
+  const ac = useComposerAutocomplete({
+    composerText,
+    onComposerTextChange,
+    mentionCandidates,
+  });
+
+  const updateScrollFlags = () => {
+    const node = scrollRef.current;
+    if (!node) return;
+    const distanceFromBottom = node.scrollHeight - node.scrollTop - node.clientHeight;
+    const nearBottom = distanceFromBottom < 80;
+    setIsNearBottom(nearBottom);
+    shouldAutoScrollRef.current = nearBottom;
+  };
+
+  const scrollToBottom = (behavior: ScrollBehavior = "smooth") => {
+    bottomRef.current?.scrollIntoView({ behavior, block: "end" });
+  };
+
+  const scrollToUnread = () => {
+    unreadRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    updateScrollFlags();
+  }, []);
+
+  useEffect(() => {
+    if (shouldAutoScrollRef.current) {
+      scrollToBottom();
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -138,16 +238,44 @@ export function ChatPanel({
     };
   }, []);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleComposerKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (ac.handleComposerKeyDown(e)) return;
+    if (showSlashHint && slashCommands.length > 0) {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setShowSlashHint(false);
+        return;
+      }
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setSlashActiveIndex((i) => (i + 1) % slashCommands.length);
+        return;
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setSlashActiveIndex((i) => (i - 1 + slashCommands.length) % slashCommands.length);
+        return;
+      }
+      if (e.key === "Enter" || e.key === "Tab") {
+        e.preventDefault();
+        const picked = slashCommands[slashActiveIndex] ?? slashCommands[0];
+        if (picked) {
+          onComposerTextChange(picked.insert);
+          setShowSlashHint(false);
+        }
+        return;
+      }
+    }
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       onSend();
     }
   };
 
-  const handleComposerChange = (value: string) => {
-    onComposerTextChange(value);
-    setShowSlashHint(value.trimStart().startsWith("/"));
+  const handleComposerChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    ac.onComposerInput(e);
+    const value = e.target.value.trimStart();
+    setShowSlashHint(value.startsWith("/"));
   };
 
   const quickEmojis = ["👍", "✅", "🔥", "🎯", "🙏", "👏", "🚧", "📌"];
@@ -163,6 +291,25 @@ export function ChatPanel({
   }, [conversation, messages.length]);
 
   const pinnedMessages = useMemo(() => messages.filter((m) => m.pinned), [messages]);
+  const slashCommands = useMemo(() => {
+    if (!showSlashHint) return [];
+    const query = composerText.trimStart().slice(1).toLowerCase();
+    return SLASH_COMMANDS.filter((cmd) =>
+      !query || cmd.id.includes(query) || cmd.label.toLowerCase().includes(query)
+    );
+  }, [composerText, showSlashHint]);
+  const unreadAnchorGroupId = useMemo(() => {
+    if (unreadStartIndex < 0) return null;
+    let cursor = 0;
+    for (const group of buildGroups(messages)) {
+      const nextCursor = cursor + group.messages.length;
+      if (unreadStartIndex >= cursor && unreadStartIndex < nextCursor) {
+        return group.groupId;
+      }
+      cursor = nextCursor;
+    }
+    return null;
+  }, [messages, unreadStartIndex]);
 
   const startMockUpload = (files: FileList | null) => {
     if (!files) return;
@@ -182,6 +329,178 @@ export function ChatPanel({
       uploadTimersRef.current.push(timer);
       window.setTimeout(() => window.clearInterval(timer), 1800);
     });
+  };
+
+  useEffect(() => {
+    setSlashActiveIndex(0);
+  }, [composerText, showSlashHint]);
+
+  useEffect(() => {
+    if (!menuMessageId) return;
+    setMenuActiveIndex(0);
+  }, [menuMessageId]);
+
+  useEffect(() => {
+    if (!menuMessageId) return;
+    menuItemRefs.current[menuActiveIndex]?.focus();
+  }, [menuActiveIndex, menuMessageId]);
+
+  const closeMessageMenu = (focusTrigger = false) => {
+    setMenuMessageId((prev) => {
+      if (prev && focusTrigger) {
+        menuTriggerRefs.current[prev]?.focus();
+      }
+      return null;
+    });
+  };
+
+  useEffect(() => {
+    const onPointerDown = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (!target) return;
+      const withinPanel = !!panelRef.current?.contains(target);
+      if (!withinPanel) {
+        closeMessageMenu(false);
+        setShowTemplatePicker(false);
+        setShowEmojiPicker(false);
+        setShowSlashHint(false);
+        ac.setDismissed(true);
+        return;
+      }
+      if (!target.closest("[data-message-menu],[data-message-menu-trigger]")) {
+        closeMessageMenu(false);
+      }
+      if (!target.closest("[data-composer-area]")) {
+        setShowSlashHint(false);
+        ac.setDismissed(true);
+      }
+    };
+    const onEsc = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      closeMessageMenu(true);
+      setShowTemplatePicker(false);
+      setShowEmojiPicker(false);
+      setShowSlashHint(false);
+      ac.setDismissed(true);
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("keydown", onEsc);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("keydown", onEsc);
+    };
+  }, [ac]);
+
+  const handleAction = async (message: Message, actionId: MessageActionId) => {
+    if (actionId === "copyText") {
+      await navigator.clipboard.writeText(message.text);
+      closeMessageMenu(false);
+      return;
+    }
+    if (actionId === "copyLink") {
+      const url = `${window.location.origin}/messages?chat=${message.conversationId}&message=${message.id}`;
+      await navigator.clipboard.writeText(url);
+      closeMessageMenu(false);
+      return;
+    }
+    if (actionId === "quoteReply") {
+      onComposerTextChange(`> ${message.text}\n${composerText}`.trim());
+      closeMessageMenu(false);
+      return;
+    }
+    if (actionId === "editMessage") {
+      setEditingMessageId(message.id);
+      setEditingText(message.text);
+      closeMessageMenu(false);
+      return;
+    }
+    if (actionId === "deleteMessage") {
+      onDeleteMessage(message.id);
+      closeMessageMenu(false);
+    }
+  };
+
+  const openThread = (message: Message) => {
+    setThreadMessage(message);
+    setThreadDraft("");
+  };
+
+  const threadReplies = useMemo(() => {
+    if (!threadMessage) return [];
+    return [
+      {
+        id: `${threadMessage.id}-r1`,
+        author: threadMessage.mine ? "Project Ops" : "You",
+        text: "Acknowledged. Adding this to the thread for follow-up.",
+        time: "now",
+      },
+      {
+        id: `${threadMessage.id}-r2`,
+        author: "System",
+        text: "Thread created from channel message.",
+        time: "now",
+      },
+    ];
+  }, [threadMessage]);
+
+  const toggleMessageMenu = (messageId: string) => {
+    setMenuMessageId((prev) => {
+      if (prev === messageId) return null;
+      return messageId;
+    });
+  };
+
+  const onMenuTriggerKeyDown = (
+    e: React.KeyboardEvent<HTMLButtonElement>,
+    messageId: string
+  ) => {
+    if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      if (menuMessageId !== messageId) setMenuActiveIndex(0);
+      setMenuMessageId(messageId);
+    }
+    if (e.key === "Escape") {
+      e.preventDefault();
+      closeMessageMenu(true);
+    }
+  };
+
+  const onMenuKeyDown = (
+    e: React.KeyboardEvent<HTMLDivElement>,
+    message: Message,
+    mine: boolean
+  ) => {
+    const items = getMessageActionItems(mine);
+    if (items.length === 0) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setMenuActiveIndex((i) => (i + 1) % items.length);
+      return;
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setMenuActiveIndex((i) => (i - 1 + items.length) % items.length);
+      return;
+    }
+    if (e.key === "Home") {
+      e.preventDefault();
+      setMenuActiveIndex(0);
+      return;
+    }
+    if (e.key === "End") {
+      e.preventDefault();
+      setMenuActiveIndex(items.length - 1);
+      return;
+    }
+    if (e.key === "Escape" || e.key === "Tab") {
+      closeMessageMenu(e.key === "Escape");
+      return;
+    }
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      const item = items[menuActiveIndex] ?? items[0];
+      if (item) void handleAction(message, item.id);
+    }
   };
 
   if (!conversation) {
@@ -214,7 +533,7 @@ export function ChatPanel({
     typeof onOpenDetails === "function";
 
   return (
-    <section className="relative flex min-h-0 flex-1 flex-col bg-bg">
+    <section ref={panelRef} className="relative flex min-h-0 flex-1 flex-col bg-bg">
       {/* ── Header (52px — matches Messages sidebar + Details column) ── */}
       <header className="flex h-[52px] shrink-0 items-center justify-between border-b border-border bg-surface px-4">
         <div className="flex min-h-0 min-w-0 flex-1 items-center gap-2.5">
@@ -257,6 +576,16 @@ export function ChatPanel({
         </div>
 
         <div className="flex shrink-0 items-center gap-1">
+          {unreadStartIndex >= 0 ? (
+            <button
+              type="button"
+              title="Jump to unread"
+              onClick={scrollToUnread}
+              className="hidden h-8 items-center rounded-md border border-brand/35 bg-brand/10 px-2.5 text-[11px] font-medium text-brand transition-colors hover:bg-brand/15 lg:flex"
+            >
+              Unread
+            </button>
+          ) : null}
           {/* Members */}
           <button
             type="button"
@@ -311,7 +640,11 @@ export function ChatPanel({
       </header>
 
       {/* ── Messages ── */}
-      <div className="scrollbar-none min-h-0 flex-1 overflow-y-auto">
+      <div
+        ref={scrollRef}
+        onScroll={updateScrollFlags}
+        className="scrollbar-none min-h-0 flex-1 overflow-y-auto"
+      >
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center px-6 py-16 text-center">
             <div className="grid h-14 w-14 place-items-center rounded-2xl bg-brand/10 text-2xl">
@@ -337,6 +670,13 @@ export function ChatPanel({
 
               return (
                 <div key={group.groupId}>
+                  {unreadAnchorGroupId === group.groupId ? (
+                    <div ref={unreadRef} className="px-5 pb-1 pt-2">
+                      <div className="rounded-md border border-brand/30 bg-brand/10 px-2.5 py-1 text-[10px] font-semibold text-brand">
+                        Start of unread messages
+                      </div>
+                    </div>
+                  ) : null}
                   {showDateSep && (
                     <div className="flex items-center gap-3 px-5 py-3">
                       <div className="h-px flex-1 bg-border/60" />
@@ -370,9 +710,43 @@ export function ChatPanel({
                       <div className="mt-0.5 space-y-0.5">
                         {group.messages.map((msg) => (
                           <div key={msg.id}>
-                            <p className="text-[14px] leading-[1.55] text-primary/90">
-                              {msg.text}
-                            </p>
+                            {editingMessageId === msg.id ? (
+                              <div className="mt-1 rounded-lg border border-brand/30 bg-surface p-2">
+                                <textarea
+                                  value={editingText}
+                                  onChange={(e) => setEditingText(e.target.value)}
+                                  rows={2}
+                                  className="w-full resize-none bg-transparent text-[13px] text-primary outline-none"
+                                />
+                                <div className="mt-1.5 flex items-center justify-end gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setEditingMessageId(null);
+                                      setEditingText("");
+                                    }}
+                                    className="rounded-md border border-border px-2 py-1 text-[11px] text-secondary"
+                                  >
+                                    Cancel
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      onEditMessage(msg.id, editingText);
+                                      setEditingMessageId(null);
+                                      setEditingText("");
+                                    }}
+                                    className="rounded-md bg-brand px-2 py-1 text-[11px] font-semibold text-white"
+                                  >
+                                    Save
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="text-[14px] leading-[1.55] text-primary/90">
+                                {msg.text}
+                              </p>
+                            )}
                             {msg.attachments?.length ? (
                               <div className="mt-1 flex flex-wrap gap-1.5">
                                 {msg.attachments.map((a: MessageAttachment) => (
@@ -410,7 +784,7 @@ export function ChatPanel({
                         {group.messages[group.messages.length - 1]?.threadCount ? (
                           <button
                             type="button"
-                            onClick={() => setThreadMessage(group.messages[group.messages.length - 1])}
+                            onClick={() => openThread(group.messages[group.messages.length - 1])}
                             className="rounded-full border border-border bg-bg px-2 py-0.5 text-[11px] text-secondary hover:text-primary"
                           >
                             Reply in thread ({group.messages[group.messages.length - 1].threadCount})
@@ -445,7 +819,7 @@ export function ChatPanel({
                           stroke="currentColor"
                           viewBox="0 0 24 24"
                           aria-hidden
-                          onClick={() => setThreadMessage(group.messages[group.messages.length - 1])}
+                          onClick={() => openThread(group.messages[group.messages.length - 1])}
                         >
                           <path
                             strokeLinecap="round"
@@ -455,8 +829,33 @@ export function ChatPanel({
                           />
                         </svg>
                       </ToolbarBtn>
-                      <ToolbarBtn title="More options">
-                        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                      <ToolbarBtn
+                        title="More options"
+                        dataMessageMenuTrigger
+                        ariaHaspopup="menu"
+                        ariaExpanded={
+                          menuMessageId === group.messages[group.messages.length - 1].id
+                        }
+                        buttonRef={(el) => {
+                          menuTriggerRefs.current[group.messages[group.messages.length - 1].id] = el;
+                        }}
+                        onClick={() =>
+                          toggleMessageMenu(group.messages[group.messages.length - 1].id)
+                        }
+                        onKeyDown={(e) =>
+                          onMenuTriggerKeyDown(
+                            e,
+                            group.messages[group.messages.length - 1].id
+                          )
+                        }
+                      >
+                        <svg
+                          className="h-3.5 w-3.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          aria-hidden
+                        >
                           <path
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -490,6 +889,43 @@ export function ChatPanel({
                         </svg>
                       </ToolbarBtn>
                     </div>
+                    {menuMessageId === group.messages[group.messages.length - 1].id ? (
+                      <div
+                        data-message-menu
+                        onKeyDown={(e) =>
+                          onMenuKeyDown(
+                            e,
+                            group.messages[group.messages.length - 1],
+                            !!group.mine
+                          )
+                        }
+                        role="menu"
+                        className="absolute right-4 top-10 z-[15] w-44 rounded-lg border border-border bg-surface p-1 shadow-token-xl"
+                      >
+                        {getMessageActionItems(!!group.mine).map((item, i) => (
+                          <button
+                            key={`${group.groupId}-${item.id}`}
+                            type="button"
+                            ref={(el) => {
+                              menuItemRefs.current[i] = el;
+                            }}
+                            onClick={() =>
+                              handleAction(group.messages[group.messages.length - 1], item.id)
+                            }
+                            role="menuitem"
+                            tabIndex={i === menuActiveIndex ? 0 : -1}
+                            className={[
+                              "w-full rounded-md px-2.5 py-1.5 text-left text-[12px] transition-colors",
+                              item.danger
+                                ? "text-danger hover:bg-danger/10"
+                                : "text-secondary hover:bg-bg hover:text-primary",
+                            ].join(" ")}
+                          >
+                            {item.label}
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
                   </div>
                 </div>
               );
@@ -506,6 +942,15 @@ export function ChatPanel({
           </div>
         )}
       </div>
+      {!isNearBottom ? (
+        <button
+          type="button"
+          onClick={() => scrollToBottom()}
+          className="absolute bottom-28 right-5 z-[5] inline-flex items-center gap-1.5 rounded-full border border-brand/40 bg-surface px-3 py-1.5 text-[11px] font-medium text-brand shadow-token-sm transition-colors hover:bg-brand/10"
+        >
+          Jump to latest
+        </button>
+      ) : null}
 
       {/* ── Composer ── */}
       <div className="shrink-0 border-t border-border px-4 py-3">
@@ -615,22 +1060,98 @@ export function ChatPanel({
             </div>
           ) : null}
 
-          {/* Text area */}
-          <textarea
-            value={composerText}
-            onChange={(e) => handleComposerChange(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder={
-              conversation.kind === "channel"
-                ? `Message #${conversation.title}`
-                : `Message ${conversation.title}`
-            }
-            rows={2}
-            className="w-full resize-none bg-transparent px-4 py-2.5 text-[14px] leading-[1.5] text-primary outline-none placeholder:text-muted"
-          />
-          {showSlashHint ? (
-            <div className="border-t border-border/60 bg-bg px-3 py-2 text-[11px] text-secondary">
-              Commands: <code>/assign</code>, <code>/rfi</code>, <code>/meeting</code>
+          {/* Text area + @ / : autocomplete */}
+          <div data-composer-area className="relative">
+            <textarea
+              ref={ac.textareaRef}
+              value={composerText}
+              onChange={handleComposerChange}
+              onKeyDown={handleComposerKeyDown}
+              onSelect={ac.syncCursorFromDom}
+              onKeyUp={ac.syncCursorFromDom}
+              onClick={ac.syncCursorFromDom}
+              placeholder={
+                conversation.kind === "channel"
+                  ? `Message #${conversation.title}`
+                  : `Message ${conversation.title}`
+              }
+              rows={2}
+              className="w-full resize-none bg-transparent px-4 py-2.5 text-[14px] leading-[1.5] text-primary outline-none placeholder:text-muted"
+              aria-autocomplete={ac.open ? "list" : undefined}
+              aria-controls={ac.open ? "composer-autocomplete" : undefined}
+              aria-expanded={ac.open}
+            />
+            {ac.open ? (
+              <ul
+                id="composer-autocomplete"
+                role="listbox"
+                className="absolute bottom-full left-2 right-2 z-30 mb-1 max-h-40 overflow-y-auto rounded-lg border border-border bg-surface py-1 shadow-token-lg"
+              >
+                {ac.trigger.kind === "mention"
+                  ? ac.mentionItems.map((row, i) => (
+                      <li key={row.id} role="option" aria-selected={i === ac.activeIndex}>
+                        <button
+                          type="button"
+                          className={[
+                            "flex w-full items-center gap-2 px-3 py-1.5 text-left text-[12.5px]",
+                            i === ac.activeIndex ? "bg-brand/12 text-primary" : "text-secondary hover:bg-bg",
+                          ].join(" ")}
+                          onMouseEnter={() => ac.setActiveIndex(i)}
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => ac.insertMention(row.label)}
+                        >
+                          <span className="font-medium">@{row.label}</span>
+                        </button>
+                      </li>
+                    ))
+                  : ac.emojiItems.map((row, i) => (
+                      <li key={row.key} role="option" aria-selected={i === ac.activeIndex}>
+                        <button
+                          type="button"
+                          className={[
+                            "flex w-full items-center justify-between gap-2 px-3 py-1.5 text-left text-[12.5px]",
+                            i === ac.activeIndex ? "bg-brand/12 text-primary" : "text-secondary hover:bg-bg",
+                          ].join(" ")}
+                          onMouseEnter={() => ac.setActiveIndex(i)}
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => ac.insertEmoji(row.emoji)}
+                        >
+                          <span className="text-base">{row.emoji}</span>
+                          <span className="font-mono text-[11px] text-muted">:{row.key}</span>
+                        </button>
+                      </li>
+                    ))}
+              </ul>
+            ) : null}
+          </div>
+          {showSlashHint && slashCommands.length > 0 ? (
+            <div
+              data-composer-area
+              className="border-t border-border/60 bg-bg px-2 py-2"
+            >
+              <div className="space-y-1">
+                {slashCommands.map((cmd, idx) => (
+                  <button
+                    key={cmd.id}
+                    type="button"
+                    onMouseEnter={() => setSlashActiveIndex(idx)}
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => {
+                      onComposerTextChange(cmd.insert);
+                      setShowSlashHint(false);
+                    }}
+                    className={[
+                      "w-full rounded-md px-2.5 py-1.5 text-left transition-colors",
+                      idx === slashActiveIndex
+                        ? "bg-brand/12 text-primary"
+                        : "text-secondary hover:bg-surface hover:text-primary",
+                    ].join(" ")}
+                  >
+                    <p className="text-[12px] font-medium">{cmd.label}</p>
+                    <p className="text-[10.5px] text-muted">{cmd.description}</p>
+                  </button>
+                ))}
+              </div>
             </div>
           ) : null}
           {uploads.length > 0 ? (
@@ -690,8 +1211,15 @@ export function ChatPanel({
                   </svg>
                 </label>
               </ToolbarBtn>
-              <ToolbarBtn title="Mention">
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <ToolbarBtn title="Insert mention">
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden
+                  onClick={() => ac.insertRawAtCursor("@")}
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -741,26 +1269,81 @@ export function ChatPanel({
         </div>
 
         <p className="mt-1.5 text-center text-[10.5px] text-muted/50">
-          <kbd className="font-mono">Enter</kbd> to send · <kbd className="font-mono">Shift+Enter</kbd> for new line
+          <kbd className="font-mono">Enter</kbd> to send · <kbd className="font-mono">Shift+Enter</kbd> new line ·{" "}
+          <kbd className="font-mono">@</kbd> people · <kbd className="font-mono">:</kbd> emoji
         </p>
       </div>
       {threadMessage ? (
-        <aside className="absolute right-4 top-16 z-[20] hidden w-[320px] rounded-xl border border-border bg-surface p-3 shadow-token-xl xl:block">
-          <div className="mb-2 flex items-center justify-between">
-            <h4 className="text-sm font-semibold text-primary">Thread</h4>
-            <button
-              type="button"
-              onClick={() => setThreadMessage(null)}
-              className="text-[11px] text-muted hover:text-primary"
-            >
-              Close
-            </button>
-          </div>
-          <p className="text-[12px] text-secondary">{threadMessage.text}</p>
-          <div className="mt-2 rounded-md border border-dashed border-border p-2 text-[11px] text-muted">
-            Thread replies (mock): add focused discussion here.
-          </div>
-        </aside>
+        <>
+          <button
+            type="button"
+            className="absolute inset-x-0 bottom-0 top-[52px] z-[22] bg-black/35 xl:hidden"
+            onClick={() => setThreadMessage(null)}
+            aria-label="Close thread panel"
+          />
+          <aside
+            className={[
+              "absolute bottom-0 right-0 top-[52px] z-[23] flex w-full max-w-[420px] flex-col border-l border-border bg-surface shadow-token-xl transition-transform duration-200",
+              threadMessage ? "translate-x-0" : "translate-x-full",
+            ].join(" ")}
+          >
+            <div className="flex h-12 shrink-0 items-center justify-between border-b border-border px-3">
+              <div>
+                <p className="text-[13px] font-semibold text-primary">Thread</p>
+                <p className="text-[10.5px] text-muted">Focused conversation</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setThreadMessage(null)}
+                className="grid h-8 w-8 place-items-center rounded-md text-muted hover:bg-bg hover:text-primary"
+                aria-label="Close thread panel"
+              >
+                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="scrollbar-none min-h-0 flex-1 overflow-y-auto px-3 py-3">
+              <div className="rounded-lg border border-border bg-bg p-2.5">
+                <p className="text-[11px] font-semibold text-primary">{threadMessage.author}</p>
+                <p className="mt-1 text-[12px] text-secondary">{threadMessage.text}</p>
+              </div>
+              <div className="mt-3 space-y-2">
+                {threadReplies.map((reply) => (
+                  <div key={reply.id} className="rounded-lg border border-border/80 bg-surface px-2.5 py-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-[11px] font-semibold text-primary">{reply.author}</p>
+                      <p className="text-[10px] text-muted">{reply.time}</p>
+                    </div>
+                    <p className="mt-1 text-[12px] text-secondary">{reply.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="shrink-0 border-t border-border px-3 py-2.5">
+              <textarea
+                value={threadDraft}
+                onChange={(e) => setThreadDraft(e.target.value)}
+                rows={2}
+                placeholder="Reply in thread"
+                className="w-full resize-none rounded-lg border border-border bg-bg px-3 py-2 text-[12.5px] text-primary outline-none placeholder:text-muted focus:border-brand/40"
+              />
+              <div className="mt-2 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!threadDraft.trim()) return;
+                    setThreadDraft("");
+                  }}
+                  className="rounded-md bg-brand px-3 py-1.5 text-[11px] font-semibold text-white disabled:opacity-40"
+                  disabled={!threadDraft.trim()}
+                >
+                  Reply
+                </button>
+              </div>
+            </div>
+          </aside>
+        </>
       ) : null}
     </section>
   );

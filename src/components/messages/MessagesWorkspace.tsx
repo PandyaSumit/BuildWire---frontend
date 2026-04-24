@@ -4,21 +4,21 @@ import { ChatPanel } from "./ChatPanel";
 import { ChatDetailsPanel } from "./ChatDetailsPanel";
 import { ConversationList } from "./ConversationList";
 import { CreateConversationDialog } from "./CreateConversationDialog";
+import { MESSAGES_LAYOUT } from "./layoutConfig";
 import type { ConversationKind, MessagesWorkspaceMode } from "./types";
 import { useMessagesState } from "./useMessagesState";
-
-const SIDEBAR_MIN = 200;
-const SIDEBAR_MAX = 400;
-const SIDEBAR_DEFAULT = 272;
-const STORAGE_KEY = "bw.messages.sidebarWidth";
+import { useMessagesViewport } from "./useMessagesViewport";
+import { useMessagesShortcuts } from "./useMessagesShortcuts";
 
 function useResizableSidebar() {
   const [width, setWidth] = useState<number>(() => {
-    if (typeof window === "undefined") return SIDEBAR_DEFAULT;
-    const saved = Number(localStorage.getItem(STORAGE_KEY));
-    return saved >= SIDEBAR_MIN && saved <= SIDEBAR_MAX
+    if (typeof window === "undefined") return MESSAGES_LAYOUT.sidebar.default;
+    const saved = Number(localStorage.getItem(MESSAGES_LAYOUT.sidebar.storageKey));
+    return (
+      saved >= MESSAGES_LAYOUT.sidebar.min && saved <= MESSAGES_LAYOUT.sidebar.max
+    )
       ? saved
-      : SIDEBAR_DEFAULT;
+      : MESSAGES_LAYOUT.sidebar.default;
   });
 
   const dragging = useRef(false);
@@ -40,8 +40,11 @@ function useResizableSidebar() {
     const onMove = (e: MouseEvent) => {
       if (!dragging.current) return;
       const next = Math.min(
-        SIDEBAR_MAX,
-        Math.max(SIDEBAR_MIN, startW.current + (e.clientX - startX.current)),
+        MESSAGES_LAYOUT.sidebar.max,
+        Math.max(
+          MESSAGES_LAYOUT.sidebar.min,
+          startW.current + (e.clientX - startX.current),
+        ),
       );
       setWidth(next);
     };
@@ -50,7 +53,10 @@ function useResizableSidebar() {
       dragging.current = false;
       document.body.style.cursor = "";
       document.body.style.userSelect = "";
-      localStorage.setItem(STORAGE_KEY, String(latestWidth.current));
+      localStorage.setItem(
+        MESSAGES_LAYOUT.sidebar.storageKey,
+        String(latestWidth.current),
+      );
     };
     document.addEventListener("mousemove", onMove);
     document.addEventListener("mouseup", onUp);
@@ -84,6 +90,8 @@ export function MessagesWorkspace({ mode }: { mode: MessagesWorkspaceMode }) {
     toggleReaction,
     toggleSaved,
     togglePinned,
+    editMessage,
+    deleteMessage,
     createConversation,
     typingLabel,
   } = useMessagesState(mode);
@@ -92,7 +100,8 @@ export function MessagesWorkspace({ mode }: { mode: MessagesWorkspaceMode }) {
   const [dialogName, setDialogName] = useState("");
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [mobileView, setMobileView] = useState<"list" | "chat">("list");
-  const [isMobileViewport, setIsMobileViewport] = useState(false);
+  const [openPaletteSignal, setOpenPaletteSignal] = useState(0);
+  const { isCompact: isMobileViewport } = useMessagesViewport();
 
   const { width: sidebarWidth, onHandleMouseDown } = useResizableSidebar();
 
@@ -132,15 +141,6 @@ export function MessagesWorkspace({ mode }: { mode: MessagesWorkspaceMode }) {
   }, [selectedConversation?.id, selectedConversation?.kind]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    // Use a wider breakpoint so split-view doesn't feel cramped on tablets/smaller laptops.
-    const apply = () => setIsMobileViewport(window.innerWidth < 1024);
-    apply();
-    window.addEventListener("resize", apply);
-    return () => window.removeEventListener("resize", apply);
-  }, []);
-
-  useEffect(() => {
     if (!isMobileViewport) return;
     // On mobile, show list first (no drawer).
     setMobileView("list");
@@ -171,20 +171,30 @@ export function MessagesWorkspace({ mode }: { mode: MessagesWorkspaceMode }) {
     setDialogKind(null);
   };
 
+  useMessagesShortcuts({
+    onOpenJumpPalette: () => {
+      if (isMobileViewport) setMobileView("list");
+      setOpenPaletteSignal((v) => v + 1);
+    },
+  });
+
+  const listProps = {
+    conversations: visibleConversations,
+    selectedId: selectedConversation?.id ?? null,
+    searchQuery,
+    onSearchQueryChange: setSearchQuery,
+    onSelect: handleSelect,
+    onCreateChannel: () => setDialogKind("channel"),
+    onCreateGroup: () => setDialogKind("group"),
+    onCreateDM: () => setDialogKind("dm"),
+    openPaletteSignal,
+  } as const;
+
   return (
     <div className="flex h-full min-h-0 w-full flex-1 flex-row overflow-hidden">
       {isMobileViewport && mobileView === "list" ? (
         <div className="flex min-h-0 w-full flex-1 flex-col">
-          <ConversationList
-            conversations={visibleConversations}
-            selectedId={selectedConversation?.id ?? null}
-            searchQuery={searchQuery}
-            onSearchQueryChange={setSearchQuery}
-            onSelect={handleSelect}
-            onCreateChannel={() => setDialogKind("channel")}
-            onCreateGroup={() => setDialogKind("group")}
-            onCreateDM={() => setDialogKind("dm")}
-          />
+          <ConversationList {...listProps} />
         </div>
       ) : null}
 
@@ -193,16 +203,7 @@ export function MessagesWorkspace({ mode }: { mode: MessagesWorkspaceMode }) {
         className="relative hidden min-h-0 shrink-0 lg:flex lg:flex-col"
         style={{ width: sidebarWidth }}
       >
-        <ConversationList
-          conversations={visibleConversations}
-          selectedId={selectedConversation?.id ?? null}
-          searchQuery={searchQuery}
-          onSearchQueryChange={setSearchQuery}
-          onSelect={handleSelect}
-          onCreateChannel={() => setDialogKind("channel")}
-          onCreateGroup={() => setDialogKind("group")}
-          onCreateDM={() => setDialogKind("dm")}
-        />
+        <ConversationList {...listProps} />
 
         {/* Resize handle */}
         <div
@@ -227,6 +228,8 @@ export function MessagesWorkspace({ mode }: { mode: MessagesWorkspaceMode }) {
           onReact={toggleReaction}
           onToggleSaved={toggleSaved}
           onTogglePinned={togglePinned}
+          onEditMessage={editMessage}
+          onDeleteMessage={deleteMessage}
           typingLabel={typingLabel}
           isMobile={isMobileViewport}
           onBackToConversationList={() => setMobileView("list")}

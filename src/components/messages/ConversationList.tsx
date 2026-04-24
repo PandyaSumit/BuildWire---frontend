@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { BuildWireLogo } from "@/components/brand/BuildWireLogo";
 import { WorkspaceSwitcherButton } from "@/components/workspace-switcher";
 import type { Conversation } from "./types";
@@ -12,6 +12,7 @@ type ConversationListProps = {
   onCreateChannel: () => void;
   onCreateGroup: () => void;
   onCreateDM: () => void;
+  openPaletteSignal?: number;
 };
 
 function Avatar({ name, color }: { name: string; color?: string }) {
@@ -153,24 +154,28 @@ export function ConversationList({
   onCreateChannel,
   onCreateGroup,
   onCreateDM,
+  openPaletteSignal = 0,
 }: ConversationListProps) {
   const channels = conversations.filter((c) => c.kind === "channel");
   const groups = conversations.filter((c) => c.kind === "group");
   const dms = conversations.filter((c) => c.kind === "dm");
   const searching = searchQuery.trim().length > 0;
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    searchInputRef.current?.focus();
+    setPaletteOpen(true);
+  }, [openPaletteSignal]);
+
+  useEffect(() => {
+    if (!paletteOpen) return;
     const onKey = (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        setPaletteOpen((v) => !v);
-      }
       if (event.key === "Escape") setPaletteOpen(false);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  }, [paletteOpen]);
 
   return (
     <aside className="relative flex h-full min-h-0 w-full flex-1 flex-col overflow-hidden bg-sidebar">
@@ -224,6 +229,7 @@ export function ConversationList({
             />
           </svg>
           <input
+            ref={searchInputRef}
             type="text"
             value={searchQuery}
             onChange={(e) => onSearchQueryChange(e.target.value)}
