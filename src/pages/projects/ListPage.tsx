@@ -13,6 +13,7 @@ import { CreateProjectModal } from '@/components/project/CreateProjectModal';
 import { projectStatusTKey } from '@/utils/project/display';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { IconPlus } from '@/components/ui/icons';
 
 const PAGE_SIZE = 12;
 
@@ -195,10 +196,10 @@ export default function ListPage() {
               <Button
                 type="button"
                 variant="primary"
-                className="shrink-0 font-semibold"
+                className="shrink-0 inline-flex items-center gap-1.5 font-semibold"
                 onClick={() => setCreateOpen(true)}
               >
-                {t('projects.newProject')}
+                <IconPlus />{t('projects.newProject')}
               </Button>
             ) : null}
           </div>

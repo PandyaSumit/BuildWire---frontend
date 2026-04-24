@@ -1,7 +1,7 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { loadUser } from '@/store/authSlice';
+import { bootstrapSession } from '@/lib/sessionBootstrap';
 
 export function ProtectedRoute({ children }: { children: ReactNode }) {
   const dispatch = useAppDispatch();
@@ -10,10 +10,14 @@ export function ProtectedRoute({ children }: { children: ReactNode }) {
   const [sessionChecked, setSessionChecked] = useState(false);
 
   useEffect(() => {
-    dispatch(loadUser()).finally(() => {
+    if (isAuthenticated) {
+      setSessionChecked(true);
+      return;
+    }
+    bootstrapSession(dispatch).finally(() => {
       setSessionChecked(true);
     });
-  }, [dispatch]);
+  }, [dispatch, isAuthenticated]);
 
   if (!sessionChecked) {
     return (

@@ -335,13 +335,31 @@
       "management": "Gestión"
     },
     "filters": {
+      "title": "Filtros",
       "type": "Tipo",
       "priority": "Prioridad",
       "assignee": "Asignado",
       "trade": "Oficio",
       "floor": "Planta",
       "clear": "Limpiar",
-      "all": "Todos"
+      "all": "Todos",
+      "quickFilters": "Filtros rápidos",
+      "myTasks": "Mis tareas",
+      "overdue": "Vencidas",
+      "blocked": "Bloqueadas",
+      "highPriority": "Alta prioridad",
+      "addFilter": "Agregar filtro"
+    },
+    "group": {
+      "title": "Grupos",
+      "clear": "Limpiar",
+      "customOrder": "Orden personalizado",
+      "ascending": "Ascendente",
+      "descending": "Descendente",
+      "addSubgroup": "Agregar subgrupo",
+      "sections": "Secciones",
+      "dueDate": "Fecha límite",
+      "noValue": "Sin valor"
     },
     "workspaceSearchPlaceholder": "Buscar tareas, ubicaciones, IDs…",
     "workspaceSearchAria": "Buscar tareas",

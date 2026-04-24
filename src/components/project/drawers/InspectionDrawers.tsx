@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { IconCalendar, IconFileText } from "@/components/ui/icons";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { Select, type SelectOption } from "@/components/ui/select";
@@ -214,11 +215,11 @@ export function InspectionDetailDrawer({
       </div>
 
       <div className="flex shrink-0 flex-wrap justify-end gap-2 border-t border-border/60 px-5 py-3">
-        <Button size="sm" variant="secondary" type="button" onClick={onClose}>
+        <Button size="sm" variant="secondary" type="button" className="inline-flex items-center gap-1.5" onClick={onClose}>
           {t("inspectionPage.close")}
         </Button>
-        <Button size="sm" variant="secondary" type="button">
-          {t("inspectionPage.openPdf")}
+        <Button size="sm" variant="secondary" type="button" className="inline-flex items-center gap-1.5">
+          <IconFileText />{t("inspectionPage.openPdf")}
         </Button>
       </div>
     </div>
@@ -248,7 +249,7 @@ export function ScheduleInspectionDrawer({
   const [location, setLocation] = useState("");
   const [by, setBy] = useState("");
   const [dateIso, setDateIso] = useState("");
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState<{ title?: string; location?: string; date?: string }>({});
 
   useEffect(() => {
     setTitle("");
@@ -258,7 +259,7 @@ export function ScheduleInspectionDrawer({
     setLocation("");
     setBy(t("inspectionPage.schedule.youLabel"));
     setDateIso("");
-    setError("");
+    setErrors({});
   }, [t]);
 
   const typeOptions: SelectOption[] = useMemo(
@@ -267,16 +268,12 @@ export function ScheduleInspectionDrawer({
   );
 
   function handleSubmit() {
-    if (!title.trim()) {
-      setError(t("inspectionPage.schedule.errorTitle"));
-      return;
-    }
-    if (!location.trim()) {
-      setError(t("inspectionPage.schedule.errorLocation"));
-      return;
-    }
-    if (!dateIso) {
-      setError(t("inspectionPage.schedule.errorDate"));
+    const newErrors: { title?: string; location?: string; date?: string } = {};
+    if (!title.trim()) newErrors.title = t("inspectionPage.schedule.errorTitle");
+    if (!location.trim()) newErrors.location = t("inspectionPage.schedule.errorLocation");
+    if (!dateIso) newErrors.date = t("inspectionPage.schedule.errorDate");
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       return;
     }
     const tmpl =
@@ -316,17 +313,16 @@ export function ScheduleInspectionDrawer({
         </button>
       </div>
       <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5">
-        {error ? (
-          <p className="rounded-md border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">
-            {error}
-          </p>
-        ) : null}
-        <Input
-          label={t("inspectionPage.schedule.fieldTitle")}
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder={t("inspectionPage.schedule.fieldTitlePh")}
-        />
+        <div>
+          <Input
+            label={t("inspectionPage.schedule.fieldTitle")}
+            required
+            value={title}
+            onChange={(e) => { setTitle(e.target.value); setErrors((p) => ({ ...p, title: undefined })); }}
+            placeholder={t("inspectionPage.schedule.fieldTitlePh")}
+          />
+          {errors.title ? <p className="mt-1 text-xs text-danger">{errors.title}</p> : null}
+        </div>
         <Select
           label={t("inspectionPage.schedule.fieldType")}
           options={typeOptions}
@@ -348,32 +344,39 @@ export function ScheduleInspectionDrawer({
           onChange={(e) => setTemplateName(e.target.value)}
           placeholder={t("inspectionPage.schedule.fieldTemplatePh")}
         />
-        <Input
-          label={t("inspectionPage.schedule.fieldLocation")}
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-          placeholder={t("inspectionPage.schedule.fieldLocationPh")}
-        />
+        <div>
+          <Input
+            label={t("inspectionPage.schedule.fieldLocation")}
+            required
+            value={location}
+            onChange={(e) => { setLocation(e.target.value); setErrors((p) => ({ ...p, location: undefined })); }}
+            placeholder={t("inspectionPage.schedule.fieldLocationPh")}
+          />
+          {errors.location ? <p className="mt-1 text-xs text-danger">{errors.location}</p> : null}
+        </div>
         <Input
           label={t("inspectionPage.schedule.fieldInspector")}
           value={by}
           onChange={(e) => setBy(e.target.value)}
         />
-        <DatePicker
-          label={t("inspectionPage.schedule.fieldDate")}
-          value={dateIso}
-          onChange={(e) => setDateIso(e.target.value)}
-          fullWidth
-          className="pr-10"
-        />
+        <div>
+          <DatePicker
+            label={t("inspectionPage.schedule.fieldDate")}
+            required
+            value={dateIso}
+            onChange={(e) => { setDateIso(e.target.value); setErrors((p) => ({ ...p, date: undefined })); }}
+            fullWidth
+          />
+          {errors.date ? <p className="mt-1 text-xs text-danger">{errors.date}</p> : null}
+        </div>
         <p className="text-[12px] text-muted">{t("inspectionPage.schedule.hint")}</p>
       </div>
       <div className="flex shrink-0 justify-end gap-2 border-t border-border/60 px-5 py-3">
-        <Button type="button" variant="secondary" size="sm" onClick={onClose}>
+        <Button type="button" variant="secondary" size="sm" className="inline-flex items-center gap-1.5" onClick={onClose}>
           {t("inspectionPage.schedule.cancel")}
         </Button>
-        <Button type="button" variant="primary" size="sm" onClick={handleSubmit}>
-          {t("inspectionPage.schedule.submit")}
+        <Button type="button" variant="primary" size="sm" className="inline-flex items-center gap-1.5" onClick={handleSubmit}>
+          <IconCalendar />{t("inspectionPage.schedule.submit")}
         </Button>
       </div>
     </div>
