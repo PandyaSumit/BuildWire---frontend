@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useTheme, type ThemePreference } from "@/components/theme";
 import { LanguageMenu } from "@/components/layout/LanguageMenu";
 import { useAppSelector } from "@/store/hooks";
+import { Button } from "@/components/ui/button";
 import { Checkbox, Input, Select } from "@/components/ui";
 import {
   getDateFormatPref,
@@ -469,22 +470,24 @@ export default function PreferencesPage() {
             <p className="mt-1 text-sm text-secondary">{t("prefs.appearanceHint")}</p>
           </div>
           <div className="flex shrink-0 gap-2">
-            <button
+            <Button
               type="button"
+              variant="secondary"
+              size="md"
               onClick={handleCancelAppearance}
               disabled={!appearanceDirty}
-              className="rounded-lg border border-border bg-surface px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-muted/10 disabled:pointer-events-none disabled:opacity-40"
             >
               {t("prefs.cancel")}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="primary"
+              size="md"
               onClick={handleSaveAppearance}
               disabled={!appearanceDirty}
-              className="rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:pointer-events-none disabled:opacity-40 dark:text-bg"
             >
               {t("prefs.saveChanges")}
-            </button>
+            </Button>
           </div>
         </div>
 

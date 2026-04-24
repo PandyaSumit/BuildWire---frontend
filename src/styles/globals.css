@@ -66,7 +66,6 @@
 }
 
 .dark {
-  /* Workspace shell: zinc-900 #18181b — unified layout (sidebar, header, main) */
   --bg:       240 6% 10%;
   --surface:  240 5% 12%;
   --elevated: 240 5% 15%;

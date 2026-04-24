@@ -2,6 +2,7 @@ import { InputHTMLAttributes, forwardRef, type ReactNode } from 'react';
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
+  required?: boolean;
   error?: string;
   helperText?: string;
   fullWidth?: boolean;
@@ -13,7 +14,7 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   (
-    { label, error, helperText, fullWidth = true, startAdornment, endAdornment, className = '', ...props },
+    { label, required, error, helperText, fullWidth = true, startAdornment, endAdornment, className = '', ...props },
     ref
   ) => {
     const hasError = Boolean(error);
@@ -25,7 +26,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       <div className={fullWidth ? 'w-full' : ''}>
         {label && (
           <label className="mb-1.5 block text-[12.5px] font-medium text-primary">
-            {label}
+            {label}{required && <span className="ml-0.5 text-danger">*</span>}
           </label>
         )}
 
