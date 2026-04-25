@@ -93,9 +93,9 @@ export default function DailyReportsPage() {
 
   const [rows, setRows] = useState<DailyReportRow[]>(() => [...DUMMY_DAILY_REPORTS]);
   const [mode, setMode] = useState<"calendar" | "list">("calendar");
-  /** Start on March 2026 to align with seed data. */
+  /** Start on April 2026 to align with seed data. */
   const [viewYear, setViewYear] = useState(2026);
-  const [viewMonthIndex, setViewMonthIndex] = useState(2);
+  const [viewMonthIndex, setViewMonthIndex] = useState(3);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerReport, setDrawerReport] = useState<DailyReportRow | null>(null);
@@ -164,6 +164,19 @@ export default function DailyReportsPage() {
     setViewMonthIndex(m - 1);
   }, []);
 
+  const monthStats = useMemo(() => {
+    const monthRows = rows.filter((r) => {
+      const [y, m] = r.date.split("-").map((x) => parseInt(x, 10));
+      return y === viewYear && m === viewMonthIndex + 1;
+    });
+    const totalWorkers = monthRows.reduce((s, r) => s + totalDailyReportCrew(r), 0);
+    const totalHours   = monthRows.reduce((s, r) => s + r.manpower.reduce((ms, m) => ms + m.workers * m.hours, 0), 0);
+    const approved     = monthRows.filter((r) => r.status === "Approved").length;
+    const pending      = monthRows.filter((r) => r.status === "Pending").length;
+    const incidents    = monthRows.reduce((s, r) => s + (r.safetyEntries?.filter((e) => e.type === "incident").length ?? 0), 0);
+    return { count: monthRows.length, totalWorkers, totalHours, approved, pending, incidents };
+  }, [rows, viewYear, viewMonthIndex]);
+
   const listColumns: DataTableColumn<DailyReportRow>[] = useMemo(
     () => [
       {
@@ -172,9 +185,17 @@ export default function DailyReportsPage() {
         headerClassName: "",
         cellClassName: "whitespace-nowrap",
         sortValue: (r) => r.date,
-        cell: (r) => (
-          <span className="font-mono text-[13px] text-primary">{r.date}</span>
-        ),
+        cell: (r) => {
+          const d = new Date(r.date + "T12:00:00");
+          return (
+            <div>
+              <p className="font-mono text-[13px] font-semibold text-primary">
+                {d.toLocaleDateString("en", { month: "short", day: "numeric" })}
+              </p>
+              <p className="text-[11px] text-muted">{d.toLocaleDateString("en", { weekday: "short", year: "numeric" })}</p>
+            </div>
+          );
+        },
       },
       {
         id: "submittedBy",
@@ -183,18 +204,10 @@ export default function DailyReportsPage() {
         cellClassName: "",
         sortValue: (r) => r.submittedBy,
         cell: (r) => (
-          <span className="text-[13px] font-medium text-primary">{r.submittedBy}</span>
-        ),
-      },
-      {
-        id: "crew",
-        header: t("dailyReportsPage.colCrew"),
-        headerClassName: "",
-        cellClassName: "",
-        align: "right",
-        sortValue: (r) => totalDailyReportCrew(r),
-        cell: (r) => (
-          <span className="text-[13px] tabular-nums text-secondary">{totalDailyReportCrew(r)}</span>
+          <div>
+            <p className="text-[13px] font-medium text-primary">{r.submittedBy}</p>
+            {r.approvedBy && <p className="text-[11px] text-muted">Approved: {r.approvedBy}</p>}
+          </div>
         ),
       },
       {
@@ -203,9 +216,55 @@ export default function DailyReportsPage() {
         headerClassName: "",
         cellClassName: "",
         sortValue: (r) => r.weather,
-        cell: (r) => (
-          <span className="text-[13px] text-secondary">{r.weather}</span>
-        ),
+        cell: (r) => {
+          const w = r.weatherDetail;
+          const icon = w ? { Sunny: "☀️", Cloudy: "☁️", Rainy: "🌧️", Windy: "💨", Stormy: "⛈️" }[w.condition] ?? "🌤️" : "🌤️";
+          return (
+            <div className="flex items-center gap-1.5">
+              <span className="text-base leading-none">{icon}</span>
+              <div>
+                <p className="text-[12px] text-primary">{w ? `${w.condition} · ${w.tempC}°C` : r.weather}</p>
+                {w?.humidity && <p className="text-[11px] text-muted">{w.humidity}% RH · {w.windKph} km/h</p>}
+              </div>
+            </div>
+          );
+        },
+      },
+      {
+        id: "crew",
+        header: "Workers / Hrs",
+        headerClassName: "",
+        cellClassName: "",
+        align: "right",
+        sortValue: (r) => totalDailyReportCrew(r),
+        cell: (r) => {
+          const hrs = r.manpower.reduce((s, m) => s + m.workers * m.hours, 0);
+          return (
+            <div className="text-right">
+              <p className="text-[13px] font-semibold tabular-nums text-primary">{totalDailyReportCrew(r)}</p>
+              <p className="text-[11px] tabular-nums text-muted">{hrs.toLocaleString()} hrs</p>
+            </div>
+          );
+        },
+      },
+      {
+        id: "safety",
+        header: "Safety",
+        headerClassName: "",
+        cellClassName: "",
+        sortValue: (r) => (r.safetyEntries?.length ?? 0),
+        cell: (r) => {
+          const incidents = r.safetyEntries?.filter((e) => e.type === "incident").length ?? 0;
+          const nearMiss  = r.safetyEntries?.filter((e) => e.type === "near_miss").length ?? 0;
+          if (!r.safetyEntries?.length) return <span className="text-[11px] text-muted">—</span>;
+          return (
+            <div className="flex flex-wrap gap-1">
+              {incidents > 0 && <span className="rounded-full bg-danger/15 px-1.5 py-0.5 text-[10px] font-semibold text-danger">{incidents} incident</span>}
+              {nearMiss  > 0 && <span className="rounded-full bg-warning/15 px-1.5 py-0.5 text-[10px] font-semibold text-warning">{nearMiss} near-miss</span>}
+              {incidents === 0 && nearMiss === 0 && <span className="rounded-full bg-success/10 px-1.5 py-0.5 text-[10px] font-semibold text-success">✓</span>}
+            </div>
+          );
+        },
       },
       {
         id: "status",
@@ -214,9 +273,12 @@ export default function DailyReportsPage() {
         cellClassName: "pr-4",
         sortValue: (r) => r.status,
         cell: (r) => (
-          <Badge variant={DAILY_REPORT_STATUS_BADGE[r.status]} size="sm">
-            {r.status}
-          </Badge>
+          <div className="flex flex-col gap-1">
+            <Badge variant={DAILY_REPORT_STATUS_BADGE[r.status]} size="sm">{r.status}</Badge>
+            {r.safetyEntries?.some((e) => e.type === "incident") && (
+              <span className="text-[10px] font-medium text-danger">⚠ Incident</span>
+            )}
+          </div>
         ),
       },
     ],
@@ -280,6 +342,27 @@ export default function DailyReportsPage() {
           </button>
         </div>
       ) : null}
+
+      {/* ── Month stats bar ── */}
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+        {[
+          { label: "Reports", value: monthStats.count, sub: "this month", icon: "📋" },
+          { label: "Workers", value: monthStats.totalWorkers.toLocaleString(), sub: "total headcount", icon: "👷" },
+          { label: "Man-hours", value: monthStats.totalHours.toLocaleString(), sub: "total hours", icon: "⏱️" },
+          { label: "Approved", value: monthStats.approved, sub: `${monthStats.pending} pending`, icon: "✅" },
+          { label: "Incidents", value: monthStats.incidents, sub: "recorded", icon: monthStats.incidents > 0 ? "⚠️" : "🟢", danger: monthStats.incidents > 0 },
+        ].map((s) => (
+          <div key={s.label}
+            className={`flex items-center gap-3 rounded-xl border px-4 py-3 ${(s as { danger?: boolean }).danger ? "border-danger/25 bg-danger/[0.04]" : "border-border/50 bg-surface"}`}>
+            <span className="text-xl leading-none">{s.icon}</span>
+            <div>
+              <p className={`text-[18px] font-bold tabular-nums leading-tight ${(s as { danger?: boolean }).danger ? "text-danger" : "text-primary"}`}>{s.value}</p>
+              <p className="text-[11px] font-medium text-muted">{s.label}</p>
+              <p className="text-[10px] text-muted">{s.sub}</p>
+            </div>
+          </div>
+        ))}
+      </div>
 
       {qNorm ? (
         <p className="text-xs text-muted">

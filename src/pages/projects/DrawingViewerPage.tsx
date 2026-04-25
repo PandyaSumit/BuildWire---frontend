@@ -169,112 +169,90 @@ export default function DrawingViewerPage() {
 
   return (
     <div className="flex h-[calc(100vh-4rem)] flex-col bg-bg">
+
       {/* ── Header ─────────────────────────────────────────────────── */}
       <header className="shrink-0 border-b border-border bg-surface">
-        <div className="flex items-center gap-3 px-4 py-2">
-          {/* Breadcrumb + drawing identity */}
-          <div className="flex min-w-0 flex-1 items-center gap-2">
-            <Link
-              to={`/projects/${projectId}/drawings`}
-              className="flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 text-[12px] font-medium text-secondary transition-colors hover:bg-primary/6 hover:text-primary"
-            >
-              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-              Plans
-            </Link>
+        {/* Single compact row — scrolls horizontally on tiny screens */}
+        <div className="flex items-center gap-2 overflow-x-auto px-3 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
 
-            <svg className="h-3 w-3 shrink-0 text-border" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          {/* Back + breadcrumb */}
+          <Link
+            to={`/projects/${projectId}/drawings`}
+            className="flex shrink-0 items-center gap-1 rounded-md px-1.5 py-1 text-[12px] font-medium text-secondary transition-colors hover:bg-muted/10 hover:text-primary"
+          >
+            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
+            <span className="hidden xs:inline sm:inline">Plans</span>
+          </Link>
 
-            <div className="min-w-0">
-              <div className="flex min-w-0 items-center gap-2">
-                <span className="shrink-0 rounded bg-muted/20 px-1.5 py-0.5 font-mono text-[11px] font-semibold tracking-wide text-secondary">
-                  {plan.sheet}
-                </span>
-                <p className="truncate text-[13px] font-semibold text-primary">
-                  {plan.name}
-                </p>
-                {plan.discipline && (
-                  <span className="hidden shrink-0 rounded-full bg-brand/10 px-2 py-0.5 text-[11px] font-medium text-brand sm:inline">
-                    {plan.discipline}
-                  </span>
-                )}
-              </div>
-            </div>
+          <svg className="h-3 w-3 shrink-0 text-border/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+
+          {/* Sheet code + name */}
+          <div className="flex shrink-0 items-center gap-1.5">
+            <span className="rounded bg-muted/20 px-1.5 py-0.5 font-mono text-[11px] font-semibold tracking-wide text-secondary">
+              {plan.sheet}
+            </span>
+            <p className="max-w-[120px] truncate text-[13px] font-semibold text-primary sm:max-w-none">
+              {plan.name}
+            </p>
+            {plan.discipline && (
+              <span className="hidden shrink-0 rounded-full bg-brand/10 px-2 py-0.5 text-[11px] font-medium text-brand md:inline">
+                {plan.discipline}
+              </span>
+            )}
           </div>
 
-          {/* Right-side controls */}
-          <div className="flex shrink-0 items-center gap-2">
-            {/* Page navigation — only shown for multi-page PDFs */}
-            {totalPages > 1 && (
-              <div className="flex items-center gap-0.5 rounded-lg border border-border/70 bg-bg/60 px-0.5 py-0.5">
-                <button
-                  type="button"
-                  disabled={currentPage <= 1}
-                  onClick={handlePrevPage}
-                  aria-label="Previous page"
-                  className="flex h-7 w-7 items-center justify-center rounded-md text-secondary transition-colors disabled:opacity-30 hover:enabled:bg-primary/8 hover:enabled:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
-                >
-                  <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                <span className="min-w-[4.5rem] text-center text-[11px] tabular-nums text-secondary">
-                  {currentPage} / {totalPages}
-                </span>
-                <button
-                  type="button"
-                  disabled={currentPage >= totalPages}
-                  onClick={handleNextPage}
-                  aria-label="Next page"
-                  className="flex h-7 w-7 items-center justify-center rounded-md text-secondary transition-colors disabled:opacity-30 hover:enabled:bg-primary/8 hover:enabled:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
-                >
-                  <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
-            )}
+          {/* Spacer */}
+          <div className="flex-1" />
 
-            {/* Zoom controls */}
-            <div className="flex items-center gap-0.5 rounded-lg border border-border/70 bg-bg/60 px-0.5 py-0.5">
-              <button
-                type="button"
-                onClick={() => viewerRef.current?.zoomOut()}
-                aria-label="Zoom out"
-                className="flex h-7 w-7 items-center justify-center rounded-md text-secondary transition-colors hover:bg-primary/8 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
-              >
+          {/* Page navigation */}
+          {totalPages > 1 && (
+            <div className="flex shrink-0 items-center gap-0.5 rounded-lg border border-border/70 bg-bg/60 px-0.5 py-0.5">
+              <button type="button" disabled={currentPage <= 1} onClick={handlePrevPage} aria-label="Previous page"
+                className="flex h-7 w-7 items-center justify-center rounded-md text-secondary transition-colors disabled:opacity-30 hover:enabled:bg-muted/15 hover:enabled:text-primary">
                 <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16zM8 11h6" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
-              <button
-                type="button"
-                onClick={() => viewerRef.current?.fitToView()}
-                className="min-w-[3.5rem] rounded-md px-2 py-1 text-center text-[11px] tabular-nums text-secondary transition-colors hover:bg-primary/8 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
-                title="Fit to view"
-              >
-                {zoomPct}%
-              </button>
-              <button
-                type="button"
-                onClick={() => viewerRef.current?.zoomIn()}
-                aria-label="Zoom in"
-                className="flex h-7 w-7 items-center justify-center rounded-md text-secondary transition-colors hover:bg-primary/8 hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
-              >
+              <span className="min-w-[3.5rem] text-center text-[11px] tabular-nums text-secondary">
+                {currentPage} / {totalPages}
+              </span>
+              <button type="button" disabled={currentPage >= totalPages} onClick={handleNextPage} aria-label="Next page"
+                className="flex h-7 w-7 items-center justify-center rounded-md text-secondary transition-colors disabled:opacity-30 hover:enabled:bg-muted/15 hover:enabled:text-primary">
                 <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16zM11 8v6M8 11h6" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </button>
             </div>
+          )}
+
+          {/* Zoom controls */}
+          <div className="flex shrink-0 items-center gap-0.5 rounded-lg border border-border/70 bg-bg/60 px-0.5 py-0.5">
+            <button type="button" onClick={() => viewerRef.current?.zoomOut()} aria-label="Zoom out"
+              className="flex h-7 w-7 items-center justify-center rounded-md text-secondary transition-colors hover:bg-muted/15 hover:text-primary">
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16zM8 11h6" />
+              </svg>
+            </button>
+            <button type="button" onClick={() => viewerRef.current?.fitToView()} title="Fit to view"
+              className="min-w-[3rem] rounded-md px-2 py-1 text-center text-[11px] tabular-nums text-secondary transition-colors hover:bg-muted/15 hover:text-primary">
+              {zoomPct}%
+            </button>
+            <button type="button" onClick={() => viewerRef.current?.zoomIn()} aria-label="Zoom in"
+              className="flex h-7 w-7 items-center justify-center rounded-md text-secondary transition-colors hover:bg-muted/15 hover:text-primary">
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16zM11 8v6M8 11h6" />
+              </svg>
+            </button>
           </div>
         </div>
       </header>
 
       {/* ── Canvas area + task panel ────────────────────────────────── */}
-      <div className="flex min-h-0 min-w-0 flex-1 flex-row">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-row overflow-hidden">
         <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
           <PlanCanvasViewer
             ref={viewerRef}
@@ -292,9 +270,9 @@ export default function DrawingViewerPage() {
             className="min-h-0 flex-1"
           />
 
-          {/* Floating toolbar — bottom-center */}
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col items-center gap-2 pb-4">
-            <div className="pointer-events-auto">
+          {/* Floating toolbar — scrollable on mobile */}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex flex-col items-center gap-2 pb-3">
+            <div className="pointer-events-auto w-full max-w-full overflow-x-auto px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:w-auto sm:overflow-visible sm:px-0">
               <DrawingViewerToolbar
                 variant="floating"
                 activeTool={activeTool}
@@ -312,12 +290,13 @@ export default function DrawingViewerPage() {
             </div>
           </div>
 
-          {/* Hint */}
-          <p className="pointer-events-none absolute bottom-2 left-3 z-10 hidden text-[10px] text-muted sm:block">
+          {/* Hint — desktop only */}
+          <p className="pointer-events-none absolute bottom-2 left-3 z-10 hidden text-[10px] text-muted md:block">
             Scroll: zoom · Drag: pan · Drop tasks onto the plan
           </p>
         </div>
 
+        {/* Task panel — desktop sidebar / mobile FAB+sheet (handled inside component) */}
         <DrawingViewerTaskPanel tasks={MOCK_TASKS} pinnedTaskIds={pinnedTaskIds} />
       </div>
     </div>
