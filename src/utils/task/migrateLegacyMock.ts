@@ -3,26 +3,19 @@ import { MOCK_TASKS, type UiTask } from '@/utils/task/fixtures';
 import { demoUserIdFromName } from '@/utils/task/demoUsers';
 
 function mapType(t: UiTask['type']): TaskTypeKey {
-  switch (t.type) {
-    case 'General':
-      return 'general';
-    case 'Safety':
-      return 'safety';
-    case 'Quality':
-      return 'quality';
-    case 'Punch List':
-      return 'punch_list';
-    case 'RFI Action':
-      return 'rfi_action';
-    case 'Inspection Item':
-      return 'inspection_action';
-    default:
-      return 'general';
+  switch (t) {
+    case 'General':         return 'general';
+    case 'Safety':          return 'safety';
+    case 'Quality':         return 'quality';
+    case 'Punch List':      return 'punch_list';
+    case 'RFI Action':      return 'rfi_action';
+    case 'Inspection Item': return 'inspection_action';
+    default:                return 'general';
   }
 }
 
 function mapStatus(s: UiTask['status']): TaskStatus {
-  return s === 'completed' ? 'done' : s;
+  return s;
 }
 
 function mapTrade(raw: string): TaskTradeKey {
@@ -65,9 +58,10 @@ const DEMO_TASK_DRAWING_LINK: Record<
 export function buildWireTaskFromUi(u: UiTask, index: number): BuildWireTask {
   const now = new Date().toISOString();
   const due = isoFromDue(u.due);
-  const start =
-    u.createdAt ??
-    `2025-${String((index % 9) + 1).padStart(2, '0')}-${String((index % 26) + 1).padStart(2, '0')}`;
+  // Generate a start_date spread across recent weeks so Gantt bars are visible
+  const fallbackStart = new Date();
+  fallbackStart.setDate(fallbackStart.getDate() - ((index * 11 + 7) % 45));
+  const start = u.createdAt ?? fallbackStart.toISOString().slice(0, 10);
   const photos = Array.from({ length: u.photos }, (_, i) => ({
     id: `${u.id}-p${i}`,
     url: '',
@@ -90,7 +84,7 @@ export function buildWireTaskFromUi(u: UiTask, index: number): BuildWireTask {
     display_number: u.number,
     title: u.title,
     description: '',
-    type: mapType(u),
+    type: mapType(u.type),
     priority: u.priority as TaskPriorityKey,
     trade: mapTrade(u.trade),
     category: '',

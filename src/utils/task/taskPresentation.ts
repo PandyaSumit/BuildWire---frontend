@@ -22,7 +22,7 @@ export function taskTablePriorityPillClassKey(p: TaskPriorityKey): string {
   return PM_TASK_TABLE_PRIORITY_PILL[p] ?? 'border-border bg-muted/20 text-secondary';
 }
 
-/** Gantt bar fill by status */
+/** Gantt bar fill by status — returns Tailwind class (kept for legacy callers) */
 export function ganttBarClassForStatus(status: string): string {
   switch (status) {
     case 'done':
@@ -39,3 +39,19 @@ export function ganttBarClassForStatus(status: string): string {
       return 'fill-sky-500/35';
   }
 }
+
+/** Gantt bar fill color as an inline SVG hex/rgba — works regardless of Tailwind purging */
+export function ganttBarFill(status: string): string {
+  switch (status) {
+    case 'done':      return 'rgba(156,163,175,0.45)';   // muted gray
+    case 'void':      return 'rgba(156,163,175,0.30)';
+    case 'blocked':   return 'rgba(239,68,68,0.55)';     // red
+    case 'in_review':
+    case 'awaiting_inspection': return 'rgba(245,158,11,0.55)'; // amber
+    case 'in_progress': return 'rgba(59,130,246,0.65)';  // blue (brand)
+    default:          return 'rgba(14,165,233,0.55)';    // sky (open)
+  }
+}
+
+/** Stroke color for overdue tasks */
+export const GANTT_OVERDUE_STROKE = 'rgba(239,68,68,0.9)';
