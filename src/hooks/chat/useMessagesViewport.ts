@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { isCompactMessagesViewport } from "./layoutConfig";
+import { isCompactMessagesViewport } from "@/utils/chat/layoutConfig";
 
 export function useMessagesViewport() {
   const [isCompact, setIsCompact] = useState(false);

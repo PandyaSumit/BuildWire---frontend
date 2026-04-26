@@ -1,5 +1,5 @@
-import type { NavGroupDef } from "./nav-types";
-import { icons } from "./icons";
+import type { NavGroupDef } from "@/config/navigation/nav-types";
+import { icons } from "@/config/navigation/icons";
 
 export function getMessagesSidebarGroups(): NavGroupDef[] {
   return [

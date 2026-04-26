@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Conversation } from "./types";
+import type { Conversation } from "@/types/chat";
 
 type ChatDetailsPanelProps = {
   conversation: Conversation | null;

@@ -6,7 +6,7 @@ import { parseOrgRole } from "@/lib/rbac";
 import { useSidebarMode } from "@/hooks/useSidebarMode";
 import { getGlobalSidebarGroups } from "@/config/navigation/global-sidebar";
 import { getProjectSidebarGroups } from "@/config/navigation/project-sidebar";
-import { getHiringSidebarGroups } from "@/config/navigation/hiring-sidebar";
+import { getHiringSidebarGroups } from "@/config/navigation/hiring/sidebar";
 import type { NavItemDef } from "@/config/navigation/nav-types";
 import { AccountDropdown } from "@/components/layout/AccountDropdown";
 import { useSidebarLayout } from "@/components/layout/SidebarLayoutContext";

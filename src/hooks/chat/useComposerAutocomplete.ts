@@ -3,7 +3,7 @@ import {
   detectComposerTrigger,
   EMOJI_SUGGESTIONS,
   type ComposerTrigger,
-} from "./composerAutocomplete";
+} from "@/utils/chat/composerAutocomplete";
 
 export type MentionItem = { id: string; label: string };
 

@@ -1,5 +1,5 @@
 import { Button, Input } from "@/components/ui";
-import type { ConversationKind } from "./types";
+import type { ConversationKind } from "@/types/chat";
 
 type CreateConversationDialogProps = {
   kind: ConversationKind | null;

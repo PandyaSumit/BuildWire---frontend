@@ -1,4 +1,4 @@
-import type { Conversation, Message } from "./types";
+import type { Conversation, Message } from "@/types/chat";
 
 const FALLBACK_NAMES = [
   "Project Ops",

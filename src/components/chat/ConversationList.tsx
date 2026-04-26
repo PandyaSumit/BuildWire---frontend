@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { BuildWireLogo } from "@/components/brand/BuildWireLogo";
 import { WorkspaceSwitcherButton } from "@/components/workspace-switcher";
-import type { Conversation } from "./types";
+import type { Conversation } from "@/types/chat";
 
 type ConversationListProps = {
   conversations: Conversation[];

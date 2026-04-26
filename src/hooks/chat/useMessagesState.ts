@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { initialConversations, initialMessages } from "./mockData";
+import { initialConversations, initialMessages } from "@/utils/chat/mockData";
 import type {
   Conversation,
   ConversationKind,
   Message,
   MessagesWorkspaceMode,
-} from "./types";
+} from "@/types/chat";
 import { useConversationDrafts } from "./useConversationDrafts";
 
 function allowedKinds(mode: MessagesWorkspaceMode): ConversationKind[] {

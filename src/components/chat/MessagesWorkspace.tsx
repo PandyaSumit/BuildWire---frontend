@@ -4,11 +4,11 @@ import { ChatPanel } from "./ChatPanel";
 import { ChatDetailsPanel } from "./ChatDetailsPanel";
 import { ConversationList } from "./ConversationList";
 import { CreateConversationDialog } from "./CreateConversationDialog";
-import { MESSAGES_LAYOUT } from "./layoutConfig";
-import type { ConversationKind, MessagesWorkspaceMode } from "./types";
-import { useMessagesState } from "./useMessagesState";
-import { useMessagesViewport } from "./useMessagesViewport";
-import { useMessagesShortcuts } from "./useMessagesShortcuts";
+import { MESSAGES_LAYOUT } from "@/utils/chat/layoutConfig";
+import type { ConversationKind, MessagesWorkspaceMode } from "@/types/chat";
+import { useMessagesState } from "@/hooks/chat/useMessagesState";
+import { useMessagesViewport } from "@/hooks/chat/useMessagesViewport";
+import { useMessagesShortcuts } from "@/hooks/chat/useMessagesShortcuts";
 
 function useResizableSidebar() {
   const [width, setWidth] = useState<number>(() => {
@@ -142,7 +142,6 @@ export function MessagesWorkspace({ mode }: { mode: MessagesWorkspaceMode }) {
 
   useEffect(() => {
     if (!isMobileViewport) return;
-    // On mobile, show list first (no drawer).
     setMobileView("list");
   }, [isMobileViewport]);
 
@@ -238,7 +237,7 @@ export function MessagesWorkspace({ mode }: { mode: MessagesWorkspaceMode }) {
         />
       </div>
 
-      {/* ── RIGHT: Details Panel (xl+) — opens from channel/group list selection or info control ── */}
+      {/* ── RIGHT: Details Panel (xl+) ── */}
       {detailsOpen ? (
         <div className="hidden min-h-0 w-[268px] shrink-0 xl:flex xl:flex-col">
           <ChatDetailsPanel
@@ -247,9 +246,6 @@ export function MessagesWorkspace({ mode }: { mode: MessagesWorkspaceMode }) {
           />
         </div>
       ) : null}
-
-      {/* Mobile details drawer intentionally removed.
-          Mobile flow is now list -> full conversation, with explicit back navigation. */}
 
       <CreateConversationDialog
         kind={dialogKind}

@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getMessageActionItems, type MessageActionId } from "./messageActions";
-import { buildMentionCandidates } from "./mentionCandidates";
-import type { Conversation, Message, MessageAttachment } from "./types";
-import { useComposerAutocomplete } from "./useComposerAutocomplete";
+import { getMessageActionItems, type MessageActionId } from "@/utils/chat/messageActions";
+import { buildMentionCandidates } from "@/utils/chat/mentionCandidates";
+import type { Conversation, Message, MessageAttachment } from "@/types/chat";
+import { useComposerAutocomplete } from "@/hooks/chat/useComposerAutocomplete";
 
 type MessageGroup = {
   groupId: string;

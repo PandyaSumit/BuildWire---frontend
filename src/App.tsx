@@ -56,12 +56,18 @@ const FinancialsPage = lazy(() => import("./pages/projects/FinancialsPage"));
 const ProjectTeamPage = lazy(() => import("./pages/projects/TeamPage"));
 const ActivityPage = lazy(() => import("./pages/projects/ActivityPage"));
 const InventoryPage = lazy(() => import("./pages/projects/InventoryPage"));
-const HiringFeedPage = lazy(() => import("./pages/workspace/HiringFeedPage"));
-const HiringCandidatesPage = lazy(
-  () => import("./pages/workspace/HiringCandidatesPage"),
+const HiringFeedPage = lazy(
+  () => import("./pages/hiring/HiringFeedPage"),
 );
-const HiringWorkersPage = lazy(() => import("./pages/workspace/HiringWorkersPage"));
-const MessagesInboxPage = lazy(() => import("./pages/workspace/MessagesInboxPage"));
+const HiringCandidatesPage = lazy(
+  () => import("./pages/hiring/HiringCandidatesPage"),
+);
+const HiringWorkersPage = lazy(
+  () => import("./pages/hiring/HiringWorkersPage"),
+);
+const MessagesInboxPage = lazy(
+  () => import("./pages/chat/MessagesInboxPage"),
+);
 
 /** Authenticated app shell: each feature has its own top-level path (not nested under `/dashboard`). */
 export default function App() {
