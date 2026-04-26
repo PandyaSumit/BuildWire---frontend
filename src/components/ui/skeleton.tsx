@@ -19,7 +19,6 @@ export function PageSkeletonOverview() {
   );
 }
 
-/** Lightweight fallback while lazy project modules load */
 export function PageSkeletonModule() {
   return (
     <div className="min-h-[50vh] space-y-5 p-4 sm:p-6">

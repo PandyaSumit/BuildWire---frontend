@@ -22,7 +22,7 @@ import {
   taskWorkflowTKey,
 } from "@/utils/task/fixtures";
 import { Select } from "@/components/ui/select";
-import { UserMultiSelect } from "@/components/ui/UserMultiSelect";
+import { UserMultiSelect } from "@/components/ui/user-multi-select";
 import { DEMO_USERS } from "@/utils/task/demoUsers";
 import type { TaskEditorDraft } from "@/utils/task/taskEditorState";
 

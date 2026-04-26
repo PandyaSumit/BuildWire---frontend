@@ -38,10 +38,6 @@ function DangerIcon() {
   );
 }
 
-/**
- * Centered modal for confirmations (delete, destructive actions, or general “are you sure?”).
- * Renders via portal, locks body scroll, closes on overlay click and Escape when not loading.
- */
 export function ConfirmDialog({
   open,
   onOpenChange,
@@ -116,9 +112,8 @@ export function ConfirmDialog({
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={describedBy}
-        className="relative z-[101] flex w-full max-w-md flex-col rounded-2xl border border-zinc-700 bg-zinc-900 shadow-2xl shadow-black/60"
+        className="relative z-[101] flex w-full max-w-md flex-col rounded-2xl border border-border bg-elevated shadow-2xl shadow-black/60"
       >
-        {/* Body */}
         <div className="px-6 pt-6 pb-4">
           {variant === 'danger' ? (
             <div className="mb-4 flex justify-center">
@@ -140,8 +135,7 @@ export function ConfirmDialog({
           ) : null}
         </div>
 
-        {/* Footer */}
-        <div className="flex shrink-0 items-center justify-end gap-3 border-t border-zinc-700/60 px-6 py-4">
+        <div className="flex shrink-0 items-center justify-end gap-3 border-t border-border px-6 py-4">
           <Button
             ref={cancelRef}
             type="button"
@@ -176,7 +170,6 @@ export type DeleteConfirmDialogProps = Omit<ConfirmDialogProps, 'variant' | 'con
   confirmLabel?: string;
 };
 
-/** Preset: danger styling + default “Delete” label from i18n. */
 export function DeleteConfirmDialog({
   confirmLabel,
   cancelLabel,

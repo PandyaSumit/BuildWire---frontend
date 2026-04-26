@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { register, clearError } from '@/store/authSlice';
+import { register, clearError } from '@/store/slices/authSlice';
 import { Button, Input, Alert } from '@/components/ui';
 import api from '@/lib/api';
 

@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
-import authReducer from './authSlice';
-import aiMapReducer from './aiMapSlice';
+import authReducer from './slices/authSlice';
+import aiMapReducer from './slices/aiMapSlice';
 
 export const makeStore = () =>
   configureStore({

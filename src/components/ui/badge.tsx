@@ -7,7 +7,6 @@ export type BadgeShape = 'pill' | 'rounded';
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
   variant?: BadgeVariant;
   size?: BadgeSize;
-  /** `pill` = fully rounded (default); `rounded` = subtle rounding for inline text */
   shape?: BadgeShape;
   /** Dot indicator shown before the label */
   dot?: boolean;

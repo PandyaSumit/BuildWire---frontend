@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { verifyEmail, resendVerification } from '@/store/authSlice';
+import { verifyEmail, resendVerification } from '@/store/slices/authSlice';
 import { Button } from '@/components/ui/button';
 
 export function VerifyEmailForm() {

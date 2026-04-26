@@ -34,3 +34,5 @@ export {
 } from './data-table';
 export { PageHeader } from './page-header';
 export { StatsBar } from './stats-bar';
+export { StatusDot, type StatusDotProps, type StatusDotVariant } from './status-dot';
+export { UserMultiSelect, type UserOption } from './user-multi-select';

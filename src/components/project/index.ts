@@ -1,24 +1,32 @@
 export { SemanticPill } from './SemanticPill';
-export { ModulePageShell } from './ModulePageShell';
-export { ModuleSplitLayout } from './ModuleSplitLayout';
-export { FilterChipGroup } from './FilterChipGroup';
-export { FilterPopover } from './FilterPopover';
-export { ProjectUiProvider } from './ProjectUiProvider';
-export { ProjectRouteLayout } from './ProjectRouteLayout';
-export { ProjectIndexEntry } from './ProjectIndexEntry';
-export { ProjectCard } from './ProjectCard';
-export { ProjectStatusBadge } from './ProjectStatusBadge';
-export { ProjectsListEmpty } from './ProjectsListEmpty';
-export { CreateProjectModal } from './CreateProjectModal';
-export { EditProjectModal } from './EditProjectModal';
-export { DeleteProjectDialog } from './DeleteProjectDialog';
-export { ProjectMembersSection } from './ProjectMembersSection';
-export { ProjectTaskStatsGrid } from './ProjectTaskStats';
+
+export { ModulePageShell } from './layout';
+export { ModuleSplitLayout } from './layout';
+export { ProjectRouteLayout } from './layout';
+export { ProjectIndexEntry } from './layout';
+
+export { FilterChipGroup } from './filters';
+export { FilterPopover } from './filters';
+
+export { ProjectUiContext, type ProjectUiValue } from './contexts';
+export { ProjectUiProvider } from './contexts';
+
+export { ProjectCard } from './cards';
+export { ProjectStatusBadge } from './cards';
+export { ProjectsListEmpty } from './cards';
+export { ProjectTaskStatsGrid } from './cards';
+
+export { CreateProjectModal } from './modals';
+export { EditProjectModal } from './modals';
+export { DeleteProjectDialog } from './modals';
+export { ProjectMembersSection } from './modals';
+
 export { DailyReportDrawer } from './drawers/DailyReportDrawer';
 export {
   InspectionDetailDrawer,
   ScheduleInspectionDrawer,
   nextInspectionId,
 } from './drawers/InspectionDrawers';
+
 export { OverviewRollups } from './overview/OverviewRollups';
 export { OverviewExecutionSnapshot } from './overview/OverviewExecutionSnapshot';

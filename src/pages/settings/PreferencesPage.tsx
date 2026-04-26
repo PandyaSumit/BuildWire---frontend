@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useTheme, type ThemePreference } from "@/components/theme";
-import { LanguageMenu } from "@/components/layout/LanguageMenu";
+import { LanguageMenu } from "@/layouts/header/LanguageMenu";
 import { useAppSelector } from "@/store/hooks";
 import { Button } from "@/components/ui/button";
 import { Checkbox, Input, Select } from "@/components/ui";
@@ -258,7 +258,13 @@ const workspaceThemeMeta: {
   },
 ];
 
-function WorkspaceThemePreview({ light, dark }: { light: WsPreviewTok; dark: WsPreviewTok }) {
+function WorkspaceThemePreview({
+  light,
+  dark,
+}: {
+  light: WsPreviewTok;
+  dark: WsPreviewTok;
+}) {
   const mini = (tok: WsPreviewTok) => (
     <div
       className="flex h-16 min-w-0 flex-1 gap-0.5 p-1"
@@ -371,8 +377,12 @@ const appearanceOptions: {
 export default function PreferencesPage() {
   const { t } = useTranslation();
   const user = useAppSelector((s) => s.auth.user);
-  const { themePreference, setThemePreference, workspaceTheme, setWorkspaceTheme } =
-    useTheme();
+  const {
+    themePreference,
+    setThemePreference,
+    workspaceTheme,
+    setWorkspaceTheme,
+  } = useTheme();
 
   const [draftAppearance, setDraftAppearance] =
     useState<ThemePreference>(themePreference);
@@ -387,8 +397,12 @@ export default function PreferencesPage() {
   const [dailyDigest, setDailyDigest] = useState(() => getNotifyDailyDigest());
   const [rfiNotify, setRfiNotify] = useState(() => getNotifyRfi());
 
-  const [aiAssistant, setAiAssistant] = useState(() => getAiAssistantUserConfig());
-  const [aiTitleDraft, setAiTitleDraft] = useState(() => getAiAssistantUserConfig().title);
+  const [aiAssistant, setAiAssistant] = useState(() =>
+    getAiAssistantUserConfig(),
+  );
+  const [aiTitleDraft, setAiTitleDraft] = useState(
+    () => getAiAssistantUserConfig().title,
+  );
 
   const persistAiAssistant = useCallback(
     (patch: Partial<AiAssistantUserConfig>) => {
@@ -425,8 +439,12 @@ export default function PreferencesPage() {
   return (
     <div className="space-y-10 p-6">
       <div>
-        <h1 className="text-lg font-semibold text-primary">{t("prefs.title")}</h1>
-        <p className="mt-0.5 max-w-2xl text-sm text-secondary">{t("prefs.intro")}</p>
+        <h1 className="text-lg font-semibold text-primary">
+          {t("prefs.title")}
+        </h1>
+        <p className="mt-0.5 max-w-2xl text-sm text-secondary">
+          {t("prefs.intro")}
+        </p>
       </div>
 
       <section className="space-y-4 border-b border-border pb-10">
@@ -456,7 +474,9 @@ export default function PreferencesPage() {
           </p>
         </div>
         <div className="max-w-md space-y-2">
-          <p className="text-sm font-medium text-primary">{t("language.label")}</p>
+          <p className="text-sm font-medium text-primary">
+            {t("language.label")}
+          </p>
           <LanguageMenu />
         </div>
       </section>
@@ -467,7 +487,9 @@ export default function PreferencesPage() {
             <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">
               {t("prefs.appearance")}
             </h2>
-            <p className="mt-1 text-sm text-secondary">{t("prefs.appearanceHint")}</p>
+            <p className="mt-1 text-sm text-secondary">
+              {t("prefs.appearanceHint")}
+            </p>
           </div>
           <div className="flex shrink-0 gap-2">
             <Button
@@ -556,7 +578,9 @@ export default function PreferencesPage() {
                 }`}
               >
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-semibold text-primary">{t(opt.titleKey)}</span>
+                  <span className="font-semibold text-primary">
+                    {t(opt.titleKey)}
+                  </span>
                   {selected && (
                     <span className="rounded-full bg-brand/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand">
                       {t("prefs.active")}
@@ -622,14 +646,19 @@ export default function PreferencesPage() {
           <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">
             {t("prefs.aiAssistant")}
           </h2>
-          <p className="mt-1 max-w-2xl text-sm text-secondary">{t("prefs.aiAssistantHint")}</p>
+          <p className="mt-1 max-w-2xl text-sm text-secondary">
+            {t("prefs.aiAssistantHint")}
+          </p>
         </div>
         <div className="max-w-xl space-y-4">
           <Select
             label={t("prefs.aiAssistantLayout")}
             options={[
               { value: "dock_end", label: t("prefs.aiAssistantLayoutDockEnd") },
-              { value: "dock_start", label: t("prefs.aiAssistantLayoutDockStart") },
+              {
+                value: "dock_start",
+                label: t("prefs.aiAssistantLayoutDockStart"),
+              },
               { value: "modal", label: t("prefs.aiAssistantLayoutModal") },
             ]}
             value={aiAssistant.presentation}
@@ -657,24 +686,32 @@ export default function PreferencesPage() {
             onChange={(e) => setAiTitleDraft(e.target.value)}
             onBlur={() => {
               if (aiTitleDraft.trim() === aiAssistant.title) return;
-              persistAiAssistant({ title: aiTitleDraft.trim() || aiAssistant.title });
+              persistAiAssistant({
+                title: aiTitleDraft.trim() || aiAssistant.title,
+              });
             }}
             maxLength={48}
           />
           <Checkbox
             label={t("prefs.aiAssistantRememberOpen")}
             checked={aiAssistant.rememberOpen}
-            onChange={(e) => persistAiAssistant({ rememberOpen: e.target.checked })}
+            onChange={(e) =>
+              persistAiAssistant({ rememberOpen: e.target.checked })
+            }
           />
           <Checkbox
             label={t("prefs.aiAssistantDefaultOpen")}
             checked={aiAssistant.defaultOpen}
-            onChange={(e) => persistAiAssistant({ defaultOpen: e.target.checked })}
+            onChange={(e) =>
+              persistAiAssistant({ defaultOpen: e.target.checked })
+            }
           />
           <Checkbox
             label={t("prefs.aiAssistantIsolated")}
             checked={aiAssistant.isolatedChrome}
-            onChange={(e) => persistAiAssistant({ isolatedChrome: e.target.checked })}
+            onChange={(e) =>
+              persistAiAssistant({ isolatedChrome: e.target.checked })
+            }
           />
         </div>
       </section>

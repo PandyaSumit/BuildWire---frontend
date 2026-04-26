@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { login, clearError } from '@/store/authSlice';
+import { login, clearError } from '@/store/slices/authSlice';
 import { Button, Input, Checkbox, Alert } from '@/components/ui';
 
 export function LoginForm() {

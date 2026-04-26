@@ -5,13 +5,9 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'ghost' | 'outline';
   size?: 'sm' | 'md' | 'lg';
   fullWidth?: boolean;
-  /** Shows a spinner, sets `aria-busy`, and disables the control while true. */
   loading?: boolean;
-  /** Label next to the spinner when `loading` is true (e.g. "Creating…"). */
   loadingText?: string;
-  /** Optional icon rendered before children */
   iconLeft?: React.ReactNode;
-  /** Optional icon rendered after children */
   iconRight?: React.ReactNode;
 }
 

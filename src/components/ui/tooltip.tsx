@@ -9,7 +9,7 @@ export interface TooltipProps {
 
 export function Tooltip({ children, content, position = 'top', delay = 200 }: TooltipProps) {
   const [isVisible, setIsVisible] = useState(false);
-  const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout | null>(null);
+  const [timeoutId, setTimeoutId] = useState<ReturnType<typeof setTimeout> | null>(null);
 
   const showTooltip = () => {
     const id = setTimeout(() => setIsVisible(true), delay);
@@ -51,7 +51,7 @@ export function Tooltip({ children, content, position = 'top', delay = 200 }: To
       
       {isVisible && (
         <div
-          className={`absolute ${positions[position]} z-50 px-3 py-2 text-sm text-white bg-elevated border border-border rounded-lg shadow-lg whitespace-nowrap pointer-events-none animate-in fade-in-0 zoom-in-95`}
+          className={`absolute ${positions[position]} z-50 px-3 py-2 text-sm text-primary bg-elevated border border-border rounded-lg shadow-lg whitespace-nowrap pointer-events-none animate-in fade-in-0 zoom-in-95`}
         >
           {content}
           <div className={`absolute ${arrows[position]} w-0 h-0 border-4`} />

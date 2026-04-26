@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { mainWorkspacePageClassName } from "@/layouts/shell/workspace";
 
 /** Shared page chrome (title + description) for org and project screens. */
 export function AppPage({
@@ -15,9 +16,11 @@ export function AppPage({
   contentClassName?: string;
 }) {
   const rootClass = fullHeight
-    ? "flex h-full min-h-0 flex-col gap-4 p-4 lg:p-5"
-    : "space-y-6 p-6";
-  const bodyClass = fullHeight ? `min-h-0 flex-1 ${contentClassName ?? ""}` : contentClassName ?? "";
+    ? `flex h-full min-h-0 flex-col gap-4 ${mainWorkspacePageClassName()}`
+    : mainWorkspacePageClassName();
+  const bodyClass = fullHeight
+    ? `min-h-0 flex-1 ${contentClassName ?? ""}`
+    : (contentClassName ?? "");
 
   return (
     <div className={rootClass}>

@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useProjectUi } from "@/hooks/project/useProjectUi";
 import { computeOverviewTaskStats } from "@/utils/project/overviewTaskStats";
-import { Badge } from "@/components/ui/badge";
+import { Badge, Button, StatusDot } from "@/components/ui";
 import { OverviewExecutionSnapshot } from "@/components/project/overview/OverviewExecutionSnapshot";
 import { OverviewRollups } from "@/components/project/overview/OverviewRollups";
 import { EditProjectModal } from "@/components/project/EditProjectModal";
@@ -57,8 +57,8 @@ export default function OverviewPage() {
           Overview
         </h1>
         <p className="mt-1 text-sm leading-relaxed text-secondary">
-          Project identity plus rollups for schedule, RFIs, inspections, and task execution.
-          Open each area in the sidebar for full detail.
+          Project identity plus rollups for schedule, RFIs, inspections, and
+          task execution. Open each area in the sidebar for full detail.
         </p>
       </div>
 
@@ -75,14 +75,15 @@ export default function OverviewPage() {
           </div>
           <div className="flex flex-wrap items-center gap-3 text-sm text-secondary">
             <span className="inline-flex items-center gap-2">
-              <span
-                className={`inline-block h-3 w-3 rounded-full ${
+              <StatusDot
+                variant={
                   project.healthScore >= 75
-                    ? "bg-success"
+                    ? "success"
                     : project.healthScore >= 50
-                      ? "bg-warning"
-                      : "bg-danger"
-                }`}
+                      ? "warning"
+                      : "danger"
+                }
+                className="h-3 w-3"
               />
               Health score {project.healthScore}
             </span>
@@ -97,19 +98,17 @@ export default function OverviewPage() {
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
+          <Button
+            variant="secondary"
+            size="sm"
+            iconLeft={<IconPencilLine />}
             onClick={() => setEditOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-bg px-4 py-2 text-sm font-medium text-primary hover:bg-muted/10"
           >
-            <IconPencilLine />Edit project
-          </button>
-          <button
-            type="button"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-border bg-bg px-4 py-2 text-sm font-medium text-primary hover:bg-muted/10"
-          >
-            <IconShare />Share
-          </button>
+            Edit project
+          </Button>
+          <Button variant="secondary" size="sm" iconLeft={<IconShare />}>
+            Share
+          </Button>
         </div>
       </section>
 
@@ -121,7 +120,9 @@ export default function OverviewPage() {
         open={editOpen}
         project={projectDto}
         onClose={() => setEditOpen(false)}
-        onSubmit={async () => { setEditOpen(false); }}
+        onSubmit={async () => {
+          setEditOpen(false);
+        }}
       />
     </div>
   );

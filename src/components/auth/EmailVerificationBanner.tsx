@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { resendVerification } from '@/store/authSlice';
+import { resendVerification } from '@/store/slices/authSlice';
 import { Button } from '@/components/ui/button';
 
 export function EmailVerificationBanner() {
