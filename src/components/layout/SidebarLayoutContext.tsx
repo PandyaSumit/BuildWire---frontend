@@ -14,11 +14,13 @@ type SidebarLayoutContextValue = {
   collapsed: boolean;
   setCollapsed: (value: boolean) => void;
   toggle: () => void;
-  /** Mobile drawer open state (below lg breakpoint) */
+  /** Mobile drawer open state (only used below md / 768px) */
   mobileOpen: boolean;
   setMobileOpen: (value: boolean) => void;
   mobileDragOffset: number;
   setMobileDragOffset: (value: number) => void;
+  /** md–lg (768–1023px): docked icon rail, no bottom sheet or workspace pill */
+  tabletIconRail: boolean;
 };
 
 const SidebarLayoutContext = createContext<SidebarLayoutContextValue | null>(null);
@@ -27,6 +29,10 @@ export function SidebarLayoutProvider({ children }: { children: ReactNode }) {
   const [collapsed, setCollapsedState] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileDragOffset, setMobileDragOffset] = useState(0);
+  const [tabletIconRail, setTabletIconRail] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(min-width: 768px) and (max-width: 1023px)').matches;
+  });
 
   useEffect(() => {
     try {
@@ -36,6 +42,18 @@ export function SidebarLayoutProvider({ children }: { children: ReactNode }) {
     } catch {
       /* ignore */
     }
+  }, []);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px) and (max-width: 1023px)');
+    const sync = () => {
+      const next = mq.matches;
+      setTabletIconRail(next);
+      if (next) setMobileOpen(false);
+    };
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
   }, []);
 
   const setCollapsed = useCallback((value: boolean) => {
@@ -68,8 +86,9 @@ export function SidebarLayoutProvider({ children }: { children: ReactNode }) {
       setMobileOpen,
       mobileDragOffset,
       setMobileDragOffset,
+      tabletIconRail,
     }),
-    [collapsed, setCollapsed, toggle, mobileOpen, mobileDragOffset],
+    [collapsed, setCollapsed, toggle, mobileOpen, mobileDragOffset, tabletIconRail],
   );
 
   return <SidebarLayoutContext.Provider value={value}>{children}</SidebarLayoutContext.Provider>;

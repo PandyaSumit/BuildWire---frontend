@@ -46,14 +46,14 @@ export function Header({ title, subtitle, actions }: HeaderProps) {
   if (isMessagesWorkspace) return null;
 
   return (
-    <header className="sticky top-0 z-40 flex h-[52px] items-center gap-2 border-b border-border/50 bg-header/95 px-2.5 backdrop-blur-sm sm:px-4 dark:border-white/[0.05]">
-      {/* Left: hamburger (mobile) + breadcrumb context */}
-      <div className="flex min-w-0 flex-1 items-center gap-2">
+    <header className="sticky top-0 z-40 flex h-[52px] shrink-0 items-stretch gap-2 border-b border-border/50 bg-header/95 px-2.5 backdrop-blur-sm sm:px-4 dark:border-white/[0.05]">
+      {/* Left: hamburger (narrow mobile) + breadcrumb — row uses items-center for vertical centering */}
+      <div className="flex min-h-0 min-w-0 flex-1 items-center gap-2">
         <button
           type="button"
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="shrink-0 rounded-lg p-1.5 text-muted transition-colors hover:bg-primary/8 hover:text-primary lg:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
-          aria-label={mobileOpen ? t('header.closeMenu', { defaultValue: 'Close menu' }) : t('header.openMenu')}
+          className="hidden shrink-0 rounded-lg p-1.5 text-muted transition-colors hover:bg-primary/8 hover:text-primary sm:inline-flex md:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+          aria-label={mobileOpen ? t('header.closeMenu') : t('header.openMenu')}
           aria-expanded={mobileOpen}
         >
           {mobileOpen ? (
@@ -68,15 +68,18 @@ export function Header({ title, subtitle, actions }: HeaderProps) {
         </button>
 
         {showProjectBack && (
-          <nav aria-label="Breadcrumb" className="flex min-w-0 items-center gap-1 text-[11.5px]">
+          <nav
+            aria-label="Breadcrumb"
+            className="flex min-h-0 min-w-0 items-center gap-1 text-[11.5px] leading-none"
+          >
             <Link
               to="/projects"
-              className="shrink-0 rounded-md px-1.5 py-1 text-muted transition-colors hover:bg-primary/6 hover:text-primary"
+              className="inline-flex h-8 max-w-[40%] shrink-0 items-center truncate rounded-md px-1.5 text-muted transition-colors hover:bg-primary/6 hover:text-primary"
             >
               {t('header.allProjects')}
             </Link>
-            <span className="text-muted/40">/</span>
-            <span className="truncate font-medium text-primary">
+            <span className="shrink-0 text-muted/40">/</span>
+            <span className="min-w-0 truncate font-medium leading-snug text-primary">
               {projectUi?.project.name ?? t('nav.projects')}
             </span>
           </nav>
@@ -98,27 +101,21 @@ export function Header({ title, subtitle, actions }: HeaderProps) {
         {!showProjectBack && !title && (
           <nav
             aria-label={t('header.breadcrumbAria')}
-            className="flex min-w-0 items-center gap-1 text-[12px]"
+            className="flex min-h-0 min-w-0 items-center gap-1 text-[12px] leading-none"
           >
             <span className="shrink-0 font-semibold text-primary">BuildWire</span>
             <span className="shrink-0 text-muted/40">/</span>
-            <span className="truncate text-muted">{shellBreadcrumbLabel}</span>
+            <span className="min-w-0 truncate text-muted">{shellBreadcrumbLabel}</span>
           </nav>
         )}
       </div>
 
-      <div className="hidden w-full max-w-[15rem] flex-1 sm:flex lg:max-w-[18rem]">
+      <div className="hidden h-full w-full max-w-[15rem] flex-1 items-center sm:flex lg:max-w-[18rem]">
         <GlobalSearchBar className="max-w-full" />
       </div>
 
-      <div className="flex shrink-0 items-center gap-1">
+      <div className="flex h-full shrink-0 items-center gap-1">
         {actions}
-
-        <button type="button" className={`sm:hidden ${iconBtn}`} aria-label={t('header.search')}>
-          <svg className="h-[17px] w-[17px]" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </button>
 
         <div className="hidden md:block">
           <LanguageMenu />

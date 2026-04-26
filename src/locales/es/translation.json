@@ -51,10 +51,18 @@
   },
   "header": {
     "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
     "allProjects": "Todos los proyectos",
     "search": "Buscar",
+    "mobileSearchFind": "Buscar…",
+    "openGlobalSearch": "Abrir búsqueda",
+    "closeSearch": "Cerrar búsqueda",
+    "openWorkspaceMenu": "Abrir menú del espacio de trabajo",
+    "closeWorkspaceMenu": "Cerrar menú del espacio de trabajo",
     "globalSearchPlaceholder": "Buscar proyectos, tareas, RFIs, informes diarios, inspecciones, archivos…",
     "globalSearchAria": "Búsqueda global",
+    "globalSearchPaletteHint": "Salta a una página o sigue escribiendo para filtrar accesos directos. Las listas en cada pantalla también usan esta búsqueda cuando aplica.",
+    "globalSearchNoShortcuts": "Ningún acceso directo coincide con ese texto.",
     "notifications": "Notificaciones",
     "language": "Idioma",
     "breadcrumbAria": "Migas de pan"

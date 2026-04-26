@@ -29,11 +29,11 @@ export function Sidebar() {
   const orgRole = parseOrgRole(user?.org?.role);
   const sidebarMode = useSidebarMode();
   const { activeWorkspace } = useWorkspaceSwitcher();
-  const { collapsed, toggle, mobileOpen, setMobileOpen } = useSidebarLayout();
+  const { collapsed, toggle, mobileOpen, setMobileOpen, tabletIconRail } = useSidebarLayout();
   const isMessagesWorkspace = activeWorkspace === "messages";
 
-  // On mobile, the drawer always shows expanded layout regardless of collapsed state.
-  const effectiveCollapsed = !mobileOpen && collapsed;
+  // Phone drawer expanded when open; tablet (md–lg) always icon rail; desktop uses persisted collapse.
+  const effectiveCollapsed = tabletIconRail || (mobileOpen ? false : collapsed);
 
   const navigation =
     activeWorkspace === "hiring"
@@ -77,26 +77,51 @@ export function Sidebar() {
     <>
       <aside
         className={[
-          "fixed start-0 top-0 z-50 flex h-dvh max-h-dvh flex-col bg-sidebar",
-          "border-e border-border/50 dark:border-white/[0.05]",
-          "w-60 transition-transform duration-200 ease-out",
-          mobileOpen ? "translate-x-0" : "-translate-x-full",
-          "lg:translate-x-0 lg:z-30 lg:transition-[width] lg:duration-200 lg:ease-out",
+          "fixed flex flex-col bg-sidebar transition-[transform,width] duration-200 ease-out",
+          "max-md:z-50 md:z-30",
+          // Phone: bottom sheet (< md)
+          "max-md:inset-x-2 max-md:bottom-2 max-md:top-auto max-md:h-[78dvh] max-md:max-h-[82dvh] max-md:w-auto max-md:rounded-2xl max-md:border max-md:border-border/60 max-md:shadow-token-xl",
+          mobileOpen ? "max-md:translate-y-0" : "max-md:translate-y-[calc(100%+1rem)]",
+          // Tablet + desktop: docked left rail (md is always narrow; lg picks width from collapse)
+          "md:left-0 md:right-auto md:top-0 md:bottom-auto md:h-dvh md:max-h-dvh md:translate-y-0 md:rounded-none md:border-e md:border-t-0 md:border-b-0 md:border-s-0 md:border-border/50 md:shadow-none dark:md:border-white/[0.05]",
+          "md:w-14",
           collapsed ? "lg:w-14" : "lg:w-60",
         ].join(" ")}
       >
         <div
           className={`shrink-0 border-b border-border/40 dark:border-white/[0.05] ${
-            effectiveCollapsed
+            effectiveCollapsed && !mobileOpen
               ? "flex h-[52px] items-center justify-center px-2"
               : "flex h-[52px] items-center px-3"
           }`}
         >
-          {effectiveCollapsed ? (
+          {mobileOpen ? (
+            <div className="flex w-full items-center justify-between gap-2">
+              <div className="flex min-w-0 flex-1 items-center gap-2.5">
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-brand text-white shadow-token-sm dark:text-bg">
+                  <BuildWireLogo size={16} decorative />
+                </div>
+                <span className="block truncate text-[14.5px] font-semibold tracking-tight text-primary">
+                  {t("brand.name")}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setMobileOpen(false)}
+                className={iconBtn}
+                aria-label={t("sidebar.close", { defaultValue: "Close menu" })}
+                title={t("sidebar.close", { defaultValue: "Close menu" })}
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          ) : effectiveCollapsed ? (
             <button
               type="button"
               onClick={toggle}
-              className={iconBtn}
+              className={`${iconBtn} hidden md:inline-flex`}
               aria-expanded={false}
               aria-label={t("sidebar.expand")}
               title={t("sidebar.expand")}
@@ -115,19 +140,13 @@ export function Sidebar() {
               </div>
               <button
                 type="button"
-                onClick={mobileOpen ? () => setMobileOpen(false) : toggle}
-                className={iconBtn}
-                aria-expanded={!effectiveCollapsed}
-                aria-label={mobileOpen ? t("sidebar.close", { defaultValue: "Close menu" }) : t("sidebar.collapse")}
-                title={mobileOpen ? t("sidebar.close", { defaultValue: "Close menu" }) : t("sidebar.collapse")}
+                onClick={toggle}
+                className={`${iconBtn} hidden lg:inline-flex`}
+                aria-expanded
+                aria-label={t("sidebar.collapse")}
+                title={t("sidebar.collapse")}
               >
-                {mobileOpen ? (
-                  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                ) : (
-                  <BuildWireMark size={20} strokeWidth={1.75} decorative />
-                )}
+                <BuildWireMark size={20} strokeWidth={1.75} decorative />
               </button>
             </div>
           )}

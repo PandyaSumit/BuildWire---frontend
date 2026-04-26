@@ -51,10 +51,18 @@
   },
   "header": {
     "openMenu": "فتح القائمة",
+    "closeMenu": "إغلاق القائمة",
     "allProjects": "كل المشاريع",
     "search": "بحث",
+    "mobileSearchFind": "بحث…",
+    "openGlobalSearch": "فتح البحث",
+    "closeSearch": "إغلاق البحث",
+    "openWorkspaceMenu": "فتح قائمة مساحة العمل",
+    "closeWorkspaceMenu": "إغلاق قائمة مساحة العمل",
     "globalSearchPlaceholder": "ابحث في المشاريع والمهام وطلبات المعلومات والتقارير اليومية والفحوصات والملفات…",
     "globalSearchAria": "بحث عام",
+    "globalSearchPaletteHint": "انتقل إلى صفحة أو واصل الكتابة لتصفية الاختصارات. تستخدم القوائم في كل شاشة هذا البحث عند الدعم.",
+    "globalSearchNoShortcuts": "لا يطابق أي اختصار هذا النص.",
     "notifications": "الإشعارات",
     "language": "اللغة",
     "breadcrumbAria": "مسار التنقل"

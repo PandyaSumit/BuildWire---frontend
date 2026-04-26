@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useGlobalSearch } from '@/components/layout/GlobalSearchContext';
 
@@ -13,28 +12,8 @@ function useIsApplePlatform() {
 
 export function GlobalSearchBar({ className }: GlobalSearchBarProps) {
   const { t } = useTranslation();
-  const { query, setQuery, inputRef, focusSearch } = useGlobalSearch();
+  const { query, setQuery, inputRef } = useGlobalSearch();
   const apple = useIsApplePlatform();
-
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (!(e.metaKey || e.ctrlKey) || e.key.toLowerCase() !== 'k') return;
-      const target = e.target as HTMLElement | null;
-      if (
-        target &&
-        (target.tagName === 'INPUT' ||
-          target.tagName === 'TEXTAREA' ||
-          target.tagName === 'SELECT' ||
-          target.isContentEditable)
-      ) {
-        return;
-      }
-      e.preventDefault();
-      focusSearch();
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [focusSearch]);
 
   return (
     <div className={['relative w-full max-w-lg min-w-[7.5rem]', className].filter(Boolean).join(' ')}>

@@ -51,10 +51,18 @@
   },
   "header": {
     "openMenu": "मेनू खोलें",
+    "closeMenu": "मेनू बंद करें",
     "allProjects": "सभी परियोजनाएँ",
     "search": "खोज",
+    "mobileSearchFind": "खोजें…",
+    "openGlobalSearch": "खोज खोलें",
+    "closeSearch": "खोज बंद करें",
+    "openWorkspaceMenu": "वर्कस्पेस मेनू खोलें",
+    "closeWorkspaceMenu": "वर्कस्पेस मेनू बंद करें",
     "globalSearchPlaceholder": "प्रोजेक्ट, टास्क, RFI, दैनिक रिपोर्ट, निरीक्षण, फ़ाइलें खोजें…",
     "globalSearchAria": "वैश्विक खोज",
+    "globalSearchPaletteHint": "किसी पृष्ठ पर जाएँ या शॉर्टकट फ़िल्टर करने के लिए टाइप करते रहें। समर्थित स्क्रीन पर सूचियाँ भी इसी खोज का उपयोग करती हैं।",
+    "globalSearchNoShortcuts": "इस टेक्स्ट से कोई शॉर्टकट मेल नहीं खाता।",
     "notifications": "सूचनाएँ",
     "language": "भाषा",
     "breadcrumbAria": "ब्रेडक्रंब"
