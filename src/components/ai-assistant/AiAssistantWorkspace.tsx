@@ -1,8 +1,8 @@
-import { useEffect, type ReactNode } from 'react';
-import { createPortal } from 'react-dom';
-import { useAiAssistant } from './AiAssistantContext';
-import { AiAssistantPanelChrome } from './AiAssistantPanelChrome';
-import { AiAssistantDefaultBody } from './AiAssistantDefaultBody';
+import { useEffect, type ReactNode } from "react";
+import { createPortal } from "react-dom";
+import { useAiAssistant } from "./AiAssistantContext";
+import { AiAssistantPanelChrome } from "./AiAssistantPanelChrome";
+import { AiAssistantDefaultBody } from "./AiAssistantDefaultBody";
 
 export function AiAssistantWorkspace({
   children,
@@ -26,12 +26,12 @@ export function AiAssistantWorkspace({
   const panelInner = panelBody ?? <AiAssistantDefaultBody />;
 
   useEffect(() => {
-    if (!open || effectivePresentation !== 'modal') return;
+    if (!open || effectivePresentation !== "modal") return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === "Escape") setOpen(false);
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [open, effectivePresentation, setOpen]);
 
   const dockedPanel = (
@@ -39,9 +39,11 @@ export function AiAssistantWorkspace({
       data-bw-ai-assistant-dock
       aria-hidden={!open}
       className={[
-        'flex shrink-0 flex-col overflow-hidden border-border transition-[width,opacity] duration-200 ease-out',
-        open ? 'border-s opacity-100' : 'w-0 min-w-0 border-transparent opacity-0',
-      ].join(' ')}
+        "flex shrink-0 flex-col overflow-hidden border-border transition-[width,opacity] duration-200 ease-out",
+        open
+          ? "border-s opacity-100"
+          : "w-0 min-w-0 border-transparent opacity-0",
+      ].join(" ")}
       style={
         open
           ? {
@@ -63,18 +65,19 @@ export function AiAssistantWorkspace({
     </aside>
   );
 
+  /** Match floating dock height (pt-1 + h-11 + safe pb) + thin gap so content clears the pill — avoid large empty band. */
   const main = (
-    <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-contain max-md:pb-[max(4.5rem,env(safe-area-inset-bottom))]">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-x-hidden overflow-y-auto overscroll-contain max-md:pb-[calc(0.25rem+2.75rem+max(0.5rem,env(safe-area-inset-bottom))+0.125rem)]">
       {children}
     </div>
   );
 
-  if (effectivePresentation === 'modal') {
+  if (effectivePresentation === "modal") {
     return (
       <>
         {main}
         {open &&
-          typeof document !== 'undefined' &&
+          typeof document !== "undefined" &&
           createPortal(
             <div
               data-bw-ai-assistant-modal-root
@@ -107,7 +110,7 @@ export function AiAssistantWorkspace({
     );
   }
 
-  const dockStart = effectivePresentation === 'dock_start';
+  const dockStart = effectivePresentation === "dock_start";
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-row">

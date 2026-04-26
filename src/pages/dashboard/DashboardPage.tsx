@@ -31,7 +31,7 @@ export default function DashboardPage() {
   const { t } = useTranslation();
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6 px-6 pt-6 pb-6 max-md:pb-3">
       <div className="flex h-16 shrink-0 flex-col justify-center">
         <h1 className="text-lg font-semibold leading-tight text-primary">{t('nav.dashboard')}</h1>
         <p className="mt-0.5 line-clamp-1 max-w-2xl text-sm leading-snug text-secondary">{t('dashboard.subtitle')}</p>
