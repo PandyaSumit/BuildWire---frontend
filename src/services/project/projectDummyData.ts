@@ -638,7 +638,7 @@ export const DEMO_PLAN_PINS: Record<string, DemoPlanPin[]> = {
         { id: 'p1', label: 'T-038', x: 380, y: 410, status: 'blocked' },
     ],
     s201: [
-        { id: 'p1', label: 'T-020', x: 520, y: 380, status: 'completed' },
+        { id: 'p1', label: 'T-020', x: 520, y: 380, status: 'done' },
     ],
     m301: [],
     p101: [
@@ -716,24 +716,60 @@ export type DailyReportManpowerLine = {
 export type DailyReportEquipmentLine = {
     asset: string;
     hours: number;
+    notes?: string;
 };
 
 export type DailyReportDeliveryLine = {
     description: string;
     supplier?: string;
+    quantity?: string;
+};
+
+export type DailyReportVisitorLine = {
+    name: string;
+    company: string;
+    purpose?: string;
+};
+
+export type DailyReportWeatherDetail = {
+    condition: string;  // 'Sunny' | 'Cloudy' | 'Rainy' | 'Stormy' | 'Windy'
+    tempC: number;
+    humidity?: number;  // percent
+    windKph?: number;
+    notes?: string;
+};
+
+export type DailyReportSafetyEntry = {
+    type: 'near_miss' | 'incident' | 'observation' | 'toolbox_talk';
+    description: string;
+    corrective?: string;
+};
+
+export type DailyReportWorkActivity = {
+    area: string;       // e.g. "Level 3 – Grid C"
+    trade: string;
+    description: string;
+    percentComplete?: number;
 };
 
 export type DailyReportRow = {
     date: string;
     submittedBy: string;
-    weather: string;
+    weather: string;                        // legacy short string kept for list display
+    weatherDetail?: DailyReportWeatherDetail;
     status: DailyReportStatus;
     narrative: string;
+    workActivities?: DailyReportWorkActivity[];
+    safetyEntries?: DailyReportSafetyEntry[];
+    visitors?: DailyReportVisitorLine[];
     photoLabels?: string[];
     linkedRfis?: string[];
     manpower: DailyReportManpowerLine[];
     equipment: DailyReportEquipmentLine[];
     deliveries: DailyReportDeliveryLine[];
+    subcontractorConfirmed?: boolean;
+    approvedBy?: string;
+    approvedAt?: string;
 };
 
 export function totalDailyReportCrew(row: DailyReportRow): number {
@@ -857,91 +893,151 @@ export function buildDailyReportDayDotsForMonth(input: {
 
 export const DUMMY_DAILY_REPORTS: DailyReportRow[] = [
     {
-        date: '2026-03-20',
+        date: '2026-04-24',
         submittedBy: 'Raj Kumar',
-        weather: 'Sunny · 33°C',
+        weather: 'Sunny · 34°C',
+        weatherDetail: { condition: 'Sunny', tempC: 34, humidity: 42, windKph: 12 },
         status: 'Pending',
-        narrative: 'Slab pour completed Zone C; curing blankets installed.',
-        photoLabels: ['pour-west-edge.jpg'],
+        narrative: 'Slab pour completed Zone C; curing blankets installed by 17:00. Crane idle 2h due to wind check.',
+        photoLabels: ['pour-west-edge.jpg', 'curing-blankets-c.jpg'],
         linkedRfis: ['RFI-003'],
+        workActivities: [
+            { area: 'Level 5 – Zone C', trade: 'Structural', description: 'Slab pour — 180m³ concrete placed', percentComplete: 100 },
+            { area: 'Level 4 – MEP shaft', trade: 'MEP', description: 'Conduit routing continued', percentComplete: 65 },
+        ],
+        safetyEntries: [
+            { type: 'toolbox_talk', description: 'Crane safety & wind speed protocol reviewed with all operatives.' },
+        ],
+        visitors: [
+            { name: 'Anjali Mehta', company: 'Structural Consultant', purpose: 'Pour inspection' },
+        ],
         manpower: [
             { company: 'Peak Concrete', trade: 'Structural', workers: 32, hours: 10, costCode: '03-3000' },
             { company: 'Spark MEP', trade: 'MEP', workers: 16, hours: 8, costCode: '23-0000' },
         ],
-        equipment: [{ asset: 'Concrete pump 38m', hours: 6 }],
-        deliveries: [{ description: 'Rebar bundle — Grid C', supplier: 'SteelCo' }],
+        equipment: [{ asset: 'Concrete pump 38m', hours: 6, notes: 'Stood down 10:00–12:00 wind check' }],
+        deliveries: [{ description: 'Rebar bundle — Grid C', supplier: 'SteelCo', quantity: '4.2 T' }],
+        subcontractorConfirmed: false,
     },
     {
-        date: '2026-03-19',
+        date: '2026-04-23',
         submittedBy: 'Priya Shah',
         weather: 'Partly cloudy · 31°C',
+        weatherDetail: { condition: 'Cloudy', tempC: 31, humidity: 55, windKph: 18 },
         status: 'Approved',
-        narrative: 'Façade panels set on north elevation; swing stage moved.',
+        narrative: 'Façade panels set on north elevation; swing stage relocated to east face.',
+        workActivities: [
+            { area: 'North Elevation – L6-L8', trade: 'Finishing', description: 'Cladding panel installation — 24 panels fixed', percentComplete: 78 },
+        ],
+        safetyEntries: [
+            { type: 'near_miss', description: 'Panel clamp released prematurely — no injury. Procedure reviewed.', corrective: 'Toolbox talk held; clamp checklist updated.' },
+        ],
         manpower: [
             { company: 'Vertex Cladding', trade: 'Finishing', workers: 28, hours: 9, costCode: '07-4200' },
             { company: 'Site GC', trade: 'GC', workers: 24, hours: 8, costCode: '01-7416' },
         ],
         equipment: [{ asset: 'Swing stage NW', hours: 9 }],
         deliveries: [],
+        subcontractorConfirmed: true,
+        approvedBy: 'Site Manager',
+        approvedAt: '2026-04-24T09:15:00',
     },
     {
-        date: '2026-03-18',
+        date: '2026-04-22',
         submittedBy: 'Raj Kumar',
         weather: 'Light rain · 28°C',
+        weatherDetail: { condition: 'Rainy', tempC: 28, humidity: 82, windKph: 22, notes: 'Stopped exterior work 14:00' },
         status: 'Approved',
-        narrative: 'Rain stopped exterior work at 14:00; MEP rough-in continued indoors.',
+        narrative: 'Rain stopped exterior work at 14:00; MEP rough-in continued indoors on L3 & L4.',
+        workActivities: [
+            { area: 'Level 3-4 – MEP', trade: 'MEP', description: 'Electrical conduit rough-in, fire suppression pipe supports', percentComplete: 55 },
+            { area: 'Level 2 – Drywall', trade: 'Drywall', description: 'Partition framing complete; boarding started', percentComplete: 40 },
+        ],
         manpower: [
             { company: 'Spark MEP', trade: 'MEP', workers: 22, hours: 8, costCode: '23-0000' },
             { company: 'DryFit Interiors', trade: 'Drywall', workers: 22, hours: 8, costCode: '09-2100' },
         ],
         equipment: [],
-        deliveries: [{ description: 'Cable tray fittings', supplier: 'ElecSupply' }],
+        deliveries: [{ description: 'Cable tray fittings — 50mm', supplier: 'ElecSupply', quantity: '200 units' }],
+        subcontractorConfirmed: true,
+        approvedBy: 'Project Engineer',
+        approvedAt: '2026-04-23T08:30:00',
     },
     {
-        date: '2026-03-17',
+        date: '2026-04-21',
         submittedBy: 'Amit Verma',
         weather: 'Sunny · 32°C',
+        weatherDetail: { condition: 'Sunny', tempC: 32, humidity: 38, windKph: 10 },
         status: 'Approved',
-        narrative: 'Tower crane picks for mechanical unit; traffic marshal on duty.',
+        narrative: 'Tower crane picks for AHU mechanical unit on roof; traffic marshal on duty all day.',
+        workActivities: [
+            { area: 'Roof – Plant room', trade: 'Rigging', description: 'AHU-1 & AHU-2 set in position', percentComplete: 100 },
+            { area: 'Site perimeter', trade: 'GC', description: 'Hoarding panel replacement — west side', percentComplete: 100 },
+        ],
+        safetyEntries: [
+            { type: 'observation', description: 'PPE compliance 100% during crane pick. Exclusion zone maintained.' },
+        ],
+        visitors: [
+            { name: 'Deepak Nair', company: 'MEP Consultant', purpose: 'AHU coordination' },
+            { name: 'Fire Inspector', company: 'Municipal Authority', purpose: 'Routine site audit' },
+        ],
         manpower: [
             { company: 'LiftRight Rigging', trade: 'Rigging', workers: 12, hours: 8 },
             { company: 'Site GC', trade: 'GC', workers: 27, hours: 10, costCode: '01-7416' },
         ],
-        equipment: [{ asset: 'Tower crane', hours: 8 }],
+        equipment: [{ asset: 'Tower crane TC-1', hours: 8 }],
         deliveries: [],
+        subcontractorConfirmed: true,
+        approvedBy: 'Site Manager',
+        approvedAt: '2026-04-22T10:00:00',
     },
     {
-        date: '2026-03-16',
+        date: '2026-04-20',
         submittedBy: 'Priya Shah',
         weather: 'Cloudy · 30°C',
+        weatherDetail: { condition: 'Cloudy', tempC: 30, humidity: 60, windKph: 14 },
         status: 'Rejected',
         narrative: 'Incomplete manpower breakdown — resubmit with cost codes.',
         manpower: [{ company: 'Various', trade: 'Mixed', workers: 41, hours: 8 }],
         equipment: [],
         deliveries: [],
+        subcontractorConfirmed: false,
     },
     {
-        date: '2026-03-15',
+        date: '2026-04-17',
         submittedBy: 'Raj Kumar',
         weather: 'Sunny · 34°C',
+        weatherDetail: { condition: 'Sunny', tempC: 34, humidity: 35, windKph: 8 },
         status: 'Approved',
-        narrative: 'Formwork strike L2 podium; debris cleared.',
+        narrative: 'Formwork strike L2 podium; debris cleared to waste skip. Waterproofing membrane applied to P2 slab.',
+        workActivities: [
+            { area: 'Level 2 – Podium', trade: 'Structural', description: 'Formwork struck, shores removed', percentComplete: 100 },
+            { area: 'Parking P2', trade: 'Waterproofing', description: 'Waterproof membrane — 800m²', percentComplete: 60 },
+        ],
         manpower: [
             { company: 'Peak Concrete', trade: 'Structural', workers: 26, hours: 9, costCode: '03-3000' },
             { company: 'Site GC', trade: 'GC', workers: 20, hours: 8, costCode: '01-7416' },
         ],
         equipment: [],
         deliveries: [],
+        subcontractorConfirmed: true,
+        approvedBy: 'Project Engineer',
+        approvedAt: '2026-04-18T09:45:00',
     },
     {
-        date: '2026-03-14',
+        date: '2026-04-16',
         submittedBy: 'Site Sup.',
         weather: 'Windy · 29°C',
+        weatherDetail: { condition: 'Windy', tempC: 29, humidity: 45, windKph: 38, notes: 'High-wind alert 09:00–11:30' },
         status: 'Draft',
-        narrative: 'Draft — toolbox talk notes pending.',
+        narrative: 'Draft — toolbox talk notes and safety incident report pending.',
+        safetyEntries: [
+            { type: 'incident', description: 'Minor hand laceration — worker treated on site. No LTI.', corrective: 'Additional glove station installed at L3 entry.' },
+        ],
         manpower: [{ company: 'Site GC', trade: 'GC', workers: 38, hours: 6 }],
         equipment: [],
         deliveries: [],
+        subcontractorConfirmed: false,
     },
 ];
 
