@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Button, Input } from "@/components/ui";
 import type { ConversationKind } from "@/types/chat";
 
@@ -34,25 +35,69 @@ export function CreateConversationDialog({
   onClose,
   onCreate,
 }: CreateConversationDialogProps) {
+  useEffect(() => {
+    if (!kind) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [kind, onClose]);
+
+  useEffect(() => {
+    if (!kind) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [kind]);
+
   if (!kind) return null;
 
   return (
-    <div className="fixed inset-0 z-[65] flex items-center justify-center bg-black/35 p-4">
-      <div className="w-full max-w-md rounded-[10px] border border-border bg-surface p-4 shadow-token-xl">
-        <h4 className="text-sm font-semibold text-primary">{titleByKind(kind)}</h4>
-        <p className="mt-1 text-xs text-secondary">{descriptionByKind(kind)}</p>
-        <div className="mt-3">
+    <div className="fixed inset-0 z-[65] flex items-center justify-center p-4">
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/60 backdrop-blur-[2px]"
+        aria-label="Close dialog"
+        onClick={onClose}
+      />
+      <div
+        role="dialog"
+        aria-modal="true"
+        className="relative z-10 flex w-full max-w-md flex-col rounded-2xl border border-border bg-elevated shadow-2xl shadow-black/60"
+      >
+        {/* Header */}
+        <div className="flex shrink-0 items-start justify-between border-b border-border/60 px-6 pb-4 pt-5">
+          <div>
+            <h2 className="text-lg font-semibold text-primary">{titleByKind(kind)}</h2>
+            <p className="mt-1 text-sm text-secondary">{descriptionByKind(kind)}</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-muted transition-colors hover:bg-surface hover:text-primary"
+            aria-label="Close"
+          >
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="px-6 py-4">
           <Input
             value={name}
             onChange={(event) => onNameChange(event.target.value)}
             placeholder={placeholderByKind(kind)}
+            autoFocus
           />
         </div>
-        <div className="mt-4 flex justify-end gap-2">
-          <Button type="button" variant="ghost" onClick={onClose}>
+
+        {/* Footer */}
+        <div className="flex shrink-0 items-center justify-end gap-3 border-t border-border/60 bg-elevated px-6 py-4">
+          <Button type="button" variant="secondary" size="sm" onClick={onClose}>
             Cancel
           </Button>
-          <Button type="button" onClick={onCreate}>
+          <Button type="button" variant="primary" size="sm" onClick={onCreate}>
             Create
           </Button>
         </div>

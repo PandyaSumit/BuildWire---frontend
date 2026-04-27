@@ -712,7 +712,7 @@
     "title": "Daily Reports",
     "description": "Field narrative, crew, weather, and photos — fast to submit.",
     "close": "Close",
-    "newReport": "+ New report",
+    "newReport": "New report",
     "modeCalendar": "Calendar",
     "modeList": "List",
     "bannerMissingTitle": "Missing report",

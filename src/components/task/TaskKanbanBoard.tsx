@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   closestCorners,
@@ -70,36 +70,6 @@ function statusDotColor(status: TaskStatus): string {
 
 const SECTION_COL_CLASS = 'flex w-full shrink-0 flex-col md:w-[272px] md:max-w-[272px] md:shrink-0';
 
-// ── Kanban toolbar ────────────────────────────────────────────────────────────
-function KanbanToolbar({ filtersOpen, onToggleFilters }: { filtersOpen: boolean; onToggleFilters: () => void }) {
-  const { t } = useTranslation();
-  return (
-    <div className="mb-4 flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-border/25 pb-3">
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-muted">{t('tasks.viewKanban')}</p>
-      <div className="flex items-center gap-1 text-[12px] text-secondary">
-        <button type="button" onClick={onToggleFilters} aria-expanded={filtersOpen}
-          className={`inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 hover:bg-muted/10 hover:text-primary ${filtersOpen ? 'bg-muted/10 text-primary' : ''}`}>
-          <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
-            <path d="M1.5 3.25a.75.75 0 0 1 .75-.75h11.5a.75.75 0 0 1 0 1.5H2.25a.75.75 0 0 1-.75-.75zM3 7.25a.75.75 0 0 1 .75-.75h8.5a.75.75 0 0 1 0 1.5h-8.5A.75.75 0 0 1 3 7.25zm2 4a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 5 11.25z" />
-          </svg>
-          {t('tasks.filter')}
-        </button>
-        <button type="button" className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 hover:bg-muted/10 hover:text-primary">
-          <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
-            <path d="M3.5 3.75a.75.75 0 0 0-1.5 0v8.5a.75.75 0 0 0 1.5 0v-8.5zm5.25 0a.75.75 0 0 0-1.5 0v8.5a.75.75 0 0 0 1.5 0V7.5l3.22 5.28a.75.75 0 0 0 1.28-.78V3.75a.75.75 0 0 0-1.5 0v4.75L8.75 3.22z" />
-          </svg>
-          {t('tasks.listToolbarSort')}
-        </button>
-        <button type="button" className="hidden h-8 items-center gap-1.5 rounded-lg px-2.5 hover:bg-muted/10 hover:text-primary md:inline-flex">
-          <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
-            <path d="M1 2.75A.75.75 0 0 1 1.75 2h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 1 2.75zm0 5A.75.75 0 0 1 1.75 7h4.5a.75.75 0 0 1 0 1.5h-4.5A.75.75 0 0 1 1 7.75zm0 5a.75.75 0 0 1 .75-.75h4.5a.75.75 0 0 1 0 1.5h-4.5a.75.75 0 0 1-.75-.75zM9.25 2a.75.75 0 0 0 0 1.5h5a.75.75 0 0 0 0-1.5h-5zm0 5a.75.75 0 0 0 0 1.5h5a.75.75 0 0 0 0-1.5h-5zm0 5a.75.75 0 0 0 0 1.5h5a.75.75 0 0 0 0-1.5h-5z" />
-          </svg>
-          {t('tasks.listToolbarGroup')}
-        </button>
-      </div>
-    </div>
-  );
-}
 
 // ── Compact Kanban card — Procore/Fieldwire style ─────────────────────────────
 const CompactCard = memo(function CompactCard({
@@ -248,7 +218,25 @@ function KanbanSectionColumn({
   const { t } = useTranslation();
   const [renaming, setRenaming] = useState(false);
   const [renameDraft, setRenameDraft] = useState(title);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
   const { setNodeRef, isOver } = useDroppable({ id: sectionDropId(section.id) });
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    function onDown(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+    }
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') setMenuOpen(false);
+    }
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [menuOpen]);
 
   useEffect(() => { setRenameDraft(title); }, [title]);
 
@@ -308,32 +296,39 @@ function KanbanSectionColumn({
               <path d="M8 3a.75.75 0 0 1 .75.75v3.5h3.5a.75.75 0 0 1 0 1.5h-3.5v3.5a.75.75 0 0 1-1.5 0v-3.5h-3.5a.75.75 0 0 1 0-1.5h3.5v-3.5A.75.75 0 0 1 8 3z" />
             </svg>
           </button>
-          <details className="relative">
-            <summary className="list-none flex h-7 w-7 cursor-pointer items-center justify-center rounded text-muted hover:bg-muted/15 hover:text-primary [&::-webkit-details-marker]:hidden">
+          <div ref={menuRef} className="relative">
+            <button
+              type="button"
+              onClick={() => setMenuOpen((v) => !v)}
+              aria-expanded={menuOpen}
+              className="flex h-7 w-7 items-center justify-center rounded text-muted hover:bg-muted/15 hover:text-primary"
+            >
               <svg className="h-4 w-4" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
                 <path d="M8 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zM1.5 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm13 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z" />
               </svg>
-            </summary>
-            <div className="absolute end-0 top-full z-20 mt-1 min-w-[10rem] rounded-xl border border-border/50 bg-elevated py-1 text-[12px] shadow-lg">
-              <button type="button" className="block w-full px-3 py-2 text-start hover:bg-muted/10"
-                onClick={() => { setRenameDraft(title); setRenaming(true); }}>
-                {t('tasks.kanbanRenameSection')}
-              </button>
-              <button type="button" disabled={sectionIndex <= 0} className="block w-full px-3 py-2 text-start hover:bg-muted/10 disabled:opacity-40"
-                onClick={() => onMoveLeft(sectionIndex)}>
-                {t('tasks.kanbanMoveSectionLeft')}
-              </button>
-              <button type="button" disabled={sectionIndex >= totalSections - 1} className="block w-full px-3 py-2 text-start hover:bg-muted/10 disabled:opacity-40"
-                onClick={() => onMoveRight(sectionIndex)}>
-                {t('tasks.kanbanMoveSectionRight')}
-              </button>
-              <div className="my-1 border-t border-border/30" />
-              <button type="button" disabled={totalSections <= 1} className="block w-full px-3 py-2 text-start text-danger hover:bg-danger/10 disabled:opacity-40"
-                onClick={() => onDelete(section.id)}>
-                {t('tasks.kanbanDeleteSection')}
-              </button>
-            </div>
-          </details>
+            </button>
+            {menuOpen && (
+              <div className="absolute end-0 top-full z-20 mt-1 min-w-[10rem] rounded-xl border border-border/50 bg-elevated py-1 text-[12px] shadow-lg">
+                <button type="button" className="block w-full px-3 py-2 text-start hover:bg-muted/10"
+                  onClick={() => { setRenameDraft(title); setRenaming(true); setMenuOpen(false); }}>
+                  {t('tasks.kanbanRenameSection')}
+                </button>
+                <button type="button" disabled={sectionIndex <= 0} className="block w-full px-3 py-2 text-start hover:bg-muted/10 disabled:opacity-40"
+                  onClick={() => { onMoveLeft(sectionIndex); setMenuOpen(false); }}>
+                  {t('tasks.kanbanMoveSectionLeft')}
+                </button>
+                <button type="button" disabled={sectionIndex >= totalSections - 1} className="block w-full px-3 py-2 text-start hover:bg-muted/10 disabled:opacity-40"
+                  onClick={() => { onMoveRight(sectionIndex); setMenuOpen(false); }}>
+                  {t('tasks.kanbanMoveSectionRight')}
+                </button>
+                <div className="my-1 border-t border-border/30" />
+                <button type="button" disabled={totalSections <= 1} className="block w-full px-3 py-2 text-start text-danger hover:bg-danger/10 disabled:opacity-40"
+                  onClick={() => { onDelete(section.id); setMenuOpen(false); }}>
+                  {t('tasks.kanbanDeleteSection')}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -377,11 +372,17 @@ function AddSectionColumn({ onAdd }: { onAdd: () => void }) {
   const { t } = useTranslation();
   return (
     <div className="flex w-full shrink-0 flex-col md:w-[200px] md:shrink-0">
+      {/* Mobile: compact inline row */}
       <button type="button" onClick={onAdd}
-        className="flex min-h-[8rem] flex-1 flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border/35 bg-muted/[0.02] px-4 py-6 text-center text-[12px] font-medium text-muted transition hover:border-brand/40 hover:bg-brand/[0.04] hover:text-secondary md:min-h-[5rem]">
-        <svg className="h-5 w-5 opacity-60" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+        className="flex items-center gap-1.5 rounded-lg px-2 py-2 text-[12px] font-medium text-muted transition hover:text-secondary md:hidden">
+        <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
           <path d="M8 3a.75.75 0 0 1 .75.75v3.5h3.5a.75.75 0 0 1 0 1.5h-3.5v3.5a.75.75 0 0 1-1.5 0v-3.5h-3.5a.75.75 0 0 1 0-1.5h3.5v-3.5A.75.75 0 0 1 8 3z" />
         </svg>
+        {t('tasks.listAddSection')}
+      </button>
+      {/* Desktop: compact header-height button */}
+      <button type="button" onClick={onAdd}
+        className="hidden h-[50px] w-full items-center justify-center rounded-t-xl border border-dashed border-border/30 bg-elevated px-3 text-[13px] font-medium text-muted transition hover:border-brand/40 hover:bg-brand/[0.04] hover:text-secondary md:flex">
         {t('tasks.listAddSection')}
       </button>
     </div>
@@ -392,13 +393,9 @@ function AddSectionColumn({ onAdd }: { onAdd: () => void }) {
 export function TaskKanbanBoard({
   onOpenTask,
   onRequestCreate,
-  filtersOpen = false,
-  onToggleFilters,
 }: {
   onOpenTask: (t: BuildWireTask) => void;
   onRequestCreate: (sectionId?: string) => void;
-  filtersOpen?: boolean;
-  onToggleFilters?: () => void;
 }) {
   const { t } = useTranslation();
   const projectUi   = useOptionalProjectUi();
@@ -468,9 +465,7 @@ export function TaskKanbanBoard({
   return (
     <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={onDragStart} onDragEnd={onDragEnd}>
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-        {onToggleFilters && (
-          <KanbanToolbar filtersOpen={filtersOpen} onToggleFilters={onToggleFilters} />
-        )}
+
         <div className="min-h-0 flex-1 overflow-x-auto overflow-y-auto pb-4 [-webkit-overflow-scrolling:touch] md:overflow-y-hidden">
           <div className="flex w-full flex-col gap-4 pb-1 md:inline-flex md:w-max md:max-w-none md:flex-row md:items-start md:gap-4">
             {kanbanSections.map((section, sectionIndex) => (

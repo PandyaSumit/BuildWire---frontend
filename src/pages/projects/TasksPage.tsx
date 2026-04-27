@@ -790,6 +790,20 @@ function ProjectTasksInner() {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [groupOpen, setGroupOpen] = useState(false);
   const [optionsOpen, setOptionsOpen] = useState(false);
+  const toolbarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!filtersOpen && !groupOpen && !optionsOpen) return;
+    function onDown(e: MouseEvent) {
+      if (toolbarRef.current && !toolbarRef.current.contains(e.target as Node)) {
+        setFiltersOpen(false);
+        setGroupOpen(false);
+        setOptionsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', onDown);
+    return () => document.removeEventListener('mousedown', onDown);
+  }, [filtersOpen, groupOpen, optionsOpen]);
   const [taskOptions, setTaskOptions] =
     useState<TaskOptionsState>(DEFAULT_TASK_OPTIONS);
   const [groupBy, setGroupBy] = useState<GroupByKey>("sections");
@@ -974,8 +988,8 @@ function ProjectTasksInner() {
 
   return (
     <div
-      className={`relative flex min-h-0 min-w-0 flex-1 flex-col px-6 pt-6 ${
-        selectedIds.size > 0 ? "pb-24" : "pb-6"
+      className={`relative flex min-h-0 min-w-0 flex-1 flex-col px-6 pt-6 max-sm:px-4 ${
+        selectedIds.size > 0 ? "pb-24" : "pb-6 max-sm:pb-20"
       }`}
     >
       <div className="shrink-0">
@@ -997,7 +1011,7 @@ function ProjectTasksInner() {
         </div>
 
         {/* Row 2: tabs (left) + toolbar buttons (right) */}
-        <div className="relative mt-2 flex min-w-0 items-center justify-between border-b border-border/55 max-sm:flex-wrap max-sm:gap-y-1">
+        <div ref={toolbarRef} className="relative mt-2 flex min-w-0 items-center justify-between border-b border-border/55 max-sm:flex-wrap max-sm:gap-y-1">
           <SegmentedControl<View>
             variant="underline"
             className="min-w-0 !border-b-0"
@@ -1012,7 +1026,7 @@ function ProjectTasksInner() {
           />
 
           {/* Toolbar buttons */}
-          <div className="mb-1 flex shrink-0 items-center gap-x-1 text-[12px] text-secondary">
+          <div className="mb-1 flex shrink-0 items-center gap-x-1 text-[12px] text-secondary max-sm:min-w-0 max-sm:shrink max-sm:overflow-x-auto max-sm:pb-0.5 max-sm:w-full">
             {searchExpanded ? (
               <div className="flex items-center gap-2 rounded-lg border border-border/50 bg-surface/40 px-2.5 py-1">
                 <svg
@@ -1157,12 +1171,12 @@ function ProjectTasksInner() {
 
           {/* Floating panels — anchored to this row */}
           {filtersOpen ? (
-            <div className="absolute right-0 top-full z-30 mt-1 w-[500px] max-w-[calc(100vw-1rem)]">
+            <div className="absolute right-0 top-full z-30 mt-1 w-[500px] max-w-[calc(100vw-1rem)] max-sm:inset-x-0 max-sm:w-auto max-sm:max-h-[70vh] max-sm:overflow-y-auto">
               <TaskFiltersBar />
             </div>
           ) : null}
           {groupOpen ? (
-            <div className="absolute right-0 top-full z-30 mt-1 w-[500px] max-w-[calc(100vw-1rem)]">
+            <div className="absolute right-0 top-full z-30 mt-1 w-[500px] max-w-[calc(100vw-1rem)] max-sm:inset-x-0 max-sm:w-auto max-sm:max-h-[70vh] max-sm:overflow-y-auto">
               <TaskGroupPanel
                 groupBy={groupBy}
                 sortOrder={groupSortOrder}
@@ -1173,7 +1187,7 @@ function ProjectTasksInner() {
             </div>
           ) : null}
           {optionsOpen ? (
-            <div className="absolute right-0 top-full z-30 mt-1 w-[380px] max-w-[calc(100vw-1rem)]">
+            <div className="absolute right-0 top-full z-30 mt-1 w-[380px] max-w-[calc(100vw-1rem)] max-sm:inset-x-0 max-sm:w-auto max-sm:max-h-[70vh] max-sm:overflow-y-auto">
               <TaskOptionsPanel
                 options={taskOptions}
                 onChange={(next) => {
@@ -1204,8 +1218,6 @@ function ProjectTasksInner() {
           <TaskKanbanBoard
             onOpenTask={openTask}
             onRequestCreate={openCreate}
-            filtersOpen={filtersOpen}
-            onToggleFilters={() => setFiltersOpen((v) => !v)}
           />
         </div>
       ) : null}
@@ -1281,14 +1293,6 @@ function ProjectTasksInner() {
 
       <TaskBulkToolbar onClearSelection={clearSelection} />
 
-      <button
-        type="button"
-        onClick={() => openCreate()}
-        className="fixed bottom-6 end-6 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-brand text-2xl font-bold text-white shadow-lg shadow-brand/20 dark:text-bg md:hidden"
-        aria-label={t("tasks.newTaskFab")}
-      >
-        +
-      </button>
     </div>
   );
 }

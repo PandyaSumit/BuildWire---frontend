@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { IconTrash } from '@/components/ui/icons';
 
@@ -17,10 +18,7 @@ export function DeleteProjectDialog({ open, projectName, onClose, onConfirm }: P
   const match = confirmText.trim() === projectName.trim();
 
   useEffect(() => {
-    if (!open) {
-      setConfirmText('');
-      setError(null);
-    }
+    if (!open) { setConfirmText(''); setError(null); }
   }, [open]);
 
   useEffect(() => {
@@ -39,7 +37,7 @@ export function DeleteProjectDialog({ open, projectName, onClose, onConfirm }: P
     return () => { document.body.style.overflow = prev; };
   }, [open]);
 
-  if (!open) return null;
+  if (!open || typeof document === 'undefined') return null;
 
   async function handleDelete() {
     if (!match) return;
@@ -56,7 +54,7 @@ export function DeleteProjectDialog({ open, projectName, onClose, onConfirm }: P
     }
   }
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <button
         type="button"
@@ -68,11 +66,11 @@ export function DeleteProjectDialog({ open, projectName, onClose, onConfirm }: P
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="delete-project-title"
-        className="relative z-10 flex w-full max-w-md flex-col rounded-2xl border border-zinc-700 bg-zinc-900 shadow-2xl shadow-black/60"
+        className="relative z-10 flex w-full max-w-md flex-col rounded-2xl border border-border bg-elevated shadow-2xl shadow-black/60"
         style={{ maxHeight: '90vh' }}
       >
         {/* Header */}
-        <div className="flex shrink-0 items-start justify-between px-6 pt-5 pb-4">
+        <div className="flex shrink-0 items-start justify-between border-b border-border/60 px-6 pb-4 pt-5">
           <div className="flex items-start gap-3">
             <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-danger/15">
               <svg className="h-5 w-5 text-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
@@ -80,55 +78,53 @@ export function DeleteProjectDialog({ open, projectName, onClose, onConfirm }: P
               </svg>
             </div>
             <div>
-              <h2 id="delete-project-title" className="text-xl font-semibold text-primary">
+              <h2 id="delete-project-title" className="text-lg font-semibold text-primary">
                 Delete project?
               </h2>
               <p className="mt-1 text-sm text-secondary">
-                This will remove <span className="font-medium text-primary">{projectName}</span> for your organization.
+                This will permanently remove <span className="font-medium text-primary">{projectName}</span> for your entire organization.
               </p>
             </div>
           </div>
           <button
             type="button"
             onClick={() => !submitting && onClose()}
-            className="rounded-lg p-1.5 text-muted hover:bg-white/5 hover:text-primary"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-muted transition-colors hover:bg-surface hover:text-primary"
             aria-label="Close"
           >
-            <svg className="h-5 w-5" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
-              <path d="M13.78 3.28a.75.75 0 0 0-1.06-1.06L8 6.94 3.28 2.22a.75.75 0 0 0-1.06 1.06L6.94 8l-4.72 4.72a.75.75 0 1 0 1.06 1.06L8 9.06l4.72 4.72a.75.75 0 1 0 1.06-1.06L9.06 8l4.72-4.72z" />
+            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         {/* Body */}
-        <div className="px-6 pb-2">
-          <p className="mb-2 text-sm text-secondary">Type the project name to confirm.</p>
+        <div className="px-6 py-4">
+          <label className="mb-1.5 block text-[12px] font-medium text-secondary">
+            Type <span className="font-semibold text-primary">{projectName}</span> to confirm
+          </label>
           <input
             type="text"
             value={confirmText}
             onChange={(e) => setConfirmText(e.target.value)}
             placeholder={projectName}
-            className="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-primary placeholder:text-muted focus:border-danger focus:outline-none focus:ring-1 focus:ring-danger"
+            className="w-full rounded-lg border border-border bg-bg px-3 py-2.5 text-sm text-primary placeholder:text-muted focus:border-danger/50 focus:outline-none focus:ring-2 focus:ring-danger/20"
             disabled={submitting}
             autoComplete="off"
+            autoFocus
           />
-          {error ? <p className="mt-1 text-xs text-danger">{error}</p> : null}
+          {error && <p className="mt-1.5 text-xs text-danger">{error}</p>}
         </div>
 
         {/* Footer */}
-        <div className="flex shrink-0 items-center justify-end gap-3 border-t border-zinc-700/60 px-6 py-4 mt-4">
-          <Button
-            type="button"
-            variant="secondary"
-            size="md"
-            onClick={() => !submitting && onClose()}
-          >
+        <div className="flex shrink-0 items-center justify-end gap-3 border-t border-border/60 bg-elevated px-6 py-4">
+          <Button type="button" variant="secondary" size="sm" onClick={() => !submitting && onClose()}>
             Cancel
           </Button>
           <Button
             type="button"
             variant="danger"
-            size="md"
+            size="sm"
             disabled={!match}
             loading={submitting}
             loadingText="Deleting…"
@@ -138,6 +134,7 @@ export function DeleteProjectDialog({ open, projectName, onClose, onConfirm }: P
           </Button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

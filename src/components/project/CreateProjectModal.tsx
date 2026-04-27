@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import type { ProjectStatus } from '@/types/project';
 import { projectStatusTKey } from '@/utils/project/display';
@@ -40,7 +41,7 @@ export function CreateProjectModal({ open, onClose, onSubmit }: Props) {
     return () => { document.body.style.overflow = prev; };
   }, [open]);
 
-  if (!open) return null;
+  if (!open || typeof document === 'undefined') return null;
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -53,11 +54,7 @@ export function CreateProjectModal({ open, onClose, onSubmit }: Props) {
     }
     setSubmitting(true);
     try {
-      await onSubmit({
-        name: trimmed,
-        description: description.trim(),
-        status,
-      });
+      await onSubmit({ name: trimmed, description: description.trim(), status });
       setName('');
       setDescription('');
       setStatus('planning');
@@ -70,7 +67,7 @@ export function CreateProjectModal({ open, onClose, onSubmit }: Props) {
     }
   }
 
-  return (
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <button
         type="button"
@@ -82,14 +79,14 @@ export function CreateProjectModal({ open, onClose, onSubmit }: Props) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="create-project-title"
-        className="relative z-10 flex w-full max-w-md flex-col rounded-2xl border border-zinc-700 bg-zinc-900 shadow-2xl shadow-black/60"
+        className="relative z-10 flex w-full max-w-md flex-col rounded-2xl border border-border bg-elevated shadow-2xl shadow-black/60"
         style={{ maxHeight: '90vh' }}
       >
         <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col">
           {/* Header */}
-          <div className="flex shrink-0 items-start justify-between px-6 pt-5 pb-4">
+          <div className="flex shrink-0 items-start justify-between border-b border-border/60 px-6 pb-4 pt-5">
             <div>
-              <h2 id="create-project-title" className="text-xl font-semibold text-primary">
+              <h2 id="create-project-title" className="text-lg font-semibold text-primary">
                 {t('projects.newProject')}
               </h2>
               <p className="mt-1 text-sm text-secondary">{t('createProject.intro')}</p>
@@ -97,35 +94,35 @@ export function CreateProjectModal({ open, onClose, onSubmit }: Props) {
             <button
               type="button"
               onClick={() => !submitting && onClose()}
-              className="rounded-lg p-1.5 text-muted hover:bg-white/5 hover:text-primary"
+              className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-muted transition-colors hover:bg-surface hover:text-primary"
               aria-label={t('common.close')}
             >
-              <svg className="h-5 w-5" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
-                <path d="M13.78 3.28a.75.75 0 0 0-1.06-1.06L8 6.94 3.28 2.22a.75.75 0 0 0-1.06 1.06L6.94 8l-4.72 4.72a.75.75 0 1 0 1.06 1.06L8 9.06l4.72 4.72a.75.75 0 1 0 1.06-1.06L9.06 8l4.72-4.72z" />
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.75} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
           {/* Body */}
-          <div className="flex-1 overflow-y-auto px-6 pb-2">
-            <div className="space-y-4 py-2">
+          <div className="flex-1 overflow-y-auto px-6 py-4">
+            <div className="space-y-4">
               <div>
-                <label htmlFor="project-name" className="mb-1 block text-sm font-medium text-primary">
+                <label htmlFor="project-name" className="mb-1.5 block text-[12px] font-medium text-primary">
                   {t('createProject.name')} <span className="text-danger">*</span>
                 </label>
                 <input
                   id="project-name"
                   value={name}
                   onChange={(e) => { setName(e.target.value); setNameError(null); }}
-                  className={`w-full rounded-lg border bg-bg px-3 py-2 text-sm text-primary placeholder:text-muted focus:outline-none focus:ring-1 ${nameError ? 'border-danger focus:border-danger focus:ring-danger' : 'border-border focus:border-brand focus:ring-brand'}`}
+                  className={`w-full rounded-lg border bg-bg px-3 py-2.5 text-sm text-primary placeholder:text-muted focus:outline-none focus:ring-2 ${nameError ? 'border-danger focus:border-danger focus:ring-danger/25' : 'border-border focus:border-brand/40 focus:ring-brand/20'}`}
                   placeholder={t('createProject.namePlaceholder')}
                   autoFocus
                   disabled={submitting}
                 />
-                {nameError ? <p className="mt-1 text-xs text-danger">{nameError}</p> : null}
+                {nameError && <p className="mt-1 text-xs text-danger">{nameError}</p>}
               </div>
               <div>
-                <label htmlFor="project-desc" className="mb-1 block text-sm font-medium text-primary">
+                <label htmlFor="project-desc" className="mb-1.5 block text-[12px] font-medium text-primary">
                   {t('createProject.description')}
                 </label>
                 <textarea
@@ -133,51 +130,36 @@ export function CreateProjectModal({ open, onClose, onSubmit }: Props) {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={3}
-                  className="w-full resize-none rounded-lg border border-border bg-bg px-3 py-2 text-sm text-primary placeholder:text-muted focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand"
+                  className="w-full resize-none rounded-lg border border-border bg-bg px-3 py-2.5 text-sm text-primary placeholder:text-muted focus:border-brand/40 focus:outline-none focus:ring-2 focus:ring-brand/20"
                   placeholder={t('createProject.descPlaceholder')}
                   disabled={submitting}
                 />
               </div>
-              <div>
-                <Select
-                  id="project-status"
-                  label={t('createProject.status')}
-                  value={status}
-                  onValueChange={(v) => setStatus(v as ProjectStatus)}
-                  disabled={submitting}
-                  options={statuses.map((s) => ({
-                    value: s,
-                    label: t(projectStatusTKey(s)),
-                  }))}
-                  placeholder={t('createProject.statusPlaceholder')}
-                />
-              </div>
+              <Select
+                id="project-status"
+                label={t('createProject.status')}
+                value={status}
+                onValueChange={(v) => setStatus(v as ProjectStatus)}
+                disabled={submitting}
+                options={statuses.map((s) => ({ value: s, label: t(projectStatusTKey(s)) }))}
+                placeholder={t('createProject.statusPlaceholder')}
+              />
             </div>
-            {submitError ? <p className="pb-2 text-sm text-danger">{submitError}</p> : null}
+            {submitError && <p className="mt-3 text-sm text-danger">{submitError}</p>}
           </div>
 
           {/* Footer */}
-          <div className="flex shrink-0 items-center justify-end gap-3 border-t border-zinc-700/60 px-6 py-4">
-            <Button
-              type="button"
-              variant="secondary"
-              size="md"
-              onClick={() => !submitting && onClose()}
-            >
+          <div className="flex shrink-0 items-center justify-end gap-3 border-t border-border/60 bg-elevated px-6 py-4">
+            <Button type="button" variant="secondary" size="sm" onClick={() => !submitting && onClose()}>
               {t('common.cancel')}
             </Button>
-            <Button
-              type="submit"
-              variant="primary"
-              size="md"
-              loading={submitting}
-              loadingText={t('createProject.creating')}
-            >
+            <Button type="submit" variant="primary" size="sm" loading={submitting} loadingText={t('createProject.creating')}>
               <IconPlus className="mr-1.5" />{t('createProject.submit')}
             </Button>
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
