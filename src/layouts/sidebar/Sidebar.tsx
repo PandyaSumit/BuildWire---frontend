@@ -11,6 +11,7 @@ import { useSidebarLayout } from "./SidebarLayoutContext";
 import { BuildWireMark } from "@/components/brand/BuildWireMark";
 import { BuildWireLogo } from "@/components/brand/BuildWireLogo";
 import { useWorkspaceSwitcher } from "@/components/workspace-switcher";
+import { OrganizationSwitcher } from "@/components/organization-switcher";
 
 function isNavActive(pathname: string, item: NavItemDef): boolean {
   if (item.endMatch) return pathname === item.to;
@@ -149,6 +150,11 @@ export function Sidebar() {
           )}
         </div>
 
+        <OrganizationSwitcher
+          collapsed={effectiveCollapsed}
+          mobileDrawerOpen={mobileOpen}
+        />
+
         <nav
           className={`scrollbar-none flex-1 overflow-y-auto overflow-x-hidden ${
             effectiveCollapsed ? "px-1.5 py-2" : "px-2 py-3"
@@ -256,9 +262,9 @@ export function Sidebar() {
                   <p className="truncate text-[12.5px] font-semibold leading-tight text-primary">
                     {displayName}
                   </p>
-                  {(user?.org?.name || user?.email) && (
+                  {user?.email && (
                     <p className="mt-px truncate text-[11px] leading-tight text-muted">
-                      {user?.org?.name ?? user?.email}
+                      {user.email}
                     </p>
                   )}
                 </div>

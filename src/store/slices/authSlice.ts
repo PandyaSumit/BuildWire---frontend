@@ -29,6 +29,8 @@ export interface AuthUser {
   onboardingStep: number;
   onboardingComplete: boolean;
   org?: AuthOrg;
+  /** Additional org memberships when `/auth/me` returns multiple (optional until API ships). */
+  organizations?: AuthOrg[];
 }
 
 const extractError = (err: unknown, fallback: string): string => {

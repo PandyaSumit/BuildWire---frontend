@@ -793,6 +793,54 @@
     "copied": "Copiado",
     "docs": "Documentación"
   },
+  "orgSwitcher": {
+    "noOrganization": "Aún no hay organización en esta cuenta. Completa el registro o acepta una invitación.",
+    "noOrganizationCta": "Continuar configuración",
+    "switchOrganizationAria": "Organización actual: {{name}}. Abre el menú para cambiar.",
+    "listLabel": "Organizaciones a las que perteneces",
+    "sectionOrganizations": "Organizaciones",
+    "addOrCreate": "Añadir o crear organización",
+    "addModalTitle": "Añadir o crear organización",
+    "addModalSubtitle": "Crea una nueva entidad empresarial o únete con un código de invitación.",
+    "tabCreate": "Crear nueva",
+    "tabJoin": "Unirse con código",
+    "continue": "Continuar",
+    "submitting": "Guardando…",
+    "thanksTitle": "Solicitud registrada",
+    "thanksBody": "Este paso es solo de interfaz por ahora.",
+    "thanksHint": "Cuando la API esté conectada, este flujo creará la organización o aceptará la invitación y la añadirá al selector.",
+    "thanksClose": "Listo",
+    "roleUnknown": "Miembro",
+    "role": {
+      "org_admin": "Administrador",
+      "org_member": "Miembro",
+      "project_manager": "Jefe de proyecto",
+      "supervisor": "Supervisor",
+      "worker": "Operario",
+      "guest": "Invitado"
+    },
+    "projectCount_one": "{{count}} proyecto",
+    "projectCount_other": "{{count}} proyectos",
+    "create": {
+      "nameLabel": "Nombre de la organización",
+      "namePlaceholder": "Strucon Engineers",
+      "typeLabel": "Tipo de organización",
+      "orgTypeContractor": "Contratista",
+      "orgTypeDeveloper": "Promotor",
+      "orgTypeConsultant": "Consultor",
+      "orgTypeOwner": "Propietario",
+      "countryLabel": "País",
+      "countryPlaceholder": "India",
+      "timezoneLabel": "Zona horaria",
+      "timezonePlaceholder": "Asia/Kolkata",
+      "hint": "GST, RERA, logotipo y facturación se añadirán en el flujo completo. Aún no se envía nada al servidor."
+    },
+    "join": {
+      "codeLabel": "Código de invitación",
+      "codePlaceholder": "Pega el código del correo",
+      "hint": "Los enlaces de invitación del correo abrirán aquí automáticamente cuando el backend esté conectado."
+    }
+  },
   "workspaceSwitcher": {
     "open": "Cambiar espacio",
     "title": "Cambiar espacio de trabajo",

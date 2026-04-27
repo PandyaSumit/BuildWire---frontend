@@ -770,6 +770,54 @@
     "copied": "कॉपी हो गया",
     "docs": "दस्तावेज़"
   },
+  "orgSwitcher": {
+    "noOrganization": "No organization on this account yet. Complete onboarding or accept an invite.",
+    "noOrganizationCta": "Continue setup",
+    "switchOrganizationAria": "Current organization: {{name}}. Open menu to switch.",
+    "listLabel": "Organizations you belong to",
+    "sectionOrganizations": "Organizations",
+    "addOrCreate": "Add or create organization",
+    "addModalTitle": "Add or create organization",
+    "addModalSubtitle": "Create a new business entity or join one with an invite code.",
+    "tabCreate": "Create new",
+    "tabJoin": "Join with code",
+    "continue": "Continue",
+    "submitting": "Saving…",
+    "thanksTitle": "Request recorded",
+    "thanksBody": "This step is front-end only for now.",
+    "thanksHint": "When the API is connected, this flow will create the organization or accept the invite and add it to your switcher.",
+    "thanksClose": "Done",
+    "roleUnknown": "Member",
+    "role": {
+      "org_admin": "Admin",
+      "org_member": "Member",
+      "project_manager": "Project manager",
+      "supervisor": "Supervisor",
+      "worker": "Worker",
+      "guest": "Guest"
+    },
+    "projectCount_one": "{{count}} project",
+    "projectCount_other": "{{count}} projects",
+    "create": {
+      "nameLabel": "Organization name",
+      "namePlaceholder": "Strucon Engineers",
+      "typeLabel": "Organization type",
+      "orgTypeContractor": "Contractor",
+      "orgTypeDeveloper": "Developer",
+      "orgTypeConsultant": "Consultant",
+      "orgTypeOwner": "Property owner",
+      "countryLabel": "Country",
+      "countryPlaceholder": "India",
+      "timezoneLabel": "Timezone",
+      "timezonePlaceholder": "Asia/Kolkata",
+      "hint": "GST, RERA, logo, and billing will be added in the full flow. Nothing is sent to the server yet."
+    },
+    "join": {
+      "codeLabel": "Invite code",
+      "codePlaceholder": "Paste the code from your email",
+      "hint": "Invite links from email will land here automatically when the backend is wired."
+    }
+  },
   "workspaceSwitcher": {
     "open": "वर्कस्पेस बदलें",
     "title": "वर्कस्पेस बदलें",

@@ -14,6 +14,7 @@ import {
   WorkspaceSwitcherProvider,
   useWorkspaceSwitcher,
 } from "@/components/workspace-switcher";
+import { OrganizationShellProvider } from "@/components/organization-switcher";
 
 function DashboardShell() {
   const { collapsed, mobileOpen, setMobileOpen } = useSidebarLayout();
@@ -114,15 +115,17 @@ export function DashboardLayout() {
     <div className="h-dvh max-h-dvh overflow-hidden bg-bg">
       <SidebarLayoutProvider>
         <GlobalSearchProvider>
-          <WorkspaceSwitcherProvider>
-            {projectId ? (
-              <ProjectUiProvider projectId={projectId}>
+          <OrganizationShellProvider>
+            <WorkspaceSwitcherProvider>
+              {projectId ? (
+                <ProjectUiProvider projectId={projectId}>
+                  <DashboardShell />
+                </ProjectUiProvider>
+              ) : (
                 <DashboardShell />
-              </ProjectUiProvider>
-            ) : (
-              <DashboardShell />
-            )}
-          </WorkspaceSwitcherProvider>
+              )}
+            </WorkspaceSwitcherProvider>
+          </OrganizationShellProvider>
         </GlobalSearchProvider>
       </SidebarLayoutProvider>
     </div>

@@ -150,7 +150,7 @@ function buildGroupedSections(
     groupMap.get(key)!.push(task);
   }
 
-  let keys = Array.from(groupMap.keys());
+  const keys = Array.from(groupMap.keys());
   if (sortOrder === "asc") {
     if (groupBy === "priority")
       keys.sort(

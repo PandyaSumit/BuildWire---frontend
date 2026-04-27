@@ -13,6 +13,7 @@ import { useOptionalProjectUi } from '@/hooks/project/useProjectUi';
 import { useAiAssistant } from '@/components/ai-assistant';
 import { WorkspaceSwitcherButton } from '@/components/workspace-switcher';
 import { useWorkspaceSwitcher } from '@/components/workspace-switcher';
+import { useOrganizationShell } from '@/components/organization-switcher';
 
 interface HeaderProps {
   title?: string;
@@ -33,6 +34,7 @@ export function Header({ title, subtitle, actions }: HeaderProps) {
   const projectUi = useOptionalProjectUi();
   const { mobileOpen, setMobileOpen } = useSidebarLayout();
   const { open: aiOpen, toggle: toggleAiAssistant } = useAiAssistant();
+  const { activeMembership } = useOrganizationShell();
 
   const shellBreadcrumbLabel = useMemo(() => {
     const key = orgShellBreadcrumbNavKey(pathname);
@@ -72,6 +74,17 @@ export function Header({ title, subtitle, actions }: HeaderProps) {
             aria-label="Breadcrumb"
             className="flex min-h-0 min-w-0 items-center gap-1 text-[11.5px] leading-none"
           >
+            {activeMembership ? (
+              <>
+                <span
+                  className="min-w-0 max-w-[min(42vw,14rem)] shrink truncate font-medium text-muted/90 md:max-w-[16rem]"
+                  title={activeMembership.name}
+                >
+                  {activeMembership.name}
+                </span>
+                <span className="shrink-0 text-muted/40">/</span>
+              </>
+            ) : null}
             <Link
               to="/projects"
               className="inline-flex h-8 max-w-[40%] shrink-0 items-center truncate rounded-md px-1.5 text-muted transition-colors hover:bg-primary/6 hover:text-primary"
@@ -105,6 +118,17 @@ export function Header({ title, subtitle, actions }: HeaderProps) {
           >
             <span className="shrink-0 font-semibold text-primary">BuildWire</span>
             <span className="shrink-0 text-muted/40">/</span>
+            {activeMembership ? (
+              <>
+                <span
+                  className="min-w-0 max-w-[min(46vw,15rem)] shrink truncate font-medium text-primary md:max-w-[18rem]"
+                  title={activeMembership.name}
+                >
+                  {activeMembership.name}
+                </span>
+                <span className="shrink-0 text-muted/40">/</span>
+              </>
+            ) : null}
             <span className="min-w-0 truncate text-muted">{shellBreadcrumbLabel}</span>
           </nav>
         )}
